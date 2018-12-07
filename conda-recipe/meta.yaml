@@ -1,0 +1,17 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: cadump
+  version: {{ data.get('version') }}
+
+build:
+  entry_points:
+    - cadump_server = cadump.cadump:main
+
+requirements:
+  build:
+    - python
+    - data_api
+  run:
+    - python
+    - data_api
