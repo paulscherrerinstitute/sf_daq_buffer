@@ -1,8 +1,10 @@
 from bottle import route, run, request, abort
 import json
-import logging
 
 import data_api
+
+import logging
+logger = logging.getLogger("logger");
 
 # This is how the notification look like
 # {
@@ -31,28 +33,26 @@ def put_document():
     try:
         download_data(json.loads(data))
     except Exception as e:
-        logging.warning("Download data failed", e)
+        logger.warning("Download data failed", e)
 
 
 def download_data(config):
 
-    logging.info("Dump data to hdf5 ...")
-    # logging.info(config)
+    logger.info("Dump data to hdf5 ...")
+    # logger.info(config)
 
     start_pulse = config["range"]["startPulseId"]
     end_pulse = config["range"]["endPulseId"]
 
     start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
 
-    print(start_date, end_date)
-
     # append _CA to the filename
     filename = config["parameters"]["output_file"]
     new_filename = filename[:-3]+"_CA"+filename[-3:]
 
-    logging.info("Retrieving data")
+    logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date))
     data = data_api.get_data(channel_list, start=start_date, end= end_date)
-    logging.info("Persist data to hdf5 file")
+    logger.info("Persist data to hdf5 file")
     data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
 
 
@@ -79,7 +79,7 @@ def main():
 
     global channel_list
     channel_list = read_channels(args.channel_list)
-    logging.info("Using channel list: " + " ".join(channel_list))
+    logger.info("Using channel list: " + " ".join(channel_list))
 
     run(host='localhost', port=10200)
 
