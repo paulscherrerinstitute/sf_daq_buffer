@@ -1,6 +1,9 @@
 package:
   name: cadump
-  version: 0.0.1
+  version: 0.0.2
+
+source:
+    path: ..
 
 build:
   entry_points:
