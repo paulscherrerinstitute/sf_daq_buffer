@@ -22,6 +22,7 @@ logger = logging.getLogger("logger");
 # }
 
 channel_list = ["S10-CPCL-VM1MGC:LOAD"]  # specified channel is only for test purposes
+base_url = ""
 
 
 @route('/notify', method='PUT')
@@ -51,7 +52,7 @@ def download_data(config):
     new_filename = filename[:-3]+"_CA"+filename[-3:]
 
     logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date))
-    data = data_api.get_data(channel_list, start=start_date, end= end_date)
+    data = data_api.get_data(channel_list, start=start_date, end= end_date, base_url=base_url)
     logger.info("Persist data to hdf5 file")
     data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
 
@@ -73,6 +74,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description='Channel Access archiver dump to hdf5')
     parser.add_argument('--channels', dest='channel_list', default="tests/channels.txt", help='channels to dump')
+    parser.add_argument('--url', dest='url', default=None, help='base url to retrieve data from')
 
     args = parser.parse_args()
     print(args.channel_list)
@@ -80,6 +82,10 @@ def main():
     global channel_list
     channel_list = read_channels(args.channel_list)
     logger.info("Using channel list: " + " ".join(channel_list))
+
+    global base_url
+    base_url = args.url
+    logger.info("Using base url: " + str(base_url))
 
     run(host='localhost', port=10200)
 
