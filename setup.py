@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="cadump",
-    version="0.0.5",
+    version="0.0.6",
     author="Paul Scherrer Institute",
     author_email="daq@psi.ch",
     description="Interface to dump data from archiver/databuffer",

@@ -92,6 +92,8 @@ def get_pulse_id_date_mapping(pulse_ids):
                      "fields": ["pulseId", "globalDate"]}
 
             for c in range(1):
+
+                logger.info("Retrieve mapping for pulse_id %d" % pulse_id)
                 # Query server
                 response = requests.post("https://data-api.psi.ch/sf/query", json=query)
 
@@ -102,6 +104,7 @@ def get_pulse_id_date_mapping(pulse_ids):
                 data = response.json()
 
                 if not pulse_id == data[0]["data"][0]["pulseId"]:
+                    logger.info("retrieval failed")
                     if c == 0:
                         ref_date = data[0]["data"][0]["globalDate"]
                         ref_date = dateutil.parser.parse(ref_date)
@@ -109,7 +112,7 @@ def get_pulse_id_date_mapping(pulse_ids):
                         now_date = datetime.datetime.now()
                         now_date = pytz.timezone('Europe/Zurich').localize(now_date)
 
-                        check_date = ref_date+datetime.timedelta(seconds=20)
+                        check_date = ref_date+datetime.timedelta(seconds=24)  # 20 seconds should be enough
                         delta_date = check_date - now_date
 
                         s = delta_date.seconds
