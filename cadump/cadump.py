@@ -75,6 +75,9 @@ def read_channels(filename):
 
 
 def get_pulse_id_date_mapping(pulse_ids):
+
+    # See https://jira.psi.ch/browse/ATEST-897 for more details ...
+    
     try:
         dates = []
         for pulse_id in pulse_ids:
