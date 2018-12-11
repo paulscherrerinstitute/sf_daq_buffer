@@ -8,8 +8,8 @@ class TestDownloadData(TestCase):
     def test_download_data(self):
         config = {
             'range': {
-                'startPulseId': 7281433214,
-                'endPulseId': 7281489688
+                'startPulseId': 7314794868,
+                'endPulseId': 7314798868
             },
 
             'parameters': {
@@ -20,6 +20,7 @@ class TestDownloadData(TestCase):
                 'output_file': 'test.h5'}    # this is usually the full path
         }
 
+        cadump.base_url = "https://data-api.psi.ch/sf"
         cadump.download_data(config)
         # self.fail()
 

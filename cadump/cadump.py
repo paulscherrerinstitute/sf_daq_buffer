@@ -2,9 +2,12 @@ from bottle import route, run, request, abort
 import json
 
 import data_api
+import requests
+import dateutil.parser
+import pytz
 
 import logging
-logger = logging.getLogger("logger");
+logger = logging.getLogger("logger")
 
 # This is how the notification look like
 # {
@@ -34,7 +37,7 @@ def put_document():
     try:
         download_data(json.loads(data))
     except Exception as e:
-        logger.warning("Download data failed", e)
+        logger.exception("Download data failed")
 
 
 def download_data(config):
@@ -45,14 +48,15 @@ def download_data(config):
     start_pulse = config["range"]["startPulseId"]
     end_pulse = config["range"]["endPulseId"]
 
-    start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
+    # start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
+    start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
 
     # append _CA to the filename
     filename = config["parameters"]["output_file"]
     new_filename = filename[:-3]+"_CA"+filename[-3:]
 
     logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date))
-    data = data_api.get_data(channel_list, start=start_date, end= end_date, base_url=base_url)
+    data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
     logger.info("Persist data to hdf5 file")
     data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
 
@@ -64,10 +68,42 @@ def read_channels(filename):
     channels = []
     for line in lines:
         line = line.strip()
-        if line: # if not empty line
+        if line:  # if not empty line
             channels.append(line) # remove all leading and trailing spaces
 
     return channels
+
+
+def get_pulse_id_date_mapping(pulse_ids):
+    try:
+        dates = []
+        for pulse_id in pulse_ids:
+
+            query = {"range": {"startPulseId": pulse_id,"endPulseId": 9223372036854775807},
+                     "limit": 1,
+                     "ordering": "asc",
+                     "channels": ["SIN-CVME-TIFGUN-EVR0:BEAMOK"],
+                     "fields": ["pulseId", "globalDate"]}
+
+            # Query server
+            response = requests.post("https://data-api.psi.ch/sf/query", json=query)
+
+            # Check for successful return of data
+            if response.status_code != 200:
+                raise RuntimeError("Unable to retrieve data from server: ", response)
+
+            data = response.json()
+
+            if not pulse_id == data[0]["data"][0]["pulseId"]:
+                raise RuntimeError('Unable to retrieve mapping')
+
+            date = data[0]["data"][0]["globalDate"]
+            date = dateutil.parser.parse(date)
+            dates.append(date)
+
+        return dates
+    except Exception:
+        raise RuntimeError('Unable to retrieve mapping')
 
 
 def main():
