@@ -5,6 +5,8 @@ import data_api
 import requests
 import dateutil.parser
 import pytz
+import datetime
+import time
 
 import logging
 logger = logging.getLogger("logger")
@@ -48,6 +50,7 @@ def download_data(config):
     start_pulse = config["range"]["startPulseId"]
     end_pulse = config["range"]["endPulseId"]
 
+    logger.info("Retrieve pulse-id / data mapping for pulse ids")
     # start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
     start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
 
@@ -77,32 +80,49 @@ def read_channels(filename):
 def get_pulse_id_date_mapping(pulse_ids):
 
     # See https://jira.psi.ch/browse/ATEST-897 for more details ...
-    
+
     try:
         dates = []
         for pulse_id in pulse_ids:
 
-            query = {"range": {"startPulseId": pulse_id,"endPulseId": 9223372036854775807},
+            query = {"range": {"startPulseId": 0,"endPulseId": pulse_id},
                      "limit": 1,
-                     "ordering": "asc",
+                     "ordering": "desc",
                      "channels": ["SIN-CVME-TIFGUN-EVR0:BEAMOK"],
                      "fields": ["pulseId", "globalDate"]}
 
-            # Query server
-            response = requests.post("https://data-api.psi.ch/sf/query", json=query)
+            for c in range(1):
+                # Query server
+                response = requests.post("https://data-api.psi.ch/sf/query", json=query)
 
-            # Check for successful return of data
-            if response.status_code != 200:
-                raise RuntimeError("Unable to retrieve data from server: ", response)
+                # Check for successful return of data
+                if response.status_code != 200:
+                    raise RuntimeError("Unable to retrieve data from server: ", response)
 
-            data = response.json()
+                data = response.json()
 
-            if not pulse_id == data[0]["data"][0]["pulseId"]:
-                raise RuntimeError('Unable to retrieve mapping')
+                if not pulse_id == data[0]["data"][0]["pulseId"]:
+                    if c == 0:
+                        ref_date = data[0]["data"][0]["globalDate"]
+                        ref_date = dateutil.parser.parse(ref_date)
 
-            date = data[0]["data"][0]["globalDate"]
-            date = dateutil.parser.parse(date)
-            dates.append(date)
+                        now_date = datetime.datetime.now()
+                        now_date = pytz.timezone('Europe/Zurich').localize(now_date)
+
+                        check_date = ref_date+datetime.timedelta(seconds=20)
+                        delta_date = check_date - now_date
+
+                        s = delta_date.seconds
+                        logger.info("retry in " + str(s) + " seconds ")
+                        if not s <= 0:
+                            time.sleep(s)
+                        continue
+
+                    raise RuntimeError('Unable to retrieve mapping')
+
+                date = data[0]["data"][0]["globalDate"]
+                date = dateutil.parser.parse(date)
+                dates.append(date)
 
         return dates
     except Exception:

@@ -9,7 +9,7 @@ class TestDownloadData(TestCase):
         config = {
             'range': {
                 'startPulseId': 7314794868,
-                'endPulseId': 7314798868
+                'endPulseId': 7414798868
             },
 
             'parameters': {
