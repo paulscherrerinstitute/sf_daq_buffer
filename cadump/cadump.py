@@ -91,7 +91,7 @@ def get_pulse_id_date_mapping(pulse_ids):
                      "channels": ["SIN-CVME-TIFGUN-EVR0:BEAMOK"],
                      "fields": ["pulseId", "globalDate"]}
 
-            for c in range(1):
+            for c in range(10):
 
                 logger.info("Retrieve mapping for pulse_id %d" % pulse_id)
                 # Query server
@@ -126,6 +126,7 @@ def get_pulse_id_date_mapping(pulse_ids):
                 date = data[0]["data"][0]["globalDate"]
                 date = dateutil.parser.parse(date)
                 dates.append(date)
+                break
 
         return dates
     except Exception:
