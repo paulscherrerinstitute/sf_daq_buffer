@@ -2,6 +2,7 @@ from bottle import route, run, request, abort
 import json
 
 import data_api
+import data_api.client
 import requests
 import dateutil.parser
 import pytz
@@ -59,9 +60,16 @@ def download_data(config):
     new_filename = filename[:-3]+"_CA"+filename[-3:]
 
     logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date))
-    data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
-    logger.info("Persist data to hdf5 file")
-    data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
+    # data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
+    data = get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
+
+    if len(data) < 1:
+        logger.error("No data retrieved")
+        open(new_filename+"_NO_DATA", 'a').close()
+
+    else:
+        logger.info("Persist data to hdf5 file")
+        data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
 
 
 def read_channels(filename):
@@ -72,9 +80,25 @@ def read_channels(filename):
     for line in lines:
         line = line.strip()
         if line:  # if not empty line
-            channels.append(line) # remove all leading and trailing spaces
+            channels.append(line)  # remove all leading and trailing spaces
 
     return channels
+
+
+def get_data(channel_list, start=None, end=None, base_url=None):
+    query = {"range": {"startDate": datetime.datetime.isoformat(start), "endDate": datetime.datetime.isoformat(end), "startExpansion": True},
+             "channels": channel_list,
+             "fields": ["pulseId", "globalSeconds", "globalDate", "value", "eventCount"]}
+
+    response = requests.post(base_url + '/query', json=query)
+
+    # Check for successful return of data
+    if response.status_code != 200:
+        raise RuntimeError("Unable to retrieve data from server: ", response)
+
+    data = response.json()
+
+    return data_api.client._build_pandas_data_frame(data, index_field="globalDate")
 
 
 def get_pulse_id_date_mapping(pulse_ids):
