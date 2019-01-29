@@ -27,9 +27,7 @@ class TestDownloadData(TestCase):
     def test_read_channels(self):
         channels = cadump.read_channels("channels.txt")
         logging.info(channels)
-        self.assertEqual(len(channels), 3)
-
-
+        self.assertEqual(len(channels), 4)
 
 
 if __name__ == '__main__':

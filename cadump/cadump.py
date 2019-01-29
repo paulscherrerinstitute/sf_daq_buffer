@@ -8,6 +8,7 @@ import dateutil.parser
 import pytz
 import datetime
 import time
+import re
 
 import logging
 logger = logging.getLogger("logger")
@@ -78,6 +79,7 @@ def read_channels(filename):
 
     channels = []
     for line in lines:
+        line = re.sub(r'\w*#.*', "", line)
         line = line.strip()
         if line:  # if not empty line
             channels.append(line)  # remove all leading and trailing spaces
