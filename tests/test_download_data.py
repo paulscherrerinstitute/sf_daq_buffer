@@ -8,8 +8,8 @@ class TestDownloadData(TestCase):
     def test_download_data(self):
         config = {
             'range': {
-                'startPulseId': 7314794868,
-                'endPulseId': 7314798868
+                'startPulseId': 9618913001,
+                'endPulseId': 9618923000
             },
 
             'parameters': {

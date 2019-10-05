@@ -6,5 +6,10 @@ setup(
     author="Paul Scherrer Institute",
     author_email="daq@psi.ch",
     description="Interface to dump data from archiver/databuffer",
-    packages=["cadump"]
+    packages=["cadump"],
+    entry_points={
+        'console_scripts': [
+            'cadump_server = cadump.cadump:main',
+        ],
+    }
 )

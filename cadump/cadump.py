@@ -58,9 +58,12 @@ def download_data(config):
 
     # append _CA to the filename
     filename = config["parameters"]["output_file"]
-    new_filename = filename[:-3]+"_CA"+filename[-3:]
+    if filename != "/dev/null":
+        new_filename = filename[:-3]+"_CA"+filename[-3:]
+    else:
+        new_filename = None
 
-    logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date))
+    logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date) + " . From " + base_url)
     # data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
     data = get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
 
@@ -69,8 +72,9 @@ def download_data(config):
         open(new_filename+"_NO_DATA", 'a').close()
 
     else:
-        logger.info("Persist data to hdf5 file")
-        data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
+        if new_filename:
+            logger.info("Persist data to hdf5 file")
+            data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
 
 
 def read_channels(filename):
@@ -92,11 +96,28 @@ def get_data(channel_list, start=None, end=None, base_url=None):
              "channels": channel_list,
              "fields": ["pulseId", "globalSeconds", "globalDate", "value", "eventCount"]}
 
+    logger.info(query)
+
     response = requests.post(base_url + '/query', json=query)
 
     # Check for successful return of data
     if response.status_code != 200:
+        #raise RuntimeError("Unable to retrieve data from server: ", response)
+        logger.info("Data retrievali failed, sleep for another time and try")
+
+        itry = 0
+        while itry < 5:
+            itry += 1
+            time.sleep(60)
+            response = requests.post(base_url + '/query', json=query)
+            if response.status_code == 200:
+                break
+            logger.info("Data retrieval failed, post attempt %d" % itry)
+
+    if response.status_code != 200:
         raise RuntimeError("Unable to retrieve data from server: ", response)
+
+    logger.info("Data retieval is successful")
 
     data = response.json()
 
