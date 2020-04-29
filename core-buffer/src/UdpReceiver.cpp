@@ -3,6 +3,7 @@
 #include "UdpReceiver.hpp"
 #include "jungfrau.hpp"
 #include "date.h"
+#include <unistd.h>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ UdpReceiver::UdpReceiver() :
 
 UdpReceiver::~UdpReceiver()
 {
-    close();
+    disconnect();
 }
 
 void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
@@ -90,8 +91,8 @@ bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
     return true;
 }
 
-void UdpReceiver::close()
+void UdpReceiver::disconnect()
 {
-    ::close(socket_fd_);
+    close(socket_fd_);
     socket_fd_ = -1;
 }

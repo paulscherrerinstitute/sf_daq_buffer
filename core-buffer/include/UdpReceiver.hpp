@@ -18,7 +18,7 @@ public:
     void bind(
             const uint16_t port,
             const size_t usec_timeout=core_buffer::BUFFER_UDP_US_TIMEOUT);
-    void close();
+    void disconnect();
 };
 
 
