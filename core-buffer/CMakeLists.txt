@@ -3,6 +3,7 @@ file(GLOB SOURCES
 
 add_library(core-buffer STATIC ${SOURCES})
 target_include_directories(core-buffer PUBLIC include/)
+target_include_directories(core-buffer PUBLIC external/)
 target_link_libraries(core-buffer core-writer)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
