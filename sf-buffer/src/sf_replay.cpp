@@ -5,6 +5,8 @@
 #include "BufferUtils.hpp"
 #include "zmq.h"
 #include "buffer_config.hpp"
+#include <H5Cpp.h>
+#include "date.h"
 
 using namespace std;
 using namespace core_buffer;
