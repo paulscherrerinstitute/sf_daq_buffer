@@ -79,10 +79,10 @@ TEST(FastQueue, data_transfer)
     int write_slot_id = queue.reserve();
 
     auto w_metadata = queue.get_metadata_buffer(write_slot_id);
-    w_metadata->pulse_id = 1;
-    w_metadata->frame_index = 2;
-    w_metadata->daq_rec = 3;
-    w_metadata->n_received_packets = 4;
+    w_metadata->pulse_id[0] = 1;
+    w_metadata->frame_index[0] = 2;
+    w_metadata->daq_rec[0] = 3;
+    w_metadata->n_received_packets[0] = 4;
 
     auto w_data = (uint16_t*)(queue.get_data_buffer(write_slot_id));
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {
@@ -94,10 +94,14 @@ TEST(FastQueue, data_transfer)
     auto read_slot_id = queue.read();
 
     auto r_metadata = queue.get_metadata_buffer(read_slot_id);
-    EXPECT_EQ(w_metadata->pulse_id, r_metadata->pulse_id);
-    EXPECT_EQ(w_metadata->frame_index, r_metadata->frame_index);
-    EXPECT_EQ(w_metadata->daq_rec, r_metadata->daq_rec);
-    EXPECT_EQ(w_metadata->n_received_packets, r_metadata->n_received_packets);
+    EXPECT_EQ(w_metadata->pulse_id[0],
+            r_metadata->pulse_id[0]);
+    EXPECT_EQ(w_metadata->frame_index[0],
+            r_metadata->frame_index[0]);
+    EXPECT_EQ(w_metadata->daq_rec[0],
+            r_metadata->daq_rec[0]);
+    EXPECT_EQ(w_metadata->n_received_packets[0],
+            r_metadata->n_received_packets[0]);
 
     auto r_data = (uint16_t*)(queue.get_data_buffer(read_slot_id));
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {

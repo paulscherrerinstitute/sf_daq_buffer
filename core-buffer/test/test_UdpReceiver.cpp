@@ -48,7 +48,7 @@ TEST(UdpReceiver, simple_recv)
     ASSERT_FALSE(udp_receiver.receive(
             &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
 
-    udp_receiver.close();
+    udp_receiver.disconnect();
     ::close(send_socket_fd);
 }
 
@@ -100,7 +100,7 @@ TEST(UdpReceiver, false_recv)
     ASSERT_TRUE(udp_receiver.receive(
             &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET-1));
 
-    udp_receiver.close();
+    udp_receiver.disconnect();
     ::close(send_socket_fd);
 }
 
@@ -165,6 +165,6 @@ TEST(UdpReceiver, receive_many)
     n_msgs = udp_receiver.receive_many(msgs, JUNGFRAU_N_PACKETS_PER_FRAME);
     ASSERT_EQ(n_msgs, -1);
 
-    udp_receiver.close();
+    udp_receiver.disconnect();
     ::close(send_socket_fd);
 }
