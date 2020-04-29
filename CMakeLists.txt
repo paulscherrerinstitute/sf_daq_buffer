@@ -29,5 +29,4 @@ add_subdirectory(
         EXCLUDE_FROM_ALL)
 
 add_subdirectory("core-buffer")
-add_subdirectory("core-writer")
 add_subdirectory("sf-buffer")
