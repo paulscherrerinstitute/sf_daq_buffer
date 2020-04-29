@@ -28,6 +28,9 @@ namespace core_buffer {
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_RB_SIZE = 1000;
 
+    // Microseconds timeout for UDP recv.
+    const int BUFFER_UDP_US_TIMEOUT = 10 * 1000;
+
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
 

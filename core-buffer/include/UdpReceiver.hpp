@@ -1,9 +1,8 @@
 #ifndef UDPRECEIVER_H
 #define UDPRECEIVER_H
 
-#include "config.hpp"
 #include <sys/socket.h>
-#include "RingBuffer.hpp"
+#include "buffer_config.hpp"
 
 class UdpReceiver {
 
@@ -18,7 +17,7 @@ public:
 
     void bind(
             const uint16_t port,
-            const size_t usec_timeout=config::udp_usec_timeout);
+            const size_t usec_timeout=core_buffer::BUFFER_UDP_US_TIMEOUT);
     void close();
 };
 
