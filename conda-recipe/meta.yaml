@@ -6,6 +6,7 @@ source:
     path: ..
 
 build:
+  noarch: python
   entry_points:
     - cadump_server = cadump.cadump:main
 
