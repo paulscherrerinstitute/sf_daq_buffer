@@ -1,0 +1,16 @@
+[Unit]
+Description=JF07 UDP2buffer worker instance as a service, instance %i
+Requires=JF07-buffer.service
+Before=JF07-buffer.service
+BindsTo=JF07-buffer.service
+
+[Service]
+PermissionsStartOnly=true
+Type=idle
+User=root
+ExecStart=/usr/bin/sh /home/dbe/test/systemd/JF07-buffer-worker.sh %i
+TimeoutStartSec=10
+RestartSec=10
+
+[Install]
+WantedBy=JF07-buffer.service

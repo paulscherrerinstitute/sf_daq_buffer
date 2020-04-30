@@ -1,0 +1,10 @@
+[Unit]
+Description=All UDP-buffer instances of JF07
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh /home/dbe/test/systemd/JF07-buffer-worker.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
