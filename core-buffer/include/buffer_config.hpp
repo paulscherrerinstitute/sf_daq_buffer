@@ -42,6 +42,9 @@ namespace core_buffer {
 
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
+
+    // If the RB is empty, how much time to wait before trying to read it again.
+    const size_t RB_READ_RETRY_INTERVAL_MS = 5;
 }
 
 #endif //BUFFERCONFIG_HPP
