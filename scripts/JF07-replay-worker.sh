@@ -14,7 +14,7 @@ coreAssociated=(17 17 17 17 17 17 17 17 18 18 18 18 18 18 18 18 19 19 19 19 19 1
 latest_file=`cat /gpfs/photonics/swissfel/buffer/JF07T32V01/M00/LATEST`
 last_pulse_id=`basename ${latest_file} | sed 's/.h5//'`
 #first_pulse_id=$((${last_pulse_id}-100000))
-first_pulse_id=$((${last_pulse_id}-1000))
+first_pulse_id=$((${last_pulse_id}-100000))
 
 echo "First/last pulse_id : ${first_pulse_id} ${last_pulse_id}"
 
