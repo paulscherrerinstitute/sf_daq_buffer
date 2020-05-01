@@ -12,96 +12,28 @@
 using namespace std;
 using namespace core_buffer;
 
-void load_data_from_file (
-        FileBufferMetadata* metadata_buffer,
-        char* image_buffer,
-        const string &filename,
-        const size_t start_index)
-{
-
-    hsize_t b_image_dim[3] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
-    H5::DataSpace b_i_space (3, b_image_dim);
-    hsize_t b_i_count[] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
-    hsize_t b_i_start[] = {0, 0, 0};
-    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
-
-    hsize_t f_image_dim[3] = {FILE_MOD, 512, 1024};
-    H5::DataSpace f_i_space (3, f_image_dim);
-    hsize_t f_i_count[] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
-    hsize_t f_i_start[] = {start_index, 0, 0};
-    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    hsize_t b_metadata_dim[2] = {REPLAY_READ_BLOCK_SIZE, 1};
-    H5::DataSpace b_m_space (2, b_metadata_dim);
-    hsize_t b_m_count[] = {REPLAY_READ_BLOCK_SIZE, 1};
-    hsize_t b_m_start[] = {0, 0};
-    b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
-
-    hsize_t f_metadata_dim[2] = {FILE_MOD, 1};
-    H5::DataSpace f_m_space (2, f_metadata_dim);
-    hsize_t f_m_count[] = {REPLAY_READ_BLOCK_SIZE, 1};
-    hsize_t f_m_start[] = {start_index, 0};
-    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
-
-    H5::H5File input_file(filename, H5F_ACC_RDONLY);
-
-    auto image_dataset = input_file.openDataSet("image");
-    image_dataset.read(
-            image_buffer, H5::PredType::NATIVE_UINT16,
-            b_i_space, f_i_space);
-
-    auto pulse_id_dataset = input_file.openDataSet("pulse_id");
-    pulse_id_dataset.read(
-            metadata_buffer->pulse_id, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
-
-    auto frame_id_dataset = input_file.openDataSet("frame_id");
-    frame_id_dataset.read(
-            metadata_buffer->frame_index, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
-
-    auto daq_rec_dataset = input_file.openDataSet("daq_rec");
-    daq_rec_dataset.read(
-            metadata_buffer->daq_rec, H5::PredType::NATIVE_UINT32,
-            b_m_space, f_m_space);
-
-    auto received_packets_dataset =
-            input_file.openDataSet("received_packets");
-    received_packets_dataset.read(
-            metadata_buffer->n_received_packets, H5::PredType::NATIVE_UINT16,
-            b_m_space, f_m_space);
-
-    input_file.close();
-}
-
 void sf_live (
         void* socket,
         const string& device,
         const string& channel_name,
         const uint16_t source_id)
 {
-    auto metadata_buffer = make_unique<ModuleFrame>();
-    auto image_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
-
-    const auto current_filename = device + "/" + channel_name + "/CURRENT";
-
-    LiveH5Reader reader(current_filename, source_id);
+    LiveH5Reader reader(device, channel_name, source_id);
 
     auto current_pulse_id = reader.get_latest_pulse_id();
-
     while (true) {
 
-        reader.get_frame_metadata(current_pulse_id, metadata_buffer.get());
+        auto metadata = reader.read_frame_metadata(current_pulse_id);
 
         zmq_send(socket,
-                 (char*)(metadata_buffer.get()),
+                 (char*) metadata,
                  sizeof(ModuleFrame),
                  ZMQ_SNDMORE);
 
-        reader.get_frame_data(current_pulse_id, image_buffer.get());
+        auto data = reader.read_frame_data(current_pulse_id);
 
         zmq_send(socket,
-                 (char*)(image_buffer.get()),
+                 data,
                  MODULE_N_BYTES,
                  0);
 
