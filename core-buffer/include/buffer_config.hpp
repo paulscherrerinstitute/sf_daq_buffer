@@ -45,6 +45,8 @@ namespace core_buffer {
 
     // If the RB is empty, how much time to wait before trying to read it again.
     const size_t RB_READ_RETRY_INTERVAL_MS = 5;
+
+    const size_t LIVE_READ_BLOCK_SIZE = 10;
 }
 
 #endif //BUFFERCONFIG_HPP
