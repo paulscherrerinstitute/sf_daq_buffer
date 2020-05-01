@@ -25,7 +25,7 @@ void sf_live (
         auto metadata = reader.get_metadata();
 
         zmq_send(socket,
-                 (char*) metadata,
+                 &metadata,
                  sizeof(ModuleFrame),
                  ZMQ_SNDMORE);
 
