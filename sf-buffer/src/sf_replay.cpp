@@ -1,11 +1,11 @@
 #include <iostream>
-#include <UdpReceiver.hpp>
 #include <thread>
 #include "jungfrau.hpp"
 #include "BufferUtils.hpp"
 #include "zmq.h"
 #include "buffer_config.hpp"
 #include <H5Cpp.h>
+#include <cstring>
 #include "date.h"
 
 using namespace std;
