@@ -53,5 +53,14 @@ target_link_libraries(sf-writer
         boost_system
         pthread)
 
+add_executable(sf-stream src/sf_stream.cpp)
+set_target_properties(sf-stream PROPERTIES OUTPUT_NAME sf_stream)
+target_link_libraries(sf-stream
+        core-buffer
+        zmq
+        jsoncpp
+        boost_system
+        pthread) 
+
 enable_testing()
 add_subdirectory(test/)

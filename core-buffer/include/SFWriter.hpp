@@ -12,6 +12,7 @@ struct DetectorFrame
     uint64_t frame_index[core_buffer::WRITER_N_FRAMES_BUFFER];
     uint32_t daq_rec[core_buffer::WRITER_N_FRAMES_BUFFER];
     uint16_t n_received_packets[core_buffer::WRITER_N_FRAMES_BUFFER];
+    bool     is_good_frame[core_buffer::WRITER_N_FRAMES_BUFFER];
 };
 
 class SFWriter {
