@@ -3,7 +3,7 @@ Description=All replay instances of JF07
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/sh /home/dbe/test/systemd/JF07-replay.sh
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF07-replay-worker.sh
 RemainAfterExit=yes
 
 [Install]

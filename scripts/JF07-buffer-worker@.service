@@ -8,7 +8,7 @@ BindsTo=JF07-buffer.service
 PermissionsStartOnly=true
 Type=idle
 User=root
-ExecStart=/usr/bin/sh /home/dbe/test/systemd/JF07-buffer-worker.sh %i
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF07-buffer-worker.sh %i
 TimeoutStartSec=10
 RestartSec=10
 
