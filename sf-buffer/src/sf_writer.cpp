@@ -7,7 +7,6 @@
 #include <thread>
 #include <chrono>
 #include "SFWriter.hpp"
-#include <config.hpp>
 #include <FastQueue.hpp>
 #include <cstring>
 #include "date.h"
@@ -190,7 +189,7 @@ int main (int argc, char *argv[])
 
         if(slot_id == -1) {
             this_thread::sleep_for(chrono::milliseconds(
-                    config::ring_buffer_read_retry_interval));
+                    RB_READ_RETRY_INTERVAL_MS));
             continue;
         }
 
