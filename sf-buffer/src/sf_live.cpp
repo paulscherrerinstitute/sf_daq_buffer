@@ -48,6 +48,8 @@ void sf_live (
 
         current_pulse_id++;
     }
+
+    reader.close_file();
 }
 
 int main (int argc, char *argv[]) {
