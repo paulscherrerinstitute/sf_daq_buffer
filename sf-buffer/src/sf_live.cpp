@@ -1,10 +1,7 @@
 #include <iostream>
-#include <thread>
 #include "jungfrau.hpp"
-#include "BufferUtils.hpp"
 #include "zmq.h"
 #include "buffer_config.hpp"
-#include <H5Cpp.h>
 #include <cstring>
 #include "date.h"
 #include "LiveH5Reader.hpp"
