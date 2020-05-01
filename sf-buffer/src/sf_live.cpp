@@ -20,14 +20,16 @@ void sf_live (
     auto current_pulse_id = reader.get_latest_pulse_id();
     while (true) {
 
-        auto metadata = reader.read_frame_metadata(current_pulse_id);
+        reader.load_pulse_id(current_pulse_id);
+
+        auto metadata = reader.get_metadata();
 
         zmq_send(socket,
                  (char*) metadata,
                  sizeof(ModuleFrame),
                  ZMQ_SNDMORE);
 
-        auto data = reader.read_frame_data(current_pulse_id);
+        auto data = reader.get_data();
 
         zmq_send(socket,
                  data,
