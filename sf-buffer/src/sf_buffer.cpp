@@ -78,9 +78,11 @@ int main (int argc, char *argv[]) {
         }
 
         ModuleFrame* metadata = queue.get_metadata_buffer(slot_id);
-        char* data = queue.get_data_buffer(slot_id);
-        auto pulse_id = metadata->pulse_id;
+        metadata->module_id = source_id;
 
+        char* data = queue.get_data_buffer(slot_id);
+
+        auto pulse_id = metadata->pulse_id;
         writer.set_pulse_id(pulse_id);
         writer.write_data(data);
 
@@ -131,7 +133,6 @@ int main (int argc, char *argv[]) {
             cout << " sf_buffer:n_missed_frames " << n_missed_frames;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << endl;
-
 
             stats_counter = 0;
             n_missed_packets = 0;
