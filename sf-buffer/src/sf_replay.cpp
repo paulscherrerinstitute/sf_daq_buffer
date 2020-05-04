@@ -17,57 +17,43 @@ void load_data_from_file (
         const string &filename,
         const size_t start_index)
 {
+    H5::H5File input_file(filename, H5F_ACC_RDONLY);
 
-    hsize_t b_image_dim[3] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
-    H5::DataSpace b_i_space (3, b_image_dim);
-    hsize_t b_i_count[] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
+    hsize_t b_image_dims[3] =
+            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace b_i_space (3, b_image_dims);
+    hsize_t b_i_count[] =
+            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
     hsize_t b_i_start[] = {0, 0, 0};
     b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
 
-    hsize_t f_image_dim[3] = {FILE_MOD, 512, 1024};
-    H5::DataSpace f_i_space (3, f_image_dim);
-    hsize_t f_i_count[] = {REPLAY_READ_BLOCK_SIZE, 512, 1024};
+    hsize_t f_image_dims[3] = {FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace f_i_space (3, f_image_dims);
+    hsize_t f_i_count[] =
+            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
     hsize_t f_i_start[] = {start_index, 0, 0};
     f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    hsize_t b_metadata_dim[2] = {REPLAY_READ_BLOCK_SIZE, 1};
-    H5::DataSpace b_m_space (2, b_metadata_dim);
-    hsize_t b_m_count[] = {REPLAY_READ_BLOCK_SIZE, 1};
-    hsize_t b_m_start[] = {0, 0};
-    b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
-
-    hsize_t f_metadata_dim[2] = {FILE_MOD, 1};
-    H5::DataSpace f_m_space (2, f_metadata_dim);
-    hsize_t f_m_count[] = {REPLAY_READ_BLOCK_SIZE, 1};
-    hsize_t f_m_start[] = {start_index, 0};
-    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
-
-    H5::H5File input_file(filename, H5F_ACC_RDONLY);
 
     auto image_dataset = input_file.openDataSet("image");
     image_dataset.read(
             image_buffer, H5::PredType::NATIVE_UINT16,
             b_i_space, f_i_space);
 
-    auto pulse_id_dataset = input_file.openDataSet("pulse_id");
-    pulse_id_dataset.read(
-            metadata_buffer->pulse_id, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
+    hsize_t b_metadata_dims[2] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
+    H5::DataSpace b_m_space (2, b_metadata_dims);
+    hsize_t b_m_count[] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
+    hsize_t b_m_start[] = {0, 0};
+    b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
 
-    auto frame_id_dataset = input_file.openDataSet("frame_id");
-    frame_id_dataset.read(
-            metadata_buffer->frame_index, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
+    hsize_t f_metadata_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
+    H5::DataSpace f_m_space (2, f_metadata_dims);
+    hsize_t f_m_count[] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
+    hsize_t f_m_start[] = {start_index, 0};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
 
-    auto daq_rec_dataset = input_file.openDataSet("daq_rec");
-    daq_rec_dataset.read(
-            metadata_buffer->daq_rec, H5::PredType::NATIVE_UINT32,
-            b_m_space, f_m_space);
-
-    auto received_packets_dataset =
-            input_file.openDataSet("received_packets");
-    received_packets_dataset.read(
-            metadata_buffer->n_received_packets, H5::PredType::NATIVE_UINT16,
+    auto metadata_dataset = input_file.openDataSet("metadata");
+    metadata_dataset.read(
+            (char*) metadata_buffer, H5::PredType::NATIVE_UINT64,
             b_m_space, f_m_space);
 
     input_file.close();
@@ -77,7 +63,6 @@ void sf_replay (
         void* socket,
         const string& device,
         const string& channel_name,
-        const uint16_t module_id,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
@@ -211,9 +196,9 @@ int main (int argc, char *argv[]) {
 
     const string device = string(argv[1]);
     const string channel_name = string(argv[2]);
-    const uint16_t module_id = (uint16_t) atoi(argv[3]);
-    const uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
-    const uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
+    const auto module_id = (uint16_t) atoi(argv[3]);
+    const auto start_pulse_id = (uint64_t) atoll(argv[4]);
+    const auto stop_pulse_id = (uint64_t) atoll(argv[5]);
 
     stringstream ipc_stream;
     ipc_stream << "ipc://sf-replay-" << (int)module_id;
@@ -249,8 +234,7 @@ int main (int argc, char *argv[]) {
     if (zmq_connect(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
-    sf_replay(socket, device, channel_name, module_id,
-            start_pulse_id, stop_pulse_id);
+    sf_replay(socket, device, channel_name, start_pulse_id, stop_pulse_id);
 
     zmq_close(socket);
     zmq_ctx_destroy(ctx);
