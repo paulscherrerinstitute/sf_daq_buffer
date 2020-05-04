@@ -3,6 +3,7 @@
 #include <chrono>
 #include <WriterUtils.hpp>
 #include <cstring>
+#include <buffer_config.hpp>
 
 extern "C"
 {
@@ -10,86 +11,57 @@ extern "C"
 }
 
 using namespace std;
+using namespace core_buffer;
 
 BufferH5Writer::BufferH5Writer(
-        const size_t n_frames_per_file,
-        const uint16_t y_frame_size,
-        const uint16_t x_frame_size,
         const string& device_name,
         const string& root_folder) :
-            n_frames_per_file_(n_frames_per_file),
-            y_frame_size_(y_frame_size),
-            x_frame_size_(x_frame_size),
             device_name_(device_name),
             root_folder_(root_folder),
-            latest_filename_(root_folder + "/" + device_name + "/LATEST"),
-            current_filename_(root_folder + "/" + device_name + "/CURRENT"),
-            frame_bytes_size_(2 * y_frame_size * x_frame_size),
-            current_output_filename_(""),
-            current_output_file_(),
-            current_image_dataset_(),
-            current_pulse_id_(0)
+            LATEST_filename_(root_folder + "/" + device_name + "/LATEST"),
+            CURRENT_filename_(root_folder + "/" + device_name + "/CURRENT"),
+            output_filename_(""),
+            current_pulse_id_(0),
+            current_file_index_(0)
 {
 }
 
 void BufferH5Writer::create_file(const string& filename)
 {
     {
-        current_output_file_ = H5::H5File(filename,
-                H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE);
+        h5_file_ = H5::H5File(filename, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE);
 
-        current_output_filename_ = filename;
+        output_filename_ = filename;
 
-        hsize_t dataset_dimension[3] =
-                {n_frames_per_file_, y_frame_size_, x_frame_size_};
-        hsize_t max_dataset_dimension[3] =
-                {n_frames_per_file_, y_frame_size_, x_frame_size_};
-        H5::DataSpace dataspace(
-                3, dataset_dimension, max_dataset_dimension);
+        H5::DataSpace data_dspace(3, data_disk_dims, data_disk_dims);
+        H5::DSetCreatPropList data_dset_prop;
+        hsize_t data_dset_chunking[3] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+        data_dset_prop.setChunk(3, data_dset_chunking);
 
-        hsize_t dataset_chunking[3] =
-                {CHUNKING_FACTOR, y_frame_size_, x_frame_size_};
-        H5::DSetCreatPropList dataset_properties;
-        dataset_properties.setChunk(3, dataset_chunking);
-
-        current_output_file_.createDataSet(
+        h5_file_.createDataSet(
                 "image",
                 H5::PredType::NATIVE_UINT16,
-                dataspace,
-                dataset_properties);
+                data_dspace,
+                data_dset_prop);
 
-        for (auto &metadata:scalar_metadata_) {
-            auto dataset_name = metadata.first;
-            auto dataset_type = metadata.second;
+        H5::DataSpace meta_dspace(2, meta_disk_dims, meta_disk_dims);
+        H5::DSetCreatPropList meta_dset_prop;
+        hsize_t meta_dset_chunking[2] = {1, ModuleFrame_N_FIELDS};
+        meta_dset_prop.setChunk(2, meta_dset_chunking);
 
-            hsize_t dataset_dimension[2] = {n_frames_per_file_, 1};
-            H5::DataSpace dataspace(2, dataset_dimension);
-            current_output_file_.createDataSet(
-                    dataset_name, dataset_type, dataspace);
-        }
+        h5_file_.createDataSet(
+                "metadata",
+                H5::PredType::NATIVE_UINT64,
+                meta_dspace,
+                meta_dset_prop);
+
+        h5_file_.close();
     }
 
-    current_output_file_.close();
+    h5_file_ = H5::H5File(filename, H5F_ACC_RDWR |H5F_ACC_SWMR_WRITE);
 
-    current_output_file_ =
-            H5::H5File(filename, H5F_ACC_RDWR |H5F_ACC_SWMR_WRITE);
-
-    current_image_dataset_ = current_output_file_.openDataSet("image");
-
-    for (auto& metadata:scalar_metadata_) {
-        auto dataset_name = metadata.first;
-        auto dataset_type = metadata.second;
-
-        auto dataset = current_output_file_.openDataSet(dataset_name);
-
-        datasets_.insert({dataset_name, dataset});
-
-        size_t n_buffer_bytes =
-                dataset.getDataType().getSize() * n_frames_per_file_;
-        buffers_.insert(
-                {dataset_name, new char[n_buffer_bytes]});
-    }
-
+    current_image_dataset_ = h5_file_.openDataSet("image");
+    current_metadata_dataset_ = h5_file_.openDataSet("metadata");
 }
 
 BufferH5Writer::~BufferH5Writer()
@@ -98,136 +70,69 @@ BufferH5Writer::~BufferH5Writer()
 }
 
 void BufferH5Writer::close_file() {
-    current_output_filename_ = "";
-    current_output_file_.close();
     current_image_dataset_.close();
+    current_metadata_dataset_.close();
+
+    h5_file_.close();
+    output_filename_ = "";
+
     current_pulse_id_ = 0;
-    current_frame_index_ = 0;
-
-    for (auto &dataset:datasets_) {
-        dataset.second.close();
-    }
-    datasets_.clear();
-
-    for (auto &buffer:buffers_) {
-        delete [] buffer.second;
-    }
-    buffers_.clear();
+    current_file_index_ = 0;
 }
 
 void BufferH5Writer::set_pulse_id(const uint64_t pulse_id)
 {
     current_pulse_id_ = pulse_id;
-    current_frame_index_ = BufferUtils::get_file_frame_index(pulse_id);
+    current_file_index_ = BufferUtils::get_file_frame_index(pulse_id);
 
     auto new_output_filename = BufferUtils::get_filename(
             root_folder_, device_name_, pulse_id);
 
-    if (new_output_filename != current_output_filename_){
+    if (new_output_filename != output_filename_){
 
-        if (current_output_file_.getId() != -1) {
-            auto latest = current_output_filename_;
+        if (h5_file_.getId() != -1) {
+            auto latest_filename = output_filename_;
             close_file();
-            BufferUtils::update_latest_file(
-                    latest_filename_, latest);
+            BufferUtils::update_latest_file(LATEST_filename_, latest_filename);
         }
 
         WriterUtils::create_destination_folder(new_output_filename);
         create_file(new_output_filename);
 
-        BufferUtils::update_latest_file(
-                current_filename_, current_output_filename_);
+        BufferUtils::update_latest_file(CURRENT_filename_, output_filename_);
     }
 }
 
-void BufferH5Writer::write_data(const char *buffer)
+void BufferH5Writer::write(const ModuleFrame* metadata, const char* data)
 {
-    hsize_t buff_dim[2] = {y_frame_size_, x_frame_size_};
-    H5::DataSpace buffer_space (2, buff_dim);
+    hsize_t meta_buff_dims[1] = {ModuleFrame_N_FIELDS};
+    H5::DataSpace meta_buffer_space (1, meta_buff_dims);
 
-    hsize_t disk_dim[3] = {n_frames_per_file_, y_frame_size_, x_frame_size_};
-    H5::DataSpace disk_space(3, disk_dim);
+    H5::DataSpace meta_disk_space(2, meta_disk_dims);
+    hsize_t meta_count[] = {1, ModuleFrame_N_FIELDS};
+    hsize_t meta_start[] = {current_file_index_, 0};
+    meta_disk_space.selectHyperslab(H5S_SELECT_SET, meta_count, meta_start);
 
-    hsize_t count[] = {1, y_frame_size_, x_frame_size_};
-    hsize_t start[] = {current_frame_index_, 0, 0};
-    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
+    current_metadata_dataset_.write(
+            (char*) metadata,
+            H5::PredType::NATIVE_UINT64,
+            meta_buffer_space,
+            meta_disk_space);
+
+    hsize_t data_buff_dims[2] = {MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace data_buffer_space (2, data_buff_dims);
+
+    H5::DataSpace data_disk_space(3, data_disk_dims);
+    hsize_t data_count[] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t data_start[] = {current_file_index_, 0, 0};
+    data_disk_space.selectHyperslab(H5S_SELECT_SET, data_count, data_start);
 
     current_image_dataset_.write(
-            buffer,
+            data,
             H5::PredType::NATIVE_UINT16,
-            buffer_space,
-            disk_space);
+            data_buffer_space,
+            data_disk_space);
 
+    H5Dflush(current_metadata_dataset_.getId());
     H5Dflush(current_image_dataset_.getId());
-}
-
-template <>
-void BufferH5Writer::write_scalar_metadata<uint64_t>(
-        const std::string& name,
-        const void* value)
-{
-    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT64);
-}
-
-template <>
-void BufferH5Writer::write_scalar_metadata<uint32_t>(
-        const std::string& name,
-        const void* value)
-{
-    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT32);
-}
-
-template <>
-void BufferH5Writer::write_scalar_metadata<uint16_t>(
-        const std::string& name,
-        const void* value)
-{
-    write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT16);
-}
-
-void BufferH5Writer::write_scalar_metadata(
-        const std::string& name,
-        const void* value,
-        const H5::DataType data_type)
-{
-    auto dataset = datasets_.at(name);
-
-    hsize_t buff_dim[1] = {1};
-    H5::DataSpace buffer_space (1, buff_dim);
-
-    hsize_t disk_dim[2] = {n_frames_per_file_, 1};
-    H5::DataSpace disk_space(1, disk_dim);
-
-    hsize_t count[] = {1, 1};
-    hsize_t start[] = {current_frame_index_, 0};
-    disk_space.selectHyperslab(H5S_SELECT_SET, count, start);
-
-    dataset.write(
-            value,
-            data_type,
-            buffer_space,
-            disk_space);
-
-    H5Dflush(dataset.getId());
-}
-
-template <>
-void BufferH5Writer::add_scalar_metadata<uint64_t>(
-        const std::string& metadata_name)
-{
-    scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT64});
-}
-
-template <>
-void BufferH5Writer::add_scalar_metadata<uint32_t>(
-        const std::string& metadata_name)
-{
-    scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT32});
-}
-
-template <>
-void BufferH5Writer::add_scalar_metadata<uint16_t>(
-        const std::string& metadata_name)
-{
-    scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT16});
 }
