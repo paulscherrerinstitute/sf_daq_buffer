@@ -35,8 +35,8 @@ inline void UdpRecvModule::init_frame (
         ModuleFrame* frame_metadata,
         jungfrau_packet& packet_buffer)
 {
-    frame_metadata->frame_index = packet_buffer.framenum;
     frame_metadata->pulse_id = packet_buffer.bunchid;
+    frame_metadata->frame_index = packet_buffer.framenum;
     frame_metadata->daq_rec = packet_buffer.debug;
 }
 
