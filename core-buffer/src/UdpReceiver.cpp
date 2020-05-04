@@ -61,8 +61,7 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
             SO_RCVTIMEO,
             (const char*)&udp_socket_timeout,
             sizeof(struct timeval));
-
-    SO_RCVLOWAT
+    //TODO: try to set SO_RCVLOWAT
 }
 
 int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
