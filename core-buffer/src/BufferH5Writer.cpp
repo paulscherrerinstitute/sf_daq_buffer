@@ -3,7 +3,6 @@
 #include <chrono>
 #include <WriterUtils.hpp>
 #include <cstring>
-#include <buffer_config.hpp>
 
 extern "C"
 {

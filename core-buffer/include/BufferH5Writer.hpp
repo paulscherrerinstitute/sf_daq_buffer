@@ -8,6 +8,7 @@
 #include <memory>
 #include "jungfrau.hpp"
 #include <unordered_map>
+#include <buffer_config.hpp>
 
 class BufferH5Writer {
 
