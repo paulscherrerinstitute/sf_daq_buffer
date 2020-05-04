@@ -51,16 +51,16 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
         throw runtime_error("Cannot bind socket.");
     }
 
-    struct timeval udp_socket_timeout;
-    udp_socket_timeout.tv_sec = 0;
-    udp_socket_timeout.tv_usec = usec_timeout;
-
-    setsockopt(
-            socket_fd_,
-            SOL_SOCKET,
-            SO_RCVTIMEO,
-            (const char*)&udp_socket_timeout,
-            sizeof(struct timeval));
+//    struct timeval udp_socket_timeout;
+//    udp_socket_timeout.tv_sec = 0;
+//    udp_socket_timeout.tv_usec = usec_timeout;
+//
+//    setsockopt(
+//            socket_fd_,
+//            SOL_SOCKET,
+//            SO_RCVTIMEO,
+//            (const char*)&udp_socket_timeout,
+//            sizeof(struct timeval));
 }
 
 int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
@@ -70,7 +70,7 @@ int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
 
 bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
 {
-    auto data_len = recv(socket_fd_, buffer, buffer_n_bytes, 0);
+    auto data_len = recv(socket_fd_, buffer, buffer_n_bytes, MSG_DONTWAIT);
 
     if (data_len < 0) {
         return false;
