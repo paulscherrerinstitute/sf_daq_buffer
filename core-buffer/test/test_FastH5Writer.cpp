@@ -1,4 +1,4 @@
-#include "FastH5Writer.hpp"
+#include "BufferH5Writer.hpp"
 #include "gtest/gtest.h"
 
 using namespace core_buffer;
@@ -17,7 +17,7 @@ TEST(FastH5Writer, basic_interaction)
     metadata.daq_rec = 3;
     metadata.n_recv_packets = 128;
 
-    FastH5Writer writer(
+    BufferH5Writer writer(
             core_buffer::FILE_MOD, 512, 1024, device_name, root_folder);
 
     writer.add_scalar_metadata<uint64_t>("pulse_id");
@@ -100,7 +100,7 @@ TEST(FastH5Writer, SWMR)
         image_ptr[i] = 99;
     }
 
-    FastH5Writer writer(
+    BufferH5Writer writer(
             FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE, device_name, root_folder);
     writer.add_scalar_metadata<uint64_t>("pulse_id");
     writer.set_pulse_id(0);

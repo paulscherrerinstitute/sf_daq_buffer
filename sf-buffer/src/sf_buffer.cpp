@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <RingBuffer.hpp>
 #include <UdpRecvModule.hpp>
-#include <FastH5Writer.hpp>
+#include <BufferH5Writer.hpp>
 #include <FastQueue.hpp>
 #include "zmq.h"
 #include "buffer_config.hpp"
@@ -60,7 +60,7 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    FastH5Writer writer(device_name, root_folder);
+    BufferH5Writer writer(device_name, root_folder);
 
     int slot_id;
 

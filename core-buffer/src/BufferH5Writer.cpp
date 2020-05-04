@@ -1,5 +1,5 @@
 #include <BufferUtils.hpp>
-#include "FastH5Writer.hpp"
+#include "BufferH5Writer.hpp"
 #include <chrono>
 #include <WriterUtils.hpp>
 #include <cstring>
@@ -11,7 +11,7 @@ extern "C"
 
 using namespace std;
 
-FastH5Writer::FastH5Writer(
+BufferH5Writer::BufferH5Writer(
         const size_t n_frames_per_file,
         const uint16_t y_frame_size,
         const uint16_t x_frame_size,
@@ -32,7 +32,7 @@ FastH5Writer::FastH5Writer(
 {
 }
 
-void FastH5Writer::create_file(const string& filename)
+void BufferH5Writer::create_file(const string& filename)
 {
     {
         current_output_file_ = H5::H5File(filename,
@@ -92,12 +92,12 @@ void FastH5Writer::create_file(const string& filename)
 
 }
 
-FastH5Writer::~FastH5Writer()
+BufferH5Writer::~BufferH5Writer()
 {
     close_file();
 }
 
-void FastH5Writer::close_file() {
+void BufferH5Writer::close_file() {
     current_output_filename_ = "";
     current_output_file_.close();
     current_image_dataset_.close();
@@ -115,7 +115,7 @@ void FastH5Writer::close_file() {
     buffers_.clear();
 }
 
-void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
+void BufferH5Writer::set_pulse_id(const uint64_t pulse_id)
 {
     current_pulse_id_ = pulse_id;
     current_frame_index_ = BufferUtils::get_file_frame_index(pulse_id);
@@ -140,7 +140,7 @@ void FastH5Writer::set_pulse_id(const uint64_t pulse_id)
     }
 }
 
-void FastH5Writer::write_data(const char *buffer)
+void BufferH5Writer::write_data(const char *buffer)
 {
     hsize_t buff_dim[2] = {y_frame_size_, x_frame_size_};
     H5::DataSpace buffer_space (2, buff_dim);
@@ -162,7 +162,7 @@ void FastH5Writer::write_data(const char *buffer)
 }
 
 template <>
-void FastH5Writer::write_scalar_metadata<uint64_t>(
+void BufferH5Writer::write_scalar_metadata<uint64_t>(
         const std::string& name,
         const void* value)
 {
@@ -170,7 +170,7 @@ void FastH5Writer::write_scalar_metadata<uint64_t>(
 }
 
 template <>
-void FastH5Writer::write_scalar_metadata<uint32_t>(
+void BufferH5Writer::write_scalar_metadata<uint32_t>(
         const std::string& name,
         const void* value)
 {
@@ -178,14 +178,14 @@ void FastH5Writer::write_scalar_metadata<uint32_t>(
 }
 
 template <>
-void FastH5Writer::write_scalar_metadata<uint16_t>(
+void BufferH5Writer::write_scalar_metadata<uint16_t>(
         const std::string& name,
         const void* value)
 {
     write_scalar_metadata(name, value, H5::PredType::NATIVE_UINT16);
 }
 
-void FastH5Writer::write_scalar_metadata(
+void BufferH5Writer::write_scalar_metadata(
         const std::string& name,
         const void* value,
         const H5::DataType data_type)
@@ -212,21 +212,21 @@ void FastH5Writer::write_scalar_metadata(
 }
 
 template <>
-void FastH5Writer::add_scalar_metadata<uint64_t>(
+void BufferH5Writer::add_scalar_metadata<uint64_t>(
         const std::string& metadata_name)
 {
     scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT64});
 }
 
 template <>
-void FastH5Writer::add_scalar_metadata<uint32_t>(
+void BufferH5Writer::add_scalar_metadata<uint32_t>(
         const std::string& metadata_name)
 {
     scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT32});
 }
 
 template <>
-void FastH5Writer::add_scalar_metadata<uint16_t>(
+void BufferH5Writer::add_scalar_metadata<uint16_t>(
         const std::string& metadata_name)
 {
     scalar_metadata_.insert({metadata_name, H5::PredType::NATIVE_UINT16});

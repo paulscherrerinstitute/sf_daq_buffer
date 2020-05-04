@@ -8,7 +8,7 @@
 #include <memory>
 #include <unordered_map>
 
-class FastH5Writer {
+class BufferH5Writer {
 
     const uint16_t CHUNKING_FACTOR = 1;
 
@@ -39,14 +39,14 @@ class FastH5Writer {
             const H5::DataType data_type);
 
 public:
-    FastH5Writer(
+    BufferH5Writer(
             const size_t n_frames_per_file,
             const uint16_t y_frame_size,
             const uint16_t x_frame_size,
             const std::string& device_name,
             const std::string& root_folder);
 
-    virtual ~FastH5Writer();
+    virtual ~BufferH5Writer();
 
     template <class T> void add_scalar_metadata(
             const std::string& metadata_name);
