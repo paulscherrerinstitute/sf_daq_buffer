@@ -14,6 +14,8 @@ https://svn.hdfgroup.org/hdf5/branches/hdf5_1_10_0/test/POSIX_Order_Write_Test_R
 https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Parallel-IO.pdf
 - MPI-IO/GPFS, an Optimized Implementationof MPI-IO on top of GPFS
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1592834
+- JSON library benchmarks
+https://github.com/miloyip/nativejson-benchmark
 
 ## Build
 
