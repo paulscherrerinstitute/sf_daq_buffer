@@ -7,36 +7,25 @@ using namespace std;
 
 TEST(UdpRecvModule, basic_interaction)
 {
-    uint16_t udp_port(12000);
+    uint16_t udp_port(MOCK_UDP_PORT);
 
-    RingBuffer<UdpFrameMetadata> ring_buffer(10);
-    UdpRecvModule udp_recv_module(ring_buffer);
-
-    udp_recv_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
-
-    EXPECT_THROW(
-            udp_recv_module.start_recv(udp_port, JUNGFRAU_BYTES_PER_PACKET),
-            runtime_error);
-
-    // Stop should never throw an exception.
-    udp_recv_module.stop_recv();
-    EXPECT_NO_THROW(udp_recv_module.stop_recv());
+    FastQueue<ModuleFrame> queue(JUNGFRAU_DATA_BYTES_PER_FRAME, 10);
+    UdpRecvModule udp_recv_module(queue, udp_port);
 }
 
 TEST(UdpRecvModule, simple_recv)
 {
+    int slot_id;
     uint16_t udp_port(MOCK_UDP_PORT);
     size_t n_msg(128);
 
-    RingBuffer<UdpFrameMetadata> ring_buffer(10);
-    UdpRecvModule udp_recv_module(ring_buffer);
-
-    udp_recv_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
+    FastQueue<ModuleFrame> queue(JUNGFRAU_DATA_BYTES_PER_FRAME, 10);
+    UdpRecvModule udp_recv_module(queue, udp_port);
 
     this_thread::sleep_for(chrono::milliseconds(100));
 
-    // The first slot should be already reserved in the ring buffer.
-    ASSERT_FALSE(ring_buffer.is_empty());
+    // The first slot should not be available to read yet.
+    ASSERT_EQ(queue.read(), -1);
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
@@ -63,13 +52,16 @@ TEST(UdpRecvModule, simple_recv)
 
     this_thread::sleep_for(chrono::milliseconds(100));
 
-    ASSERT_FALSE(ring_buffer.is_empty());
-    auto result = ring_buffer.read();
-    // The slot should be committed because the first packet is finished.
-    ASSERT_FALSE(result.first == nullptr);
+    slot_id = queue.read();
+    // This time we are supposed to get slot 0.
+    ASSERT_EQ(slot_id, 0);
+    // We sent a frame with frame_index == 1.
+    ASSERT_EQ(queue.get_metadata_buffer(slot_id)->frame_index, 1);
+    queue.release();
 
-    // When packet from new frame is received, the previous frame should be
-    // committed to the ring buffer.
+    // Next slot not yet ready.
+    ASSERT_EQ(queue.read(), -1);
+
     send_udp_buffer.framenum = 2;
     for (size_t i=0; i<128; i++){
         send_udp_buffer.packetnum = i;
@@ -86,9 +78,12 @@ TEST(UdpRecvModule, simple_recv)
 
     this_thread::sleep_for(chrono::milliseconds(100));
 
-    ASSERT_FALSE(ring_buffer.is_empty());
-    auto result2 = ring_buffer.read();
-    ASSERT_TRUE(result2.first != nullptr);
+    slot_id = queue.read();
+    // This time we are supposed to get slot 1.
+    ASSERT_EQ(slot_id, 1);
+    // We sent a frame with frame_index == 2.
+    ASSERT_EQ(queue.get_metadata_buffer(slot_id)->frame_index, 2);
+    queue.release();
 
     ::close(send_socket_fd);
 }
