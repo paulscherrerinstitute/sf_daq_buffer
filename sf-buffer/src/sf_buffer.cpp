@@ -78,7 +78,7 @@ int main (int argc, char *argv[]) {
         }
 
         ModuleFrame* metadata = queue.get_metadata_buffer(slot_id);
-        metadata->module_id = source_id;
+        metadata->module_id = (uint64_t) source_id;
 
         char* data = queue.get_data_buffer(slot_id);
 
