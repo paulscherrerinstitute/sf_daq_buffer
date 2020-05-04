@@ -201,7 +201,7 @@ int main (int argc, char *argv[]) {
     const auto stop_pulse_id = (uint64_t) atoll(argv[5]);
 
     stringstream ipc_stream;
-    ipc_stream << "ipc://sf-replay-" << (int)module_id;
+    ipc_stream << "ipc:///tmp/sf-replay-" << (int)module_id;
     const auto ipc_address = ipc_stream.str();
 
     #ifdef DEBUG_OUTPUT

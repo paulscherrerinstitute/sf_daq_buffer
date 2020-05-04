@@ -71,7 +71,7 @@ int main (int argc, char *argv[]) {
     const uint16_t source_id = (uint16_t) atoi(argv[3]);
 
     stringstream ipc_stream;
-    ipc_stream << "ipc://sf-live-" << (int)source_id;
+    ipc_stream << "ipc:///tmp/sf-live-" << (int)source_id;
     const auto ipc_address = ipc_stream.str();
 
     #ifdef DEBUG_OUTPUT

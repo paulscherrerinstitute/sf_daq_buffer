@@ -34,7 +34,7 @@ int main (int argc, char *argv[]) {
     int source_id = atoi(argv[4]);
 
     stringstream ipc_stream;
-    ipc_stream << "ipc://sf-live-" << source_id;
+    ipc_stream << "ipc:///tmp/sf-live-" << source_id;
     const auto ipc_address = ipc_stream.str();
 
     auto ctx = zmq_ctx_new();

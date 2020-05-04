@@ -158,7 +158,7 @@ int main (int argc, char *argv[])
             n_modules * MODULE_N_BYTES * WRITER_N_FRAMES_BUFFER,
             WRITER_RB_BUFFER_SLOTS);
 
-    string ipc_prefix = "ipc://sf-replay-";
+    string ipc_prefix = "ipc:///tmp/sf-replay-";
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
