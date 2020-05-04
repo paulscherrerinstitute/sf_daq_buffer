@@ -292,6 +292,39 @@ int main (int argc, char *argv[])
                 0);
             }
 
+            //same for live analysis
+            int send_live_analysis = 0;
+            if ( reduction_factor_live_analysis > 1 ) {
+                send_live_analysis = rand() % reduction_factor_live_analysis;
+            }
+            if ( send_live_analysis == 0 ) {
+                header["shape"][0] = 16384;
+                header["shape"][1] = 1024;
+            } else{
+                header["shape"][0] = 2;
+                header["shape"][1] = 2;
+            }
+
+            text_header = Json::writeString(builder, header);
+
+            zmq_send(socket_live,
+                 text_header.c_str(),
+                 text_header.size(),
+                 ZMQ_SNDMORE);
+
+            if ( send_live_analysis == 0 ) {
+                zmq_send(socket_live,
+                (char*)data,
+                core_buffer::MODULE_N_BYTES*n_modules,
+                0);
+            } else {
+                zmq_send(socket_live,
+                (char*)data_empty,
+                8,
+                0);
+            }
+
+
         }
  
         queue.release();
