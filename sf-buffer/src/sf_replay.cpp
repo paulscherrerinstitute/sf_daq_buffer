@@ -155,7 +155,7 @@ void sf_replay (
                     return;
                 }
 
-                if (current_pulse_id != module_frame.pulse_id) {
+                if (current_pulse_id != module_frame.pulse_id and module_frame.pulse_id != 0) {
                     stringstream err_msg;
 
                     using namespace date;
