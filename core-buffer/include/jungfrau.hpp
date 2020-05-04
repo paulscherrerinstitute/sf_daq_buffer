@@ -36,9 +36,9 @@ struct jungfrau_packet {
 struct ModuleFrame {
     uint64_t pulse_id;
     uint64_t frame_index;
-    uint32_t daq_rec;
-    uint16_t n_received_packets;
-    uint16_t module_id;
+    uint64_t daq_rec;
+    uint64_t n_received_packets;
+    uint64_t module_id;
 };
 #pragma pack(pop)
 
