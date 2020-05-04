@@ -30,7 +30,8 @@ TEST(BufferH5Writer, basic_interaction)
     H5::H5File input_file(filename, H5F_ACC_RDONLY);
 
     auto image_dataset = input_file.openDataSet("image");
-    auto image_buffer = make_unique<uint16_t[]>(1000*512*1024);
+    size_t image_buffer_n_bytes = JUNGFRAU_DATA_BYTES_PER_FRAME * FILE_MOD;
+    auto image_buffer = make_unique<uint16_t[]>(image_buffer_n_bytes);
     image_dataset.read(image_buffer.get(), H5::PredType::NATIVE_UINT16);
 
     auto metadata_dataset = input_file.openDataSet("metadata");
@@ -49,57 +50,81 @@ TEST(BufferH5Writer, SWMR)
     auto device_name = "fast_device";
     size_t pulse_id = 0;
 
-    auto output_buffer = make_unique<char[]>(512 * 1024 * 2);
-    auto input_buffer = make_unique<uint16_t[]>(1000*512*1024);
-    auto pulse_id_buffer = make_unique<uint64_t[]>(1000);
+    auto i_write_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
+    size_t image_buffer_n_bytes = JUNGFRAU_DATA_BYTES_PER_FRAME * FILE_MOD;
+    auto i_read_buffer = make_unique<uint16_t[]>(image_buffer_n_bytes);
 
-    auto input_ptr = (uint16_t*)(input_buffer.get());
-    auto output_ptr = (uint16_t*)(output_buffer.get());
-    auto pulse_id_ptr = (uint64_t*)(pulse_id_buffer.get());
+    ModuleFrame m_write_buffer = {1, 2, 3, 4, 5};
+    auto m_read_buffer = make_unique<ModuleFrame[]>(FILE_MOD);
 
-    for (size_t i=0; i<512*1024; i++) {
-        uint16_t* image_ptr = (uint16_t*)(output_buffer.get());
+    for (size_t i=0; i<MODULE_N_PIXELS; i++) {
+        uint16_t* image_ptr = (uint16_t*)(i_write_buffer.get());
         image_ptr[i] = 99;
     }
 
     BufferH5Writer writer(device_name, root_folder);
+    // This creates the file.
     writer.set_pulse_id(0);
 
     auto filename = BufferUtils::get_filename(
             root_folder, device_name, pulse_id);
+
     H5::H5File input_file(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
     auto image_dataset = input_file.openDataSet("image");
-    auto pulse_id_dataset = input_file.openDataSet("pulse_id");
+    auto metadata_dataset = input_file.openDataSet("metadata");
 
-    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
-    EXPECT_EQ(input_ptr[0], 0);
-    EXPECT_EQ(input_ptr[512*1024], 0);
+    // The data was not yet written to file, so 0 is expected.
+    image_dataset.read(i_read_buffer.get(), H5::PredType::NATIVE_UINT16);
+    EXPECT_EQ((i_read_buffer.get())[0], 0);
+    EXPECT_EQ((i_read_buffer.get())[512 * 1024], 0);
 
-    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
-    EXPECT_EQ(pulse_id_ptr[0], 0);
-    EXPECT_EQ(pulse_id_ptr[1], 0);
+    // The data was not yet written to file, so 0 is expected.
+    metadata_dataset.read(m_read_buffer.get(), H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ((m_read_buffer.get())[0].pulse_id, 0);
+    EXPECT_EQ((m_read_buffer.get())[1].pulse_id, 0);
 
-    pulse_id = 0;
-    writer.set_pulse_id(pulse_id);
-//    writer.write(output_buffer.get());
+    // Flushing after every frame should ensure that the reader can see this.
+    writer.set_pulse_id(0);
+    writer.write(&m_write_buffer, i_write_buffer.get());
 
-    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
-    EXPECT_EQ(input_ptr[0], 99);
-    EXPECT_EQ(input_ptr[512*1024], 0);
+    image_dataset.read(i_read_buffer.get(), H5::PredType::NATIVE_UINT16);
+    // Frame 0 was written, so we are expecting data in just the first frame.
+    EXPECT_EQ((i_read_buffer.get())[0], 99);
+    EXPECT_EQ((i_read_buffer.get())[512 * 1024], 0);
 
-    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
-    EXPECT_EQ(pulse_id_ptr[0], 0);
-    EXPECT_EQ(pulse_id_ptr[1], 0);
+    // Frame 0 written, metadata for frame 0 expected.
+    metadata_dataset.read(m_read_buffer.get(), H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ((m_read_buffer.get())[0].pulse_id, 1);
+    EXPECT_EQ((m_read_buffer.get())[0].frame_index, 2);
+    EXPECT_EQ((m_read_buffer.get())[0].daq_rec, 3);
+    EXPECT_EQ((m_read_buffer.get())[0].n_received_packets, 4);
+    EXPECT_EQ((m_read_buffer.get())[0].module_id, 5);
 
-    pulse_id = 1;
-    writer.set_pulse_id(pulse_id);
-//    writer.write(output_buffer.get());
+    EXPECT_EQ((m_read_buffer.get())[1].pulse_id, 0);
+    EXPECT_EQ((m_read_buffer.get())[1].frame_index, 0);
+    EXPECT_EQ((m_read_buffer.get())[1].daq_rec, 0);
+    EXPECT_EQ((m_read_buffer.get())[1].n_received_packets, 0);
+    EXPECT_EQ((m_read_buffer.get())[1].module_id, 0);
 
-    image_dataset.read(input_ptr, H5::PredType::NATIVE_UINT16);
-    EXPECT_EQ(input_ptr[0], 99);
-    EXPECT_EQ(input_ptr[512*1024], 99);
+    writer.set_pulse_id(1);
+    writer.write(&m_write_buffer, i_write_buffer.get());
 
-    pulse_id_dataset.read(pulse_id_ptr, H5::PredType::NATIVE_UINT64);
-    EXPECT_EQ(pulse_id_ptr[0], 0);
-    EXPECT_EQ(pulse_id_ptr[1], 1);
+    image_dataset.read(i_read_buffer.get(), H5::PredType::NATIVE_UINT16);
+    // Both frame written, and we should access both.
+    EXPECT_EQ((i_read_buffer.get())[0], 99);
+    EXPECT_EQ((i_read_buffer.get())[512 * 1024], 99);
+
+    // Both frame written, and we should access both.
+    metadata_dataset.read(m_read_buffer.get(), H5::PredType::NATIVE_UINT64);
+    EXPECT_EQ((m_read_buffer.get())[0].pulse_id, 1);
+    EXPECT_EQ((m_read_buffer.get())[0].frame_index, 2);
+    EXPECT_EQ((m_read_buffer.get())[0].daq_rec, 3);
+    EXPECT_EQ((m_read_buffer.get())[0].n_received_packets, 4);
+    EXPECT_EQ((m_read_buffer.get())[0].module_id, 5);
+
+    EXPECT_EQ((m_read_buffer.get())[1].pulse_id, 1);
+    EXPECT_EQ((m_read_buffer.get())[1].frame_index, 2);
+    EXPECT_EQ((m_read_buffer.get())[1].daq_rec, 3);
+    EXPECT_EQ((m_read_buffer.get())[1].n_received_packets, 4);
+    EXPECT_EQ((m_read_buffer.get())[1].module_id, 5);
 }
