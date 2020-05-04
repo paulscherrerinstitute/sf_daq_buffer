@@ -65,49 +65,28 @@ int main (int argc, char *argv[]) {
     int slot_id;
 
     while (true) {
+
         if ((slot_id = queue.read()) == -1){
             this_thread::sleep_for(chrono::milliseconds(BUFFER_QUEUE_RETRY_MS));
             continue;
         }
-
         ModuleFrame* metadata = queue.get_metadata_buffer(slot_id);
-        metadata->module_id = (uint64_t) source_id;
-
         char* data = queue.get_data_buffer(slot_id);
 
-        auto pulse_id = metadata->pulse_id;
-        writer.set_pulse_id(pulse_id);
+        metadata->module_id = (uint64_t) source_id;
+
+        // Write to file.
+        writer.set_pulse_id(metadata->pulse_id);
         writer.write(metadata, data);
 
-        // TODO: Combine all this into 1 struct.
-        writer.write_scalar_metadata<uint64_t>(
-                "pulse_id", &(metadata->pulse_id));
-
-        writer.write_scalar_metadata<uint64_t>(
-                "frame_id",
-                &(metadata->frame_index));
-
-        writer.write_scalar_metadata<uint32_t>(
-                "daq_rec",
-                &(metadata->daq_rec));
-
-        writer.write_scalar_metadata<uint16_t>(
-                "received_packets",
-                &(metadata->n_received_packets));
-
-        zmq_send(socket,
-                 metadata,
-                 sizeof(ModuleFrame),
-                 ZMQ_SNDMORE);
-
-        zmq_send(socket,
-                 data,
-                 MODULE_N_BYTES,
-                 0);
+        // Live stream.
+        zmq_send(socket, metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
+        zmq_send(socket, data, MODULE_N_BYTES, 0);
 
         queue.release();
 
         // TODO: Make real statistics, please.
+        auto pulse_id = metadata->pulse_id;
         stats_counter++;
 
         if (metadata->n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
