@@ -58,6 +58,7 @@ int main (int argc, char *argv[]) {
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
     uint64_t n_missed_frames = 0;
+    uint64_t n_corrupted_frames = 0;
     uint64_t last_pulse_id = 0;
 
     BufferH5Writer writer(device_name, root_folder);
@@ -92,6 +93,7 @@ int main (int argc, char *argv[]) {
         if (metadata->n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
             n_missed_packets +=
                     JUNGFRAU_N_PACKETS_PER_FRAME - metadata->n_received_packets;
+            n_corrupted_frames++;
         }
 
         if (last_pulse_id>0) {
@@ -104,10 +106,12 @@ int main (int argc, char *argv[]) {
             cout << " sf_buffer:pulse_id " << pulse_id;
             cout << " sf_buffer:n_missed_frames " << n_missed_frames;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
+            cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
             cout << endl;
 
             stats_counter = 0;
             n_missed_packets = 0;
+            n_corrupted_frames = 0;
             n_missed_frames = 0;
         }
     }
