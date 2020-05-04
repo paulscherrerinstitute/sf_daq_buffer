@@ -47,7 +47,7 @@ int main (int argc, char *argv[]) {
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms)) != 0)
         throw runtime_error(strerror (errno));
 
-    if (zmq_connect(socket, ipc_address.c_str()) != 0)
+    if (zmq_bind(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
     RingBuffer<UdpFrameMetadata> ring_buffer(BUFFER_RB_SIZE);
