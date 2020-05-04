@@ -12,6 +12,14 @@ class UdpRecvModule {
         std::thread receiving_thread_;
         std::atomic_bool is_receiving_;
 
+    inline void init_frame(
+            ModuleFrame* frame_metadata,
+            jungfrau_packet& packet_buffer);
+
+    inline void reserve_next_frame_buffers(
+            ModuleFrame*& frame_metadata,
+            char*& frame_buffer);
+
     protected:
         void receive_thread(const uint16_t udp_port);
 
