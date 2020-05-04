@@ -60,14 +60,7 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    FastH5Writer writer(
-            core_buffer::FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE,
-            device_name, root_folder);
-
-    writer.add_scalar_metadata<uint64_t>("pulse_id");
-    writer.add_scalar_metadata<uint64_t>("frame_id");
-    writer.add_scalar_metadata<uint32_t>("daq_rec");
-    writer.add_scalar_metadata<uint16_t>("received_packets");
+    FastH5Writer writer(device_name, root_folder);
 
     int slot_id;
 
@@ -84,7 +77,7 @@ int main (int argc, char *argv[]) {
 
         auto pulse_id = metadata->pulse_id;
         writer.set_pulse_id(pulse_id);
-        writer.write_data(data);
+        writer.write(metadata, data);
 
         // TODO: Combine all this into 1 struct.
         writer.write_scalar_metadata<uint64_t>(
