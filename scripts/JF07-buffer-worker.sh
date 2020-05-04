@@ -20,4 +20,4 @@ DETECTOR=JF07T32V01
 echo ${port}
 
 #taskset -c ${coreAssociatedBuffer[10#${M}]} /usr/bin/sf_buffer M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} > /gpfs/photonics/swissfel/buffer/${port}.log
-taskset -c ${coreAssociatedBuffer[10#${M}]} /usr/bin/sf_buffer M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} 
+taskset -c ${coreAssociatedBuffer[10#${M}]} /usr/bin/sf_buffer M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${M}
