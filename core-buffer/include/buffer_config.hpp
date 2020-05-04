@@ -31,6 +31,9 @@ namespace core_buffer {
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 10 * 1000;
 
+    // Output queue length for buffer live stream.
+    const int BUFFER_LIVE_SEND_HWM = 10;
+
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
 
