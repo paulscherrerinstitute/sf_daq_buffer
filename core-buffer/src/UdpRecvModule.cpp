@@ -37,7 +37,7 @@ inline void UdpRecvModule::init_frame (
 {
     frame_metadata->pulse_id = packet_buffer.bunchid;
     frame_metadata->frame_index = packet_buffer.framenum;
-    frame_metadata->daq_rec = packet_buffer.debug;
+    frame_metadata->daq_rec = (uint64_t)packet_buffer.debug;
 }
 
 inline void UdpRecvModule::reserve_next_frame_buffers(
@@ -49,8 +49,8 @@ inline void UdpRecvModule::reserve_next_frame_buffers(
         throw runtime_error("Queue is full.");
 
     frame_metadata = queue_.get_metadata_buffer(slot_id);
-    frame_metadata->pulse_id=0;
-    frame_metadata->n_received_packets=0;
+    frame_metadata->pulse_id = 0;
+    frame_metadata->n_received_packets = 0;
 
     frame_buffer = queue_.get_data_buffer(slot_id);
     memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
