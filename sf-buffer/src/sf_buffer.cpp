@@ -114,7 +114,5 @@ int main (int argc, char *argv[]) {
             n_corrupted_frames = 0;
             n_missed_frames = 0;
         }
-
-        this_thread::yield();
     }
 }

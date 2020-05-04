@@ -73,7 +73,6 @@ void UdpRecvModule::receive_thread(const uint16_t udp_port)
             if (!udp_receiver.receive(
                     &packet_buffer,
                     JUNGFRAU_BYTES_PER_PACKET)) {
-                this_thread::yield();
                 continue;
             }
 
@@ -104,6 +103,7 @@ void UdpRecvModule::receive_thread(const uint16_t udp_port)
             {
                 queue_.commit();
                 reserve_next_frame_buffers(frame_metadata, frame_buffer);
+                this_thread::yield();
             }
         }
 

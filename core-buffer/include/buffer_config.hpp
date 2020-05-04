@@ -29,10 +29,10 @@ namespace core_buffer {
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
 
     // Time to sleep before retrying to read the queue.
-    const size_t BUFFER_QUEUE_RETRY_MS = 10;
+    const size_t BUFFER_QUEUE_RETRY_MS = 5;
 
     // Microseconds timeout for UDP recv.
-    const int BUFFER_UDP_US_TIMEOUT = 10 * 1000;
+    const int BUFFER_UDP_US_TIMEOUT = 5 * 1000;
 
     // Output queue length for buffer live stream.
     const int BUFFER_LIVE_SEND_HWM = 10;
