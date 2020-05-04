@@ -5,100 +5,66 @@
 
 using namespace std;
 
-UdpRecvModule::UdpRecvModule(RingBuffer<UdpFrameMetadata>& ring_buffer) :
-            ring_buffer_(ring_buffer),
-            is_receiving_(false)
+UdpRecvModule::UdpRecvModule(
+        FastQueue<ModuleFrame>& queue,
+        const uint16_t udp_port) :
+            queue_(queue),
+            is_receiving_(true)
 {
-
-}
-
-UdpRecvModule::~UdpRecvModule()
-{
-    stop_recv();
-}
-
-void UdpRecvModule::start_recv(
-        const uint16_t udp_port,
-        const size_t frame_n_bytes)
-{
-    if (is_receiving_ == true) {
-        std::stringstream err_msg;
-
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[UdpRecvModule::start_recv]";
-        err_msg << " Receivers already running." << endl;
-
-        throw runtime_error(err_msg.str());
-    }
-
     #ifdef DEBUG_OUTPUT
         using namespace date;
         using namespace chrono;
         cout << "[" << system_clock::now() << "]";
-        cout << "[UdpRecvModule::start_recv]";
+        cout << "[UdpRecvModule::UdpRecvModule]";
         cout << " Starting with ";
         cout << "udp_port " << udp_port << endl;
     #endif
 
-    is_receiving_ = true;
-
-    if (receiving_thread_.joinable()) {
-        receiving_thread_.join();
-    }
-
     receiving_thread_ = thread(
             &UdpRecvModule::receive_thread, this,
-            udp_port,
-            frame_n_bytes);
+            udp_port);
 }
 
-void UdpRecvModule::stop_recv()
+UdpRecvModule::~UdpRecvModule()
 {
-#ifdef DEBUG_OUTPUT
-    using namespace date;
-    using namespace chrono;
-    cout << "[" << system_clock::now() << "]";
-    cout << "UdpRecvModule::stop_recv";
-    cout << " Stop receiving." << endl;
-#endif
-
     is_receiving_ = false;
-
-    if (receiving_thread_.joinable()) {
-        receiving_thread_.join();
-    }
+    receiving_thread_.join();
 }
 
-void UdpRecvModule::receive_thread(
-        const uint16_t udp_port,
-        const size_t frame_size)
+inline void UdpRecvModule::init_frame (
+        ModuleFrame* frame_metadata,
+        jungfrau_packet& packet_buffer)
+{
+    frame_metadata->frame_index = packet_buffer.framenum;
+    frame_metadata->pulse_id = packet_buffer.bunchid;
+    frame_metadata->daq_rec = packet_buffer.debug;
+}
+
+inline void UdpRecvModule::reserve_next_frame_buffers(
+        ModuleFrame*& frame_metadata,
+        char*& frame_buffer)
+{
+    int slot_id;
+    if ((slot_id = queue_.reserve()) == -1)
+        throw runtime_error("Queue is full.");
+
+    frame_metadata = queue_.get_metadata_buffer(slot_id);
+    frame_metadata->pulse_id=0;
+    frame_metadata->n_received_packets=0;
+
+    frame_buffer = queue_.get_data_buffer(slot_id);
+    memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
+}
+
+void UdpRecvModule::receive_thread(const uint16_t udp_port)
 {
     try {
-        ring_buffer_.initialize(frame_size);
-
         UdpReceiver udp_receiver;
         udp_receiver.bind(udp_port);
 
-        auto metadata = make_shared<UdpFrameMetadata>();
-        metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
-        metadata->pulse_id = 0;
-        metadata->n_recv_packets = 0;
-
-        char* frame_buffer = ring_buffer_.reserve(metadata);
-        if (frame_buffer == nullptr) {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[UdpRecvModule::receive_thread]";
-            err_msg << " Ring buffer is full.";
-            err_msg << endl;
-
-            throw runtime_error(err_msg.str());
-        }
+        ModuleFrame* frame_metadata;
+        char* frame_buffer;
+        reserve_next_frame_buffers(frame_metadata, frame_buffer);
 
         jungfrau_packet packet_buffer;
 
@@ -110,43 +76,16 @@ void UdpRecvModule::receive_thread(
                 continue;
             }
 
-            auto* frame_metadata = metadata.get();
-
-            // TODO: Horrible. Breake it down into methods.
-
             // First packet for this frame.
             if (frame_metadata->pulse_id == 0) {
-                frame_metadata->frame_index = packet_buffer.framenum;
-                frame_metadata->pulse_id = packet_buffer.bunchid;
-                frame_metadata->daq_rec = packet_buffer.debug;
-            // Packet from new frame, while we lost the last packet of
-            // previous frame.
+                init_frame(frame_metadata, packet_buffer);
+
+            // Happens if the last packet from the previous frame gets lost.
             } else if (frame_metadata->pulse_id != packet_buffer.bunchid) {
-                ring_buffer_.commit(metadata);
+                queue_.commit();
+                reserve_next_frame_buffers(frame_metadata, frame_buffer);
 
-                metadata = make_shared<UdpFrameMetadata>();
-                metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
-                metadata->pulse_id = 0;
-                metadata->n_recv_packets = 0;
-
-                frame_buffer = ring_buffer_.reserve(metadata);
-                if (frame_buffer == nullptr) {
-                    stringstream err_msg;
-
-                    using namespace date;
-                    using namespace chrono;
-                    err_msg << "[" << system_clock::now() << "]";
-                    err_msg << "[UdpRecvModule::receive_thread]";
-                    err_msg << " Ring buffer is full.";
-                    err_msg << endl;
-
-                    throw runtime_error(err_msg.str());
-                }
-                memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
-
-                frame_metadata->frame_index = packet_buffer.framenum;
-                frame_metadata->pulse_id = packet_buffer.bunchid;
-                frame_metadata->daq_rec = packet_buffer.debug;
+                init_frame(frame_metadata, packet_buffer);
             }
 
             size_t frame_buffer_offset =
@@ -157,32 +96,13 @@ void UdpRecvModule::receive_thread(
                     packet_buffer.data,
                     JUNGFRAU_DATA_BYTES_PER_PACKET);
 
-            frame_metadata->n_recv_packets++;
+            frame_metadata->n_received_packets++;
 
-            // Frame finished with last packet.
+            // Last frame packet received. Frame finished.
             if (packet_buffer.packetnum == JUNGFRAU_N_PACKETS_PER_FRAME-1)
             {
-                ring_buffer_.commit(metadata);
-
-                metadata = make_shared<UdpFrameMetadata>();
-                metadata->frame_bytes_size = JUNGFRAU_DATA_BYTES_PER_FRAME;
-                metadata->pulse_id = 0;
-                metadata->n_recv_packets = 0;
-
-                frame_buffer = ring_buffer_.reserve(metadata);
-                if (frame_buffer == nullptr) {
-                    stringstream err_msg;
-
-                    using namespace date;
-                    using namespace chrono;
-                    err_msg << "[" << system_clock::now() << "]";
-                    err_msg << "[UdpRecvModule::receive_thread]";
-                    err_msg << " Ring buffer is full.";
-                    err_msg << endl;
-
-                    throw runtime_error(err_msg.str());
-                }
-                memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
+                queue_.commit();
+                reserve_next_frame_buffers(frame_metadata, frame_buffer);
             }
         }
 

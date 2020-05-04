@@ -1,10 +1,8 @@
 #include <BufferUtils.hpp>
 #include "FastH5Writer.hpp"
-#include "date.h"
 #include <chrono>
 #include <WriterUtils.hpp>
 #include <cstring>
-#include <iostream>
 
 extern "C"
 {

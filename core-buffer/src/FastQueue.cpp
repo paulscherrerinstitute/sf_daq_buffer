@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <SFWriter.hpp>
+#include <jungfrau.hpp>
 #include "FastQueue.hpp"
 
 using namespace std;
@@ -103,3 +104,4 @@ void FastQueue<T>::release()
 }
 
 template class FastQueue<DetectorFrame>;
+template class FastQueue<ModuleFrame>;

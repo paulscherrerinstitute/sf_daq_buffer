@@ -26,10 +26,16 @@ namespace core_buffer {
     const size_t REPLAY_READ_BLOCK_SIZE = 100;
 
     // Size of sf_buffer RB in elements.
-    const size_t BUFFER_RB_SIZE = 1000;
+    const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
+
+    // Time to sleep before retrying to read the queue.
+    const size_t BUFFER_QUEUE_RETRY_MS = 10;
 
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 10 * 1000;
+
+    // Output queue length for buffer live stream.
+    const int BUFFER_LIVE_SEND_HWM = 10;
 
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
