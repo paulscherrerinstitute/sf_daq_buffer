@@ -14,7 +14,7 @@ using namespace core_buffer;
 
 
 int main (int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 5) {
         cout << endl;
         cout << "Usage: sf_buffer [device_name] [udp_port] [root_folder]";
         cout << "[source_id]";
@@ -31,7 +31,7 @@ int main (int argc, char *argv[]) {
     string device_name = string(argv[1]);
     int udp_port = atoi(argv[2]);
     string root_folder = string(argv[3]);
-    int source_id = atoi(argv[2]);
+    int source_id = atoi(argv[4]);
 
     stringstream ipc_stream;
     ipc_stream << "ipc://sf-live-" << source_id;
