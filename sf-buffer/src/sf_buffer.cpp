@@ -53,8 +53,7 @@ int main (int argc, char *argv[]) {
 
     FastQueue<ModuleFrame> queue(MODULE_N_BYTES, BUFFER_INTERNAL_QUEUE_SIZE);
 
-    UdpRecvModule udp_module(queue);
-    udp_module.start_recv(udp_port, JUNGFRAU_DATA_BYTES_PER_FRAME);
+    UdpRecvModule udp_module(queue, udp_port);
 
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
