@@ -31,6 +31,8 @@ struct jungfrau_packet {
 };
 #pragma pack(pop)
 
+#define ModuleFrame_N_FIELDS 5
+
 #pragma pack(push)
 #pragma pack(1)
 struct ModuleFrame {
@@ -41,5 +43,6 @@ struct ModuleFrame {
     uint64_t module_id;
 };
 #pragma pack(pop)
+
 
 #endif
