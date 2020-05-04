@@ -69,24 +69,22 @@ int main (int argc, char *argv[]) {
     writer.add_scalar_metadata<uint32_t>("daq_rec");
     writer.add_scalar_metadata<uint16_t>("received_packets");
 
-    while (true) {
-        auto slot_id = queue.read();
+    int slot_id;
 
-        if (slot_id == -1){
+    while (true) {
+        if ((slot_id = queue.read()) == -1){
             this_thread::sleep_for(chrono::milliseconds(BUFFER_QUEUE_RETRY_MS));
             continue;
         }
 
         ModuleFrame* metadata = queue.get_metadata_buffer(slot_id);
         char* data = queue.get_data_buffer(slot_id);
-
         auto pulse_id = metadata->pulse_id;
-        writer.set_pulse_id(pulse_id);
 
+        writer.set_pulse_id(pulse_id);
         writer.write_data(data);
 
         // TODO: Combine all this into 1 struct.
-
         writer.write_scalar_metadata<uint64_t>(
                 "pulse_id", &(metadata->pulse_id));
 
