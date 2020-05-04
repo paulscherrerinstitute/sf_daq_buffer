@@ -13,19 +13,19 @@ LiveH5Reader::LiveH5Reader(
             pulse_id_buffer_(make_unique<uint64_t[]>(FILE_MOD)),
             data_buffer_(make_unique<uint16_t[]>(MODULE_N_PIXELS))
 {
-    auto filename = BufferUtils::get_latest_file(current_filename_);
-    file_ = H5::H5File(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
-
-    uint64_t base_pulse_id = start_pulse_id / core_buffer::FILE_MOD;
-    base_pulse_id *= core_buffer::FILE_MOD;
-
-    current_file_max_pulse_id_ =
-
-    image_dataset_ = input_file.openDataSet("image");
-    pulse_id_dataset_ = input_file.openDataSet("pulse_id");
-    frame_index_dataset_ = input_file.openDataSet("frame_id");
-    daq_rec_dataset_ = input_file.openDataSet("daq_rec");
-    n_received_packets_dataset_ = input_file.openDataSet("received_packets");
+//    auto filename = BufferUtils::get_latest_file(current_filename_);
+//    file_ = H5::H5File(filename, H5F_ACC_RDONLY |  H5F_ACC_SWMR_READ);
+//
+//    uint64_t base_pulse_id = start_pulse_id / core_buffer::FILE_MOD;
+//    base_pulse_id *= core_buffer::FILE_MOD;
+//
+//    current_file_max_pulse_id_ =
+//
+//    image_dataset_ = input_file.openDataSet("image");
+//    pulse_id_dataset_ = input_file.openDataSet("pulse_id");
+//    frame_index_dataset_ = input_file.openDataSet("frame_id");
+//    daq_rec_dataset_ = input_file.openDataSet("daq_rec");
+//    n_received_packets_dataset_ = input_file.openDataSet("received_packets");
 
 }
 
