@@ -11,15 +11,8 @@
 using namespace std;
 using namespace core_buffer;
 
-struct FileBufferMetadata {
-    uint64_t pulse_id[REPLAY_READ_BLOCK_SIZE];
-    uint64_t frame_index[REPLAY_READ_BLOCK_SIZE];
-    uint32_t daq_rec[REPLAY_READ_BLOCK_SIZE];
-    uint16_t n_received_packets[REPLAY_READ_BLOCK_SIZE];
-};
-
 void load_data_from_file (
-        FileBufferMetadata* metadata_buffer,
+        ModuleFrame* metadata_buffer,
         char* image_buffer,
         const string &filename,
         const size_t start_index)
@@ -88,7 +81,7 @@ void sf_replay (
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
-    auto metadata_buffer = make_unique<FileBufferMetadata>();
+    auto metadata_buffer = make_unique<ModuleFrame[]>(REPLAY_READ_BLOCK_SIZE);
     auto image_buffer = make_unique<uint16_t[]>(
             REPLAY_READ_BLOCK_SIZE * MODULE_N_PIXELS);
 
@@ -133,15 +126,12 @@ void sf_replay (
 
             cout << "sf_replay:batch_read_ms " << ms_duration << endl;
 
-            for (size_t i_frame=0; i_frame < REPLAY_READ_BLOCK_SIZE; i_frame++) {
+            for (
+                    size_t i_frame=0;
+                    i_frame < REPLAY_READ_BLOCK_SIZE;
+                    i_frame++) {
 
-                ModuleFrame module_frame = {
-                        metadata_buffer->pulse_id[i_frame],
-                        metadata_buffer->frame_index[i_frame],
-                        metadata_buffer->daq_rec[i_frame],
-                        metadata_buffer->n_received_packets[i_frame],
-                        module_id
-                };
+                auto current_frame = (metadata_buffer.get())[i_frame];
 
                 if (current_pulse_id < start_pulse_id) {
                     current_pulse_id++;
@@ -155,7 +145,12 @@ void sf_replay (
                     return;
                 }
 
-                if (current_pulse_id != module_frame.pulse_id and module_frame.pulse_id != 0) {
+                // The buffer did not write this pulse id.
+                if (current_frame.pulse_id == 0) {
+                    cout << "pulse_id " << current_pulse_id;
+                    cout << " missing in buffer file." << endl;
+                // Wrong frame in the buffer file.
+                } else if (current_pulse_id != current_frame.pulse_id) {
                     stringstream err_msg;
 
                     using namespace date;
@@ -164,14 +159,14 @@ void sf_replay (
                     err_msg << "[sf_replay::receive]";
                     err_msg << " Read unexpected pulse_id. ";
                     err_msg << " Expected " << current_pulse_id;
-                    err_msg << " received " << module_frame.pulse_id;
+                    err_msg << " received " << current_frame.pulse_id;
                     err_msg << endl;
 
                     throw runtime_error(err_msg.str());
                 }
 
                 zmq_send(socket,
-                         &module_frame,
+                         &current_frame,
                          sizeof(ModuleFrame),
                          ZMQ_SNDMORE);
 
