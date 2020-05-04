@@ -3,7 +3,7 @@
 #include "test_UdpRecvModule.cpp"
 #include "test_BinaryWriter.cpp"
 #include "test_buffer_utils.cpp"
-#include "test_FastH5Writer.cpp"
+#include "test_BufferH5Writer.cpp"
 #include "test_SFWriter.cpp"
 #include "test_FastQueue.cpp"
 
