@@ -108,30 +108,3 @@ TEST(FastQueue, data_transfer)
         ASSERT_EQ(r_data[i], (uint16_t) i);
     }
 }
-
-TEST(FastQueue, metadata_array)
-{
-    size_t n_slots = 5;
-    size_t slot_data_n_bytes = MODULE_N_BYTES * 2;
-    FastQueue<ModuleFrame[JUNGFRAU_N_MODULES]> queue(
-            slot_data_n_bytes, n_slots);
-
-    int slot_id = queue.reserve();
-    ASSERT_NE(slot_id, -1);
-
-    auto metadata = queue.get_metadata_buffer(slot_id);
-    for (size_t i_module=0; i_module<JUNGFRAU_N_MODULES; i_module++) {
-        metadata[i_module]->module_id = i_module;
-    }
-    queue.commit();
-
-    slot_id = queue.read();
-    ASSERT_NE(slot_id, -1);
-
-    auto read_metadata = queue.get_metadata_buffer(slot_id);
-    for (size_t i_module=0; i_module<JUNGFRAU_N_MODULES; i_module++) {
-        ASSERT_EQ(read_metadata[i_module]->module_id, i_module);
-    }
-
-    queue.release();
-}
