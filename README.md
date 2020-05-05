@@ -16,6 +16,12 @@ https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Parallel-IO.pdf
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1592834
 - JSON library benchmarks
 https://github.com/miloyip/nativejson-benchmark
+- Tuning CPU scheduler for reducing latency
+https://www.scylladb.com/2016/06/10/read-latency-and-scylla-jmx-process/
+- Low latency 10Gbps Ethernet
+https://blog.cloudflare.com/how-to-achieve-low-latency/
+
+
 
 ## Build
 
