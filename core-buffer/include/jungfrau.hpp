@@ -45,5 +45,13 @@ struct ModuleFrame {
 };
 #pragma pack(pop)
 
+struct ModuleFrameBuffer {
+    uint64_t pulse_id[JUNGFRAU_N_MODULES];
+    uint64_t frame_index[JUNGFRAU_N_MODULES];
+    uint64_t daq_rec[JUNGFRAU_N_MODULES];
+    uint64_t n_received_packets[JUNGFRAU_N_MODULES];
+    uint64_t module_id[JUNGFRAU_N_MODULES];
+};
+
 
 #endif

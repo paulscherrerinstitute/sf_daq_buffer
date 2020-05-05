@@ -105,4 +105,4 @@ void FastQueue<T>::release()
 
 template class FastQueue<DetectorFrame>;
 template class FastQueue<ModuleFrame>;
-template class FastQueue<ModuleFrame[JUNGFRAU_N_MODULES]>;
+template class FastQueue<ModuleFrameBuffer>;
