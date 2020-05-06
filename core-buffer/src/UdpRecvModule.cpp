@@ -2,6 +2,10 @@
 #include "jungfrau.hpp"
 #include <iostream>
 #include <UdpReceiver.hpp>
+#include <sys/resource.h>
+#include <sys/resource.h>
+#include <syscall.h>
+
 
 using namespace std;
 
@@ -59,6 +63,12 @@ inline void UdpRecvModule::reserve_next_frame_buffers(
 void UdpRecvModule::receive_thread(const uint16_t udp_port)
 {
     try {
+
+        pid_t tid;
+        tid = syscall(SYS_gettid);
+        int ret = setpriority(PRIO_PROCESS, tid, -10);
+        if (ret == -1) throw runtime_error("cannot set nice");
+
         UdpReceiver udp_receiver;
         udp_receiver.bind(udp_port);
 
