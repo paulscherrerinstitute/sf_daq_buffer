@@ -103,7 +103,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
         }
 
         uint64_t current_pulse_id = 0;
-        auto slot_id = queue_.read();
+        auto slot_id = queue_.reserve();
         if (slot_id == -1) throw runtime_error("This cannot really happen");
 
         auto metadata = queue_.get_metadata_buffer(slot_id);
