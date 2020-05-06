@@ -155,7 +155,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules)
             data = queue_.get_data_buffer(slot_id);
 
             for (size_t i_module = 0; i_module < n_modules; i_module++) {
-                auto module_metadata = metadata->module[i_module];
+                auto& module_metadata = metadata->module[i_module];
 
                 recv_single_module(
                         sockets[i_module],
