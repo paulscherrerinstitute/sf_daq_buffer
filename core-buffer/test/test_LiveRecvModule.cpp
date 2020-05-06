@@ -22,7 +22,7 @@ TEST(LiveRecvModule, basic_interaction) {
         int linger = 0;
         if (zmq_setsockopt(sockets[i], ZMQ_LINGER, &linger,
                            sizeof(linger)) != 0) {
-            throw runtime_error(strerror(errno));
+            throw runtime_error(zmq_strerror(errno));
         }
 
         stringstream ipc_addr;
@@ -30,7 +30,7 @@ TEST(LiveRecvModule, basic_interaction) {
         const auto ipc = ipc_addr.str();
 
         if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
-            throw runtime_error(strerror(errno));
+            throw runtime_error(zmq_strerror(errno));
         }
     }
 
@@ -40,6 +40,7 @@ TEST(LiveRecvModule, basic_interaction) {
     ASSERT_EQ(queue.read(), -1);
 
 
+    this_thread::sleep_for(chrono::milliseconds(10000));
     for (size_t i = 0; i < n_modules; i++) {
         zmq_close(sockets[i]);
     }
