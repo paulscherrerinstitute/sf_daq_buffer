@@ -88,8 +88,6 @@ int main (int argc, char *argv[])
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
                 read_end_time-start_time).count();
 
-        cout << "We got frame " << metadata->module[0].pulse_id << endl;
-
 
         // TODO: Place this tests in the appropriate spot.
 //        if (frame_meta_buffer->pulse_id[i_buffer] !=
