@@ -59,8 +59,6 @@ void* LiveRecvModule::connect_socket(size_t module_id)
     ipc_addr << ipc_prefix_ << module_id;
     const auto ipc = ipc_addr.str();
 
-    cout << "ipc " << ipc << endl;
-
     if (zmq_connect(sock, ipc.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
@@ -117,7 +115,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
         auto data = queue_.get_data_buffer(slot_id);
         // First pass - determine current max pulse id.
         for (size_t i_module = 0; i_module < n_modules; i_module++) {
-            auto module_metadata = metadata->module[i_module];
+            auto& module_metadata = metadata->module[i_module];
 
             recv_single_module(
                     sockets[i_module],
@@ -129,7 +127,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
 
         // Second pass - align all receivers to the max pulse_id.
         for (size_t i_module = 0; i_module < n_modules; i_module++) {
-            auto module_metadata = metadata->module[i_module];
+            auto& module_metadata = metadata->module[i_module];
 
             size_t diff_to_max = current_pulse_id - module_metadata.pulse_id;
             for (size_t i = 0; i < diff_to_max; i++) {
