@@ -61,7 +61,7 @@ void* LiveRecvModule::connect_socket(size_t module_id)
         throw runtime_error(zmq_strerror(errno));
     }
 
-    if (zmq_setsockopt(sock, ZMQ_SUBSCRIBE, "", sizeof("")) != 0) {
+    if (zmq_setsockopt(sock, ZMQ_SUBSCRIBE, "", 0) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
