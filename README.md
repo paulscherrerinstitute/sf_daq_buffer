@@ -20,7 +20,8 @@ https://github.com/miloyip/nativejson-benchmark
 https://www.scylladb.com/2016/06/10/read-latency-and-scylla-jmx-process/
 - Low latency 10Gbps Ethernet
 https://blog.cloudflare.com/how-to-achieve-low-latency/
-
+- CFS intro
+https://opensource.com/article/19/2/fair-scheduling-linux
 
 
 ## Build
