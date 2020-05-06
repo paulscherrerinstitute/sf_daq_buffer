@@ -174,8 +174,6 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
             zmq_close(sockets[i]);
         }
 
-        zmq_ctx_destroy(ctx_);
-
     } catch (const std::exception& e) {
         is_receiving_ = false;
 
