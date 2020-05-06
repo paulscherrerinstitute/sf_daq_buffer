@@ -108,3 +108,40 @@ TEST(FastQueue, data_transfer)
         ASSERT_EQ(r_data[i], (uint16_t) i);
     }
 }
+
+TEST(FaseQueue, array_parameter)
+{
+    size_t n_modules = 32;
+    FastQueue<ModuleFrameBuffer> queue(
+            n_modules * MODULE_N_BYTES,
+            WRITER_RB_BUFFER_SLOTS);
+
+    ModuleFrame frame;
+
+    auto slot_id = queue.reserve();
+    auto metadata = queue.get_metadata_buffer(slot_id);
+
+    for (int i_module=0; i_module<n_modules; i_module++) {
+        auto& module_metadata = metadata->module[i_module];
+
+        frame.pulse_id = i_module;
+        frame.frame_index = i_module;
+        frame.daq_rec = i_module;
+        frame.n_received_packets = i_module;
+        frame.module_id = i_module;
+
+        ModuleFrame* p_metadata = &module_metadata;
+
+        memcpy(p_metadata, &frame, sizeof(ModuleFrame));
+    }
+
+    for (int i_module=0; i_module<n_modules; i_module++) {
+        auto& module_metadata = metadata->module[i_module];
+
+        ASSERT_EQ(module_metadata.pulse_id, i_module);
+        ASSERT_EQ(module_metadata.frame_index, i_module);
+        ASSERT_EQ(module_metadata.daq_rec, i_module);
+        ASSERT_EQ(module_metadata.n_received_packets, i_module);
+        ASSERT_EQ(module_metadata.module_id, i_module);
+    }
+}
