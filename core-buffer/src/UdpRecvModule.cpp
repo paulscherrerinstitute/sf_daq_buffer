@@ -66,7 +66,7 @@ void UdpRecvModule::receive_thread(const uint16_t udp_port)
 
         pid_t tid;
         tid = syscall(SYS_gettid);
-        int ret = setpriority(PRIO_PROCESS, tid, -10);
+        int ret = setpriority(PRIO_PROCESS, tid, -20);
         if (ret == -1) throw runtime_error("cannot set nice");
 
         UdpReceiver udp_receiver;
