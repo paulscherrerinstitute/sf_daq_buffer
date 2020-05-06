@@ -41,16 +41,17 @@ LiveRecvModule::~LiveRecvModule()
 void* LiveRecvModule::connect_socket(size_t module_id)
 {
     void* sock = zmq_socket(ctx_, ZMQ_SUB);
+    if (sock == nullptr) {
+        throw runtime_error(zmq_strerror(errno));
+    }
 
     int rcvhwm = STREAM_RCV_QUEUE_SIZE;
-    if (zmq_setsockopt(sock, ZMQ_RCVHWM, &rcvhwm,
-                       sizeof(rcvhwm)) != 0) {
-        throw runtime_error(strerror(errno));
+    if (zmq_setsockopt(sock, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
     }
     int linger = 0;
-    if (zmq_setsockopt(sock, ZMQ_LINGER, &linger,
-                       sizeof(linger)) != 0) {
-        throw runtime_error(strerror(errno));
+    if (zmq_setsockopt(sock, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
     }
 
     stringstream ipc_addr;
@@ -58,12 +59,11 @@ void* LiveRecvModule::connect_socket(size_t module_id)
     const auto ipc = ipc_addr.str();
 
     if (zmq_connect(sock, ipc.c_str()) != 0) {
-        throw runtime_error(strerror(errno));
+        throw runtime_error(zmq_strerror(errno));
     }
 
-    if (zmq_setsockopt(sock, ZMQ_SUBSCRIBE, "",
-                       sizeof("")) != 0) {
-        throw runtime_error(strerror(errno));
+    if (zmq_setsockopt(sock, ZMQ_SUBSCRIBE, "", sizeof("")) != 0) {
+        throw runtime_error(zmq_strerror(errno));
     }
 
     return sock;
