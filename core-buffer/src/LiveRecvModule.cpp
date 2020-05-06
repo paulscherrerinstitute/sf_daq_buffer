@@ -28,9 +28,7 @@ LiveRecvModule::LiveRecvModule(
     #endif
 
     receiving_thread_ = thread(
-            &LiveRecvModule::receive_thread, this,
-            n_modules,
-            ctx_);
+            &LiveRecvModule::receive_thread, this, n_modules);
 }
 
 LiveRecvModule::~LiveRecvModule()
@@ -98,7 +96,7 @@ void LiveRecvModule::recv_single_module(
     }
 }
 
-void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
+void LiveRecvModule::receive_thread(const size_t n_modules)
 {
     try {
 

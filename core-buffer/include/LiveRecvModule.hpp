@@ -24,7 +24,7 @@ public:
     virtual ~LiveRecvModule();
     void* connect_socket(size_t module_id);
     void recv_single_module(void* socket, ModuleFrame* metadata, char* data);
-    void receive_thread(const size_t n_modules, void* ctx);
+    void receive_thread(const size_t n_modules);
 };
 
 
