@@ -6,6 +6,7 @@
 #include "test_BufferH5Writer.cpp"
 #include "test_SFWriter.cpp"
 #include "test_FastQueue.cpp"
+#include "test_LiveRecvModule.cpp"
 
 using namespace std;
 
