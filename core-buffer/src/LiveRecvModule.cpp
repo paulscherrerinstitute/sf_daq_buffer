@@ -73,7 +73,7 @@ void* LiveRecvModule::connect_socket(size_t module_id)
 }
 
 void LiveRecvModule::recv_single_module(
-        void* socket, char* metadata, char* data)
+        void* socket, ModuleFrame* metadata, char* data)
 {
     auto n_bytes_metadata = zmq_recv(
             socket,
@@ -83,6 +83,10 @@ void LiveRecvModule::recv_single_module(
 
     if (n_bytes_metadata != sizeof(ModuleFrame)) {
         throw runtime_error("Stream header of wrong size.");
+    }
+
+    if (metadata->pulse_id == 0) {
+        throw runtime_error("Received invalid pulse_id=0.");
     }
 
     auto n_bytes_image = zmq_recv(
@@ -117,12 +121,10 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
 
             recv_single_module(
                     sockets[i_module],
-                    (char*)(&(module_metadata)),
+                    &module_metadata,
                     data + (MODULE_N_BYTES * i_module));
 
-            current_pulse_id = max(
-                    current_pulse_id,
-                    metadata->module[i_module].pulse_id);
+            current_pulse_id = max(current_pulse_id, module_metadata.pulse_id);
         }
 
         // Second pass - align all receivers to the max pulse_id.
@@ -133,7 +135,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
             for (size_t i = 0; i < diff_to_max; i++) {
                 recv_single_module(
                         sockets[i_module],
-                        (char *) (&(module_metadata)),
+                        &module_metadata,
                         data + (MODULE_N_BYTES * i_module));
             }
 
@@ -161,7 +163,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules, void* ctx_)
 
                 recv_single_module(
                         sockets[i_module],
-                        (char*)(&(module_metadata)),
+                        &module_metadata,
                         data + (MODULE_N_BYTES * i_module));
 
                 if (current_pulse_id != module_metadata.pulse_id) {
