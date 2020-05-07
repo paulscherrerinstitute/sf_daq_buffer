@@ -77,7 +77,7 @@ void sf_replay (
     base_pulse_id *= core_buffer::FILE_MOD;
 
     size_t current_pulse_id = base_pulse_id;
-    string filename_base = device + "/" + channel_name + "/";
+    string filename_base = core_buffer::BUFFER_BASE_DIR + "/" + device + "/" + channel_name + "/";
 
     for (const auto& filename_suffix:path_suffixes) {
 
