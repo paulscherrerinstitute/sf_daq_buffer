@@ -27,40 +27,32 @@ BufferH5Writer::BufferH5Writer(
 
 void BufferH5Writer::create_file(const string& filename)
 {
-    {
-        h5_file_ = H5::H5File(filename, H5F_ACC_TRUNC | H5F_ACC_SWMR_WRITE);
 
-        output_filename_ = filename;
+    h5_file_ = H5::H5File(filename, H5F_ACC_TRUNC);
 
-        H5::DataSpace data_dspace(3, data_disk_dims, data_disk_dims);
-        H5::DSetCreatPropList data_dset_prop;
-        hsize_t data_dset_chunking[3] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
-        data_dset_prop.setChunk(3, data_dset_chunking);
+    output_filename_ = filename;
 
-        h5_file_.createDataSet(
-                "image",
-                H5::PredType::NATIVE_UINT16,
-                data_dspace,
-                data_dset_prop);
+    H5::DataSpace data_dspace(3, data_disk_dims, data_disk_dims);
+    H5::DSetCreatPropList data_dset_prop;
+    hsize_t data_dset_chunking[3] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+    data_dset_prop.setChunk(3, data_dset_chunking);
 
-        H5::DataSpace meta_dspace(2, meta_disk_dims, meta_disk_dims);
-        H5::DSetCreatPropList meta_dset_prop;
-        hsize_t meta_dset_chunking[2] = {1, ModuleFrame_N_FIELDS};
-        meta_dset_prop.setChunk(2, meta_dset_chunking);
+    current_image_dataset_ = h5_file_.createDataSet(
+            "image",
+            H5::PredType::NATIVE_UINT16,
+            data_dspace,
+            data_dset_prop);
 
-        h5_file_.createDataSet(
-                "metadata",
-                H5::PredType::NATIVE_UINT64,
-                meta_dspace,
-                meta_dset_prop);
+    H5::DataSpace meta_dspace(2, meta_disk_dims, meta_disk_dims);
+    H5::DSetCreatPropList meta_dset_prop;
+    hsize_t meta_dset_chunking[2] = {1, ModuleFrame_N_FIELDS};
+    meta_dset_prop.setChunk(2, meta_dset_chunking);
 
-        h5_file_.close();
-    }
-
-    h5_file_ = H5::H5File(filename, H5F_ACC_RDWR |H5F_ACC_SWMR_WRITE);
-
-    current_image_dataset_ = h5_file_.openDataSet("image");
-    current_metadata_dataset_ = h5_file_.openDataSet("metadata");
+    current_metadata_dataset_ = h5_file_.createDataSet(
+            "metadata",
+            H5::PredType::NATIVE_UINT64,
+            meta_dspace,
+            meta_dset_prop);
 }
 
 BufferH5Writer::~BufferH5Writer()
@@ -131,7 +123,4 @@ void BufferH5Writer::write(const ModuleFrame* metadata, const char* data)
             H5::PredType::NATIVE_UINT16,
             data_buffer_space,
             data_disk_space);
-
-    H5Dflush(current_metadata_dataset_.getId());
-    H5Dflush(current_image_dataset_.getId());
 }
