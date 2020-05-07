@@ -54,3 +54,11 @@ make
 
 It is recommended to create symbolic links to the executables you will be using 
 inside your PATH.
+
+Example:
+```bash
+ln -s "$(pwd)""/""sf_buffer" /usr/bin/sf_buffer
+ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
+ln -s "$(pwd)""/""sf_replay" /usr/bin/sf_replay
+ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
+```
