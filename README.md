@@ -26,14 +26,31 @@ https://opensource.com/article/19/2/fair-scheduling-linux
 
 ## Build
 
-In order to compile you will need to install:
-- devtoolset-8
+To compile this repo you will need to install the following packages on RH7:
+- devtoolset-9
 - cmake3
 - zeromq-devel
 - hdf5-devel
 
-Procedure:
-- mkdir build
-- cd build
-- cmake3 ..
-- make
+```bash
+yum install devtoolset-9
+yum install cmake3
+yum install zeromq-devel
+yum install hdf5-devel
+yum install jsoncpp-devel
+```
+
+Step by step procedure to build the repo:
+
+```bash
+scl enable devtoolset-9 bash
+git clone https://github.com/paulscherrerinstitute/sf_daq_buffer.git
+cd sf_daq_buffer
+mkdir build
+cd build/
+cmake3 ..
+make
+```
+
+It is recommended to create symbolic links to the executables you will be using 
+inside your PATH.
