@@ -58,6 +58,7 @@ set_target_properties(sf-stream PROPERTIES OUTPUT_NAME sf_stream)
 target_link_libraries(sf-stream
         core-buffer
         zmq
+        jsoncpp
         boost_system
         pthread) 
 
