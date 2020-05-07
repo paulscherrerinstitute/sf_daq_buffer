@@ -1,14 +1,11 @@
 #include <iostream>
-#include <stdexcept>
 #include "buffer_config.hpp"
 #include "zmq.h"
 #include <string>
 #include <RingBuffer.hpp>
-#include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
 #include "SFWriter.hpp"
-#include <config.hpp>
 
 using namespace std;
 using namespace core_buffer;
@@ -52,7 +49,7 @@ int main (int argc, char *argv[])
     auto current_pulse_id = start_pulse_id;
     while (current_pulse_id <= stop_pulse_id) {
 
-        writer.write(metadata, data.get());
+        writer.write(metadata.get(), data.get());
         current_pulse_id++;
 
         i_write++;
