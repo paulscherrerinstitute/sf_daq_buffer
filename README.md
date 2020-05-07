@@ -1,6 +1,8 @@
 # sf_daq_buffer
 
-Prof of concept for the SF DAQ detector needs.
+Overview of current architecture and component interaction.
+
+![Overview image](docs/sf_daq_buffer-overview.jpg)
 
 ## Useful links
 
