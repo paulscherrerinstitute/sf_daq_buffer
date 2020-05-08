@@ -41,7 +41,7 @@ void receive_replay(
             ipc_addr << ipc_prefix << i;
             const auto ipc = ipc_addr.str();
 
-            if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
+            if (zmq_connect(sockets[i], ipc.c_str()) != 0) {
                 throw runtime_error(strerror(errno));
             }
         }
