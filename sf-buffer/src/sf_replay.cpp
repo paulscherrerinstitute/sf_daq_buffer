@@ -83,16 +83,6 @@ void sf_replay (
 
         string filename = filename_base + filename_suffix.path;
 
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            using namespace chrono;
-
-            cout << "[" << system_clock::now() << "]";
-            cout << "[sf_replay::sf_replay]";
-
-            cout << " Reading from filename " << filename << endl;
-        #endif
-
         for (size_t file_index_offset=0;
              file_index_offset < FILE_MOD;
              file_index_offset += REPLAY_READ_BLOCK_SIZE)
@@ -161,16 +151,6 @@ void sf_replay (
                          MODULE_N_BYTES,
                          0);
 
-                #ifdef DEBUG_OUTPUT
-                    using namespace date;
-                    using namespace chrono;
-
-                    cout << "[" << system_clock::now() << "]";
-                    cout << "[sf_replay::sf_replay]";
-                    cout << " Sent pulse_id ";
-                    cout << current_pulse_id << endl;
-                #endif
-
                 current_pulse_id++;
             }
         }
@@ -203,22 +183,6 @@ int main (int argc, char *argv[]) {
     stringstream ipc_stream;
     ipc_stream << "ipc:///tmp/sf-replay-" << (int)module_id;
     const auto ipc_address = ipc_stream.str();
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-
-        cout << "[" << system_clock::now() << "]";
-        cout << "[sf_replay::receive]";
-
-        cout << " device " << device;
-        cout << " channel_name " << channel_name;
-        cout << " module_id " << module_id;
-        cout << " start_pulse_id " << start_pulse_id;
-        cout << " stop_pulse_id " << stop_pulse_id;
-        cout << " ipc_address " << ipc_address;
-        cout << endl;
-    #endif
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);
