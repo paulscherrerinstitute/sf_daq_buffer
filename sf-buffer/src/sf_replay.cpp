@@ -231,7 +231,7 @@ int main (int argc, char *argv[]) {
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms)) != 0)
         throw runtime_error(strerror (errno));
 
-    if (zmq_bind(socket, ipc_address.c_str()) != 0)
+    if (zmq_connect(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
     sf_replay(socket, device, channel_name, start_pulse_id, stop_pulse_id);
