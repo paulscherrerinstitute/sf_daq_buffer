@@ -124,9 +124,9 @@ void receive_replay(
                     if (n_bytes_image != MODULE_N_BYTES) {
                         throw runtime_error("Wrong number of data bytes.");
                     }
-
-                    current_pulse_id++;
                 }
+
+                current_pulse_id++;
             }
 
             queue.commit();
