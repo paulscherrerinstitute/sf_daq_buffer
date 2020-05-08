@@ -48,7 +48,7 @@ void* LiveRecvModule::connect_socket(size_t module_id)
         throw runtime_error(zmq_strerror(errno));
     }
 
-    int rcvhwm = STREAM_RCV_QUEUE_SIZE;
+    int rcvhwm = STREAM_RCVHWM;
     if (zmq_setsockopt(sock, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }

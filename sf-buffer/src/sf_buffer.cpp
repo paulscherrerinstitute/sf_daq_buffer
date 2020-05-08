@@ -40,7 +40,7 @@ int main (int argc, char *argv[]) {
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUB);
 
-    const int sndhwm = BUFFER_LIVE_SEND_HWM;
+    const int sndhwm = BUFFER_ZMQ_SNDHWM;
     if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0)
         throw runtime_error(strerror (errno));
 

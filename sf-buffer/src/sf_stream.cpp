@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
             WRITER_RB_BUFFER_SLOTS);
 
     auto ctx = zmq_ctx_new();
-    zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
+    zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
     string ipc_prefix = "ipc:///tmp/sf-live-";
 
     LiveRecvModule recv_module(queue, n_modules, ctx, ipc_prefix);
