@@ -4,6 +4,7 @@
 #include "FastQueue.hpp"
 #include <thread>
 #include "jungfrau.hpp"
+#include <vector>
 
 class LiveRecvModule {
 
@@ -25,6 +26,11 @@ public:
     void* connect_socket(size_t module_id);
     void recv_single_module(void* socket, ModuleFrame* metadata, char* data);
     void receive_thread(const size_t n_modules);
+    uint64_t align_modules(
+            const std::vector<void*>& sockets,
+            ModuleFrameBuffer *metadata,
+            char *data);
+
 };
 
 
