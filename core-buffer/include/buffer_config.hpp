@@ -27,8 +27,6 @@ namespace core_buffer {
     // How many frames do we read at once during replay.
     const size_t REPLAY_READ_BLOCK_SIZE = 100;
 
-    // How long should the RECV queue be.
-    const size_t STREAM_RCV_QUEUE_SIZE = 100;
 
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
@@ -39,8 +37,14 @@ namespace core_buffer {
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 5 * 1000;
 
-    // Output queue length for buffer live stream.
-    const int BUFFER_LIVE_SEND_HWM = 100;
+    // HWM for live stream from buffer.
+    const int BUFFER_ZMQ_SNDHWM = 100;
+
+    // N of IO threads to receive data from modules.
+    const int STREAM_ZMQ_IO_THREADS = 4;
+
+    // How long should the RECV queue be.
+    const size_t STREAM_RCVHWM = 100;
 
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
