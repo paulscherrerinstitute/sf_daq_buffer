@@ -27,8 +27,7 @@ LiveRecvModule::LiveRecvModule(
         cout << endl;
     #endif
 
-    receiving_thread_ = thread(
-            &LiveRecvModule::receive_thread, this, n_modules);
+    receiving_thread_ = thread(&LiveRecvModule::receive_thread, this);
 }
 
 LiveRecvModule::~LiveRecvModule()
@@ -132,13 +131,13 @@ uint64_t LiveRecvModule::align_modules(
     return max_pulse_id;
 }
 
-void LiveRecvModule::receive_thread(const size_t n_modules)
+void LiveRecvModule::receive_thread()
 {
     try {
 
-        vector<void*> sockets(n_modules);
+        vector<void*> sockets(n_modules_);
 
-        for (size_t i = 0; i < n_modules; i++) {
+        for (size_t i = 0; i < n_modules_; i++) {
             sockets[i] = connect_socket(i);
         }
 
@@ -149,7 +148,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules)
         auto data = queue_.get_data_buffer(slot_id);
 
         // First buffer load for alignment.
-        for (size_t i_module = 0; i_module < n_modules; i_module++) {
+        for (size_t i_module = 0; i_module < n_modules_; i_module++) {
             auto& module_metadata = metadata->module[i_module];
 
             recv_single_module(
@@ -175,7 +174,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules)
             data = queue_.get_data_buffer(slot_id);
 
             bool sync_needed = false;
-            for (size_t i_module = 0; i_module < n_modules; i_module++) {
+            for (size_t i_module = 0; i_module < n_modules_; i_module++) {
                 auto& module_metadata = metadata->module[i_module];
 
                 recv_single_module(
@@ -208,7 +207,7 @@ void LiveRecvModule::receive_thread(const size_t n_modules)
             current_pulse_id++;
         }
 
-        for (size_t i = 0; i < n_modules; i++) {
+        for (size_t i = 0; i < n_modules_; i++) {
             zmq_close(sockets[i]);
         }
 
