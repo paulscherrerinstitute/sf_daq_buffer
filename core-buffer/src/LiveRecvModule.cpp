@@ -33,6 +33,11 @@ LiveRecvModule::LiveRecvModule(
 
 LiveRecvModule::~LiveRecvModule()
 {
+    stop();
+}
+
+void LiveRecvModule::stop()
+{
     is_receiving_ = false;
     receiving_thread_.join();
 }

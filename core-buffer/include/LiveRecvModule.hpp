@@ -31,6 +31,8 @@ public:
             ModuleFrameBuffer *metadata,
             char *data);
 
+    void stop();
+
 };
 
 
