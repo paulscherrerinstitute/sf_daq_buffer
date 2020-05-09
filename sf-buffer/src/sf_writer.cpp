@@ -141,10 +141,13 @@ void receive_replay(
                 }
 
                 current_pulse_id++;
+                // received all frames, don't wait till all WRITER_N_FRAMES_BUFFER  
+                if ( current_pulse_id > stop_pulse_id ) break;
             }
 
             queue.commit();
 
+            // break receiving loop
             if ( current_pulse_id > stop_pulse_id ) break;
         }
         for (size_t i = 0; i < n_modules; i++) {
@@ -198,7 +201,7 @@ int main (int argc, char *argv[])
             receive_replay, ipc_prefix, n_modules,
             ref(queue), ctx, start_pulse_id, stop_pulse_id);
 
-    size_t n_frames = stop_pulse_id - start_pulse_id;
+    size_t n_frames = stop_pulse_id - start_pulse_id + 1;
     SFWriter writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
