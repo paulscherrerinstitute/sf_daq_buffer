@@ -89,6 +89,7 @@ void SFWriter::write(const DetectorFrame* metadata, const char* data) {
     auto frame_index_data = (char*)(metadata->frame_index);
     auto daq_rec_data = (char*)(metadata->daq_rec);
     auto n_received_packets_data = (char*)(metadata->n_received_packets);
+    auto is_good_frame_data = (char*)(metadata->is_good_frame);
 
     hsize_t image_offset[] = {current_write_index_, 0, 0};
     hsize_t metadata_offset [] = {current_write_index_, 0};
