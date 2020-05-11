@@ -7,7 +7,11 @@
 
 class BufferUdpReceiver {
     const int source_id_;
+
     UdpReceiver udp_receiver_;
+    jungfrau_packet packet_buffer_ = {};
+
+    inline void init_frame(ModuleFrame& frame_metadata);
 
 public:
     BufferUdpReceiver(const uint16_t port, const int source_id);
