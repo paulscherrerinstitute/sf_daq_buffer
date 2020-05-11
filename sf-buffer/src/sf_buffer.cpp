@@ -41,12 +41,11 @@ inline void save_and_send(
 inline void get_frame_from_udp(
         UdpReceiver& udp_receiver,
         ModuleFrame& metadata,
-        jungfrau_packet& packet_buffer,
-        BufferH5Writer& writer,
-        uint64_t source_id,
-        char *frame_buffer
-        )
+        char *frame_buffer,
+        uint64_t source_id)
 {
+    static jungfrau_packet packet_buffer = {};
+
     // Reset the metadata and frame buffer for the next frame.
     metadata.pulse_id = 0;
     metadata.n_received_packets = 0;
@@ -95,6 +94,8 @@ inline void get_frame_from_udp(
         // Last frame packet received. Frame finished.
         if (packet_buffer.packetnum == JUNGFRAU_N_PACKETS_PER_FRAME-1)
         {
+            // Indicates that the packet has already been consumed.
+            packet_buffer.bunchid = 0;
             return;
         }
     }
@@ -149,19 +150,12 @@ int main (int argc, char *argv[]) {
 
     BufferH5Writer writer(device_name, root_folder);
 
-    jungfrau_packet packet_buffer;
-    packet_buffer.bunchid = 0;
-
     ModuleFrame metadata;
     auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
 
-    metadata.pulse_id = 0;
-    metadata.n_received_packets = 0;
-    memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
-
     while (true) {
 
-        get_frame_from_udp();
+        get_frame_from_udp(udp_receiver, metadata, frame_buffer, source_id);
 
         save_and_send(writer, socket, &metadata, frame_buffer);
 
