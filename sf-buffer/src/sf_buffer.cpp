@@ -70,18 +70,45 @@ int main (int argc, char *argv[]) {
     ModuleFrame metadata;
     auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
 
+    size_t write_total_us = 0;
+    size_t write_max_us = 0;
+    size_t send_total_us = 0;
+    size_t send_max_us = 0;
+
     while (true) {
 
         auto pulse_id = receiver.get_frame_from_udp(metadata, frame_buffer);
 
+        auto start_time = chrono::steady_clock::now();
+
         writer.set_pulse_id(pulse_id);
         writer.write(&metadata, frame_buffer);
+
+        auto write_end_time = chrono::steady_clock::now();
+        auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
+                write_end_time-start_time).count();
+
+        start_time = chrono::steady_clock::now();
 
         zmq_send(socket, &metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
         zmq_send(socket, frame_buffer, MODULE_N_BYTES, 0);
 
+        auto send_end_time = chrono::steady_clock::now();
+        auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
+                send_end_time-start_time).count();
+
         // TODO: Make real statistics, please.
         stats_counter++;
+        write_total_us += write_us_duration;
+        send_total_us += send_us_duration;
+
+        if (write_us_duration > write_max_us) {
+            write_max_us = write_us_duration;
+        }
+
+        if (send_us_duration > send_max_us) {
+            send_max_us = send_us_duration;
+        }
 
         if (metadata.n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
             n_missed_packets +=
@@ -100,12 +127,22 @@ int main (int argc, char *argv[]) {
             cout << " sf_buffer:n_missed_frames " << n_missed_frames;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
+
+            cout << " sf_buffer:write_total_us " << write_total_us/STATS_MODULO;
+            cout << " sf_buffer:write_max_us " << write_max_us;
+            cout << " sf_buffer:send_total_us " << send_total_us/STATS_MODULO;
+            cout << " sf_buffer:send_max_us " << send_max_us;
             cout << endl;
 
             stats_counter = 0;
             n_missed_packets = 0;
             n_corrupted_frames = 0;
             n_missed_frames = 0;
+
+            write_total_us = 0;
+            write_max_us = 0;
+            send_total_us = 0;
+            send_max_us = 0;
         }
     }
 
