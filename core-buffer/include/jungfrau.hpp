@@ -1,6 +1,8 @@
 #ifndef JUNGFRAU_H
 #define JUNGFRAU_H
 
+#include <cstdint>
+
 #define JUNGFRAU_N_MODULES 32
 #define JUNGFRAU_BYTES_PER_PACKET 8246
 #define JUNGFRAU_DATA_BYTES_PER_PACKET 8192
