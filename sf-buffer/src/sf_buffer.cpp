@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <RingBuffer.hpp>
 #include <BufferH5Writer.hpp>
-#include <FastQueue.hpp>
 #include "zmq.h"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
