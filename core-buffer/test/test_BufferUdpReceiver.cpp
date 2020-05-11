@@ -48,7 +48,8 @@ TEST(BufferUdpReceiver, simple_recv)
     ModuleFrame metadata;
     auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-    auto pulse_id = udp_receiver.get_frame_from_udp(metadata, frame_buffer.get());
+    auto pulse_id = udp_receiver.get_frame_from_udp(
+            metadata, frame_buffer.get());
     ASSERT_EQ(send_pulse_id, pulse_id);
 
     ::close(send_socket_fd);
