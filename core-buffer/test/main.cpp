@@ -7,6 +7,7 @@
 #include "test_SFWriter.cpp"
 #include "test_FastQueue.cpp"
 #include "test_LiveRecvModule.cpp"
+#include "test_BufferUdpReceiver.cpp"
 
 using namespace std;
 
