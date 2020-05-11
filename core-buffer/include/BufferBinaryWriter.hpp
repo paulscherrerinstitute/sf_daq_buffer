@@ -2,9 +2,9 @@
 #define BINARYWRITER_HPP
 
 #include <string>
-#include "JFFileFormat.hpp"
+#include "BufferBinaryFormat.hpp"
 
-class BinaryWriter {
+class BufferBinaryWriter {
 
     const std::string device_name_;
     const std::string root_folder_;
@@ -18,13 +18,13 @@ class BinaryWriter {
 
 
 public:
-    BinaryWriter(
+    BufferBinaryWriter(
             const std::string& device_name,
             const std::string& root_folder);
 
-    virtual ~BinaryWriter();
+    virtual ~BufferBinaryWriter();
 
-    void write(const uint64_t pulse_id, const JFFileFormat* buffer);
+    void write(const uint64_t pulse_id, const BufferBinaryFormat* buffer);
 
 };
 

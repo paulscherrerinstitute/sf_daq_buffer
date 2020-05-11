@@ -1,4 +1,4 @@
-#include "BinaryWriter.hpp"
+#include "BufferBinaryWriter.hpp"
 #include <unistd.h>
 #include <iostream>
 #include "date.h"
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-BinaryWriter::BinaryWriter(
+BufferBinaryWriter::BufferBinaryWriter(
         const string& device_name,
         const string& root_folder) :
         device_name_(device_name),
@@ -22,12 +22,12 @@ BinaryWriter::BinaryWriter(
 {
 }
 
-BinaryWriter::~BinaryWriter()
+BufferBinaryWriter::~BufferBinaryWriter()
 {
     close_current_file();
 }
 
-void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
+void BufferBinaryWriter::write(uint64_t pulse_id, const BufferBinaryFormat* buffer)
 {
     auto current_frame_file =
             BufferUtils::get_filename(root_folder_, device_name_, pulse_id);
@@ -37,7 +37,7 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
     }
 
     size_t n_bytes_offset =
-            BufferUtils::get_file_frame_index(pulse_id) * sizeof(JFFileFormat);
+            BufferUtils::get_file_frame_index(pulse_id) * sizeof(BufferBinaryFormat);
 
     auto lseek_result = lseek(output_file_fd_, n_bytes_offset, SEEK_SET);
     if (lseek_result < 0) {
@@ -56,8 +56,8 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
         throw runtime_error(err_msg.str());
     }
 
-    auto n_bytes = ::write(output_file_fd_, buffer, sizeof(JFFileFormat));
-    if (n_bytes < sizeof(JFFileFormat)) {
+    auto n_bytes = ::write(output_file_fd_, buffer, sizeof(BufferBinaryFormat));
+    if (n_bytes < sizeof(BufferBinaryFormat)) {
         stringstream err_msg;
 
         using namespace date;
@@ -72,7 +72,7 @@ void BinaryWriter::write(uint64_t pulse_id, const JFFileFormat* buffer)
     }
 }
 
-void BinaryWriter::open_file(const std::string& filename)
+void BufferBinaryWriter::open_file(const std::string& filename)
 {
     close_current_file();
 
@@ -97,7 +97,7 @@ void BinaryWriter::open_file(const std::string& filename)
     current_output_filename_ = filename;
 }
 
-void BinaryWriter::close_current_file()
+void BufferBinaryWriter::close_current_file()
 {
     if (output_file_fd_ != -1) {
         if (close(output_file_fd_) < 0) {

@@ -1,4 +1,4 @@
-#include <BinaryWriter.hpp>
+#include <BufferBinaryWriter.hpp>
 #include "BufferUtils.hpp"
 #include <fcntl.h>
 #include "gtest/gtest.h"
@@ -9,9 +9,9 @@ TEST(BinaryWriter, basic_interaction)
     auto device_name = "test_device";
     uint64_t pulse_id = 5;
 
-    BinaryWriter writer(device_name, root_folder);
+    BufferBinaryWriter writer(device_name, root_folder);
 
-    JFFileFormat frame_data;
+    BufferBinaryFormat frame_data;
     frame_data.pulse_id = 1;
     frame_data.frame_id = 2;
     frame_data.daq_rec = 3;
@@ -29,10 +29,10 @@ TEST(BinaryWriter, basic_interaction)
 
     auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
 
-    JFFileFormat read_data;
+    BufferBinaryFormat read_data;
 
-    ::lseek(read_fd, file_frame_index * sizeof(JFFileFormat), SEEK_SET);
-    ::read(read_fd, &read_data, sizeof(JFFileFormat));
+    ::lseek(read_fd, file_frame_index * sizeof(BufferBinaryFormat), SEEK_SET);
+    ::read(read_fd, &read_data, sizeof(BufferBinaryFormat));
 
     ASSERT_EQ(frame_data.FORMAT_MARKER, JF_FORMAT_START_BYTE);
     ASSERT_EQ(frame_data.FORMAT_MARKER, read_data.FORMAT_MARKER);
@@ -48,9 +48,9 @@ TEST(BinaryWriter, test_format_marker)
     auto device_name = "test_device";
     uint64_t pulse_id = 5;
 
-    BinaryWriter writer(device_name, root_folder);
+    BufferBinaryWriter writer(device_name, root_folder);
 
-    JFFileFormat frame_data;
+    BufferBinaryFormat frame_data;
     frame_data.pulse_id = 1;
     frame_data.frame_id = 2;
     frame_data.daq_rec = 3;
@@ -66,21 +66,21 @@ TEST(BinaryWriter, test_format_marker)
 
     auto file_frame_index = BufferUtils::get_file_frame_index(pulse_id);
 
-    JFFileFormat read_data;
+    BufferBinaryFormat read_data;
 
     // One frame before should be empty.
-    ::lseek(read_fd, (file_frame_index-1) * sizeof(JFFileFormat), SEEK_SET);
-    ::read(read_fd, &read_data, sizeof(JFFileFormat));
+    ::lseek(read_fd, (file_frame_index-1) * sizeof(BufferBinaryFormat), SEEK_SET);
+    ::read(read_fd, &read_data, sizeof(BufferBinaryFormat));
     ASSERT_NE(read_data.FORMAT_MARKER, JF_FORMAT_START_BYTE);
 
     // One frame after should be empty as well.
-    ::lseek(read_fd, (file_frame_index+1) * sizeof(JFFileFormat), SEEK_SET);
-    ::read(read_fd, &read_data, sizeof(JFFileFormat));
+    ::lseek(read_fd, (file_frame_index+1) * sizeof(BufferBinaryFormat), SEEK_SET);
+    ::read(read_fd, &read_data, sizeof(BufferBinaryFormat));
     ASSERT_NE(read_data.FORMAT_MARKER, JF_FORMAT_START_BYTE);
 
     // But this frame should be here.
-    ::lseek(read_fd, (file_frame_index) * sizeof(JFFileFormat), SEEK_SET);
-    ::read(read_fd, &read_data, sizeof(JFFileFormat));
+    ::lseek(read_fd, (file_frame_index) * sizeof(BufferBinaryFormat), SEEK_SET);
+    ::read(read_fd, &read_data, sizeof(BufferBinaryFormat));
     ASSERT_EQ(read_data.FORMAT_MARKER, JF_FORMAT_START_BYTE);
 
 }

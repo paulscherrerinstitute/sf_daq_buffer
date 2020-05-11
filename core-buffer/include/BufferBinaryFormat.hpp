@@ -7,9 +7,9 @@ const char JF_FORMAT_START_BYTE = 0xBE;
 
 #pragma pack(push)
 #pragma pack(1)
-struct JFFileFormat {
+struct BufferBinaryFormat {
 
-    JFFileFormat() : FORMAT_MARKER(JF_FORMAT_START_BYTE) {};
+    BufferBinaryFormat() : FORMAT_MARKER(JF_FORMAT_START_BYTE) {};
 
     const char FORMAT_MARKER;
     uint64_t pulse_id;
