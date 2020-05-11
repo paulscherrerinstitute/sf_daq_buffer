@@ -24,7 +24,10 @@ https://www.scylladb.com/2016/06/10/read-latency-and-scylla-jmx-process/
 https://blog.cloudflare.com/how-to-achieve-low-latency/
 - CFS intro
 https://opensource.com/article/19/2/fair-scheduling-linux
-
+- Making linux do hard real-time
+https://www.slideshare.net/jserv/realtime-linux
+- Linux timing and scheduling granularity
+https://fritshoogland.wordpress.com/2018/03/13/linux-timing-and-scheduling-granularity/
 
 ## Build
 
