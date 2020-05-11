@@ -68,9 +68,6 @@ uint64_t BufferUdpReceiver::get_frame_from_udp(
 
         // Happens if the last packet from the previous frame gets lost.
         } else if (metadata.pulse_id != packet_buffer_.bunchid) {
-            cout << "source_id " << source_id_ << " missing last packet";
-            cout << " pulse_id " << metadata.pulse_id << endl;
-
             packet_buffer_loaded_ = true;
 
             return metadata.pulse_id;
