@@ -10,8 +10,8 @@ class BufferUdpReceiver {
     UdpReceiver udp_receiver_;
 
 public:
-    BufferUdpReceiver(const int source_id);
-    void bind(const uint16_t port);
+    BufferUdpReceiver(const uint16_t port, const int source_id);
+    virtual ~BufferUdpReceiver();
     void get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
 };
 

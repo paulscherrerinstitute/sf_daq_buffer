@@ -57,8 +57,7 @@ int main (int argc, char *argv[]) {
     uint64_t last_pulse_id = 0;
 
     BufferH5Writer writer(device_name, root_folder);
-    BufferUdpReceiver receiver(source_id);
-    receiver.bind(udp_port);
+    BufferUdpReceiver receiver(udp_port, source_id);
 
     ModuleFrame metadata;
     auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];

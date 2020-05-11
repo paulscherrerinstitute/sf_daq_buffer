@@ -1,14 +1,15 @@
 #include "BufferUdpReceiver.hpp"
 
-BufferUdpReceiver::BufferUdpReceiver(int source_id) :
-        source_id_(source_id)
-{
-
-}
-
-void BufferUdpReceiver::bind(const uint16_t port)
+BufferUdpReceiver::BufferUdpReceiver(
+        const uint16_t port,
+        const int source_id) :
+            source_id_(source_id)
 {
     udp_receiver_.bind(port);
+}
+
+BufferUdpReceiver::~BufferUdpReceiver() {
+    udp_receiver_.disconnect();
 }
 
 inline void BufferUdpReceiver::init_frame (
