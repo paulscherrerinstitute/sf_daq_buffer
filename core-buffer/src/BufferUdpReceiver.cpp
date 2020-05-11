@@ -1,7 +1,6 @@
 #include <cstring>
 #include <jungfrau.hpp>
 #include "BufferUdpReceiver.hpp"
-#include <iostream>
 
 using namespace std;
 

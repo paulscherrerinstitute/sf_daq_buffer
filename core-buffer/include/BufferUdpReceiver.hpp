@@ -1,7 +1,6 @@
 #ifndef SF_DAQ_BUFFER_BUFFERUDPRECEIVER_HPP
 #define SF_DAQ_BUFFER_BUFFERUDPRECEIVER_HPP
 
-
 #include "UdpReceiver.hpp"
 #include "jungfrau.hpp"
 
