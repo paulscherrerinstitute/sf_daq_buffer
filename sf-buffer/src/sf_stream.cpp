@@ -46,9 +46,8 @@ int main (int argc, char *argv[])
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
-    string ipc_prefix = "ipc:///tmp/sf-live-";
 
-    LiveRecvModule recv_module(queue, n_modules, ctx, ipc_prefix);
+    LiveRecvModule recv_module(queue, n_modules, ctx, BUFFER_LIVE_IPC_URL);
 
     // 0mq sockets to streamvis and live analysis
     void *socket_streamvis = zmq_socket(ctx, ZMQ_PUB);

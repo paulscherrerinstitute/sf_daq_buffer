@@ -40,6 +40,8 @@ namespace core_buffer {
     // HWM for live stream from buffer.
     const int BUFFER_ZMQ_SNDHWM = 100;
 
+    const std::string BUFFER_LIVE_IPC_URL = "ipc:///tmp/sf-live-";
+
     // N of IO threads to receive data from modules.
     const int STREAM_ZMQ_IO_THREADS = 4;
 

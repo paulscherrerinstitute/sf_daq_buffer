@@ -8,19 +8,17 @@ using namespace core_buffer;
 
 TEST(LiveRecvModule, basic_interaction) {
     auto ctx = zmq_ctx_new();
-    string ipc_prefix = "ipc:///tmp/sf-live-";
 
     size_t n_modules = 32;
     size_t n_slots = 5;
     FastQueue<ModuleFrameBuffer> queue(MODULE_N_BYTES * n_modules, n_slots);
-    LiveRecvModule recv_module(queue, n_modules, ctx, ipc_prefix);
+    LiveRecvModule recv_module(queue, n_modules, ctx, BUFFER_LIVE_IPC_URL);
     this_thread::sleep_for(chrono::milliseconds(100));
     zmq_ctx_destroy(ctx);
 }
 
 TEST(LiveRecvModule, transfer_test) {
     auto ctx = zmq_ctx_new();
-    string ipc_prefix = "ipc:///tmp/sf-live-";
 
     size_t n_modules = 32;
     size_t n_slots = 5;
@@ -37,7 +35,7 @@ TEST(LiveRecvModule, transfer_test) {
         }
 
         stringstream ipc_addr;
-        ipc_addr << ipc_prefix << i;
+        ipc_addr << BUFFER_LIVE_IPC_URL << i;
         const auto ipc = ipc_addr.str();
 
         if (zmq_bind(sockets[i], ipc.c_str()) != 0) {
@@ -45,7 +43,7 @@ TEST(LiveRecvModule, transfer_test) {
         }
     }
 
-    LiveRecvModule recv_module(queue, n_modules, ctx, ipc_prefix);
+    LiveRecvModule recv_module(queue, n_modules, ctx, BUFFER_LIVE_IPC_URL);
 
     // Nothing should be committed, queue, should be empty.
     ASSERT_EQ(queue.read(), -1);
