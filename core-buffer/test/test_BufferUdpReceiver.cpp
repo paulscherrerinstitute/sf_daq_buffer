@@ -28,7 +28,7 @@ TEST(BufferUdpReceiver, simple_recv)
 
                 jungfrau_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
-                send_udp_buffer.bunchid = i_frame;
+                send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
                 send_udp_buffer.debug = i_frame + 10000;
 
@@ -51,7 +51,7 @@ TEST(BufferUdpReceiver, simple_recv)
     for (int i_frame=0; i_frame < BUFFER_UDP_RCVBUF_N_SLOTS; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(
                 metadata, frame_buffer.get());
-        ASSERT_EQ(i_frame, pulse_id);
+        ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         ASSERT_EQ(metadata.n_received_packets, n_packets);
@@ -84,7 +84,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
 
                 jungfrau_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
-                send_udp_buffer.bunchid = i_frame;
+                send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
                 send_udp_buffer.debug = i_frame + 10000;
 
@@ -108,7 +108,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
         auto pulse_id = udp_receiver.get_frame_from_udp(
                 metadata, frame_buffer.get());
 
-        ASSERT_EQ(i_frame, pulse_id);
+        ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
@@ -142,7 +142,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
 
                 jungfrau_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
-                send_udp_buffer.bunchid = i_frame;
+                send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
                 send_udp_buffer.debug = i_frame + 10000;
 
@@ -166,7 +166,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
         auto pulse_id = udp_receiver.get_frame_from_udp(
                 metadata, frame_buffer.get());
 
-        ASSERT_EQ(i_frame, pulse_id);
+        ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
@@ -200,7 +200,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
 
                 jungfrau_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
-                send_udp_buffer.bunchid = i_frame;
+                send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
                 send_udp_buffer.debug = i_frame + 10000;
 
@@ -220,11 +220,12 @@ TEST(BufferUdpReceiver, missing_last_packet)
     ModuleFrame metadata;
     auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-    for (int i_frame=0; i_frame < n_frames; i_frame++) {
+    // n_frames -1 because the last frame is not complete.
+    for (int i_frame=0; i_frame < n_frames - 1; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(
                 metadata, frame_buffer.get());
 
-        ASSERT_EQ(i_frame, pulse_id);
+        ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
