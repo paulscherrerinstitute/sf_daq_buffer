@@ -4,6 +4,7 @@
 #include <UdpRecvModule.hpp>
 #include <BufferH5Writer.hpp>
 #include <FastQueue.hpp>
+#include <UdpReceiver.hpp>
 #include "zmq.h"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
@@ -12,6 +13,31 @@
 using namespace std;
 using namespace core_buffer;
 
+inline void init_frame (
+        ModuleFrame* frame_metadata,
+        jungfrau_packet& packet_buffer,
+        uint64_t source_id)
+{
+    frame_metadata->pulse_id = packet_buffer.bunchid;
+    frame_metadata->frame_index = packet_buffer.framenum;
+    frame_metadata->daq_rec = (uint64_t)packet_buffer.debug;
+    frame_metadata->module_id = source_id;
+}
+
+void save_and_send(
+        BufferH5Writer& writer,
+        void* socket,
+        ModuleFrame *metadata,
+        char *data)
+{
+    // Write to file.
+    writer.set_pulse_id(metadata->pulse_id);
+    writer.write(metadata, data);
+
+    // Live stream.
+    zmq_send(socket, metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
+    zmq_send(socket, data, MODULE_N_BYTES, 0);
+}
 
 int main (int argc, char *argv[]) {
     if (argc != 5) {
@@ -51,40 +77,64 @@ int main (int argc, char *argv[]) {
     if (zmq_bind(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
-    FastQueue<ModuleFrame> queue(MODULE_N_BYTES, BUFFER_INTERNAL_QUEUE_SIZE);
-
-    UdpRecvModule udp_module(queue, udp_port);
-
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
     uint64_t n_missed_frames = 0;
     uint64_t n_corrupted_frames = 0;
     uint64_t last_pulse_id = 0;
 
+    UdpReceiver udp_receiver;
+    udp_receiver.bind(udp_port);
+
     BufferH5Writer writer(device_name, root_folder);
 
-    int slot_id;
+    jungfrau_packet packet_buffer;
+    ModuleFrame* metadata;
+    auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
 
     while (true) {
 
-        if ((slot_id = queue.read()) == -1){
-            this_thread::sleep_for(chrono::milliseconds(BUFFER_QUEUE_RETRY_MS));
+        if (!udp_receiver.receive(
+                &packet_buffer,
+                JUNGFRAU_BYTES_PER_PACKET)) {
             continue;
         }
-        ModuleFrame* metadata = queue.get_metadata_buffer(slot_id);
-        char* data = queue.get_data_buffer(slot_id);
 
-        metadata->module_id = (uint64_t) source_id;
+        // First packet for this frame.
+        if (metadata->pulse_id == 0) {
+            init_frame(metadata, packet_buffer, source_id);
 
-        // Write to file.
-        writer.set_pulse_id(metadata->pulse_id);
-        writer.write(metadata, data);
+            // Happens if the last packet from the previous frame gets lost.
+        } else if (metadata->pulse_id != packet_buffer.bunchid) {
+            save_and_send(writer, socket, metadata, frame_buffer);
 
-        // Live stream.
-        zmq_send(socket, metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
-        zmq_send(socket, data, MODULE_N_BYTES, 0);
+            metadata->pulse_id = 0;
+            metadata->n_received_packets = 0;
+            memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
-        queue.release();
+            init_frame(metadata, packet_buffer, source_id);
+        }
+
+        size_t frame_buffer_offset =
+                JUNGFRAU_DATA_BYTES_PER_PACKET * packet_buffer.packetnum;
+
+        memcpy(
+                (void*) (frame_buffer + frame_buffer_offset),
+                packet_buffer.data,
+                JUNGFRAU_DATA_BYTES_PER_PACKET);
+
+        metadata->n_received_packets++;
+
+        // Last frame packet received. Frame finished.
+        if (packet_buffer.packetnum == JUNGFRAU_N_PACKETS_PER_FRAME-1)
+        {
+            save_and_send(writer, socket, metadata, frame_buffer);
+            metadata->pulse_id = 0;
+            metadata->n_received_packets = 0;
+            memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
+        }
+
+
 
         // TODO: Make real statistics, please.
         auto pulse_id = metadata->pulse_id;
