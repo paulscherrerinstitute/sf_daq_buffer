@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <RingBuffer.hpp>
-#include <UdpRecvModule.hpp>
 #include <BufferH5Writer.hpp>
 #include <FastQueue.hpp>
 #include <UdpReceiver.hpp>
