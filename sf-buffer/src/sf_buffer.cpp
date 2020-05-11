@@ -7,6 +7,10 @@
 #include "jungfrau.hpp"
 #include "BufferUdpReceiver.hpp"
 
+#include <sys/resource.h>
+#include <syscall.h>
+
+
 
 using namespace std;
 using namespace core_buffer;
@@ -25,6 +29,11 @@ int main (int argc, char *argv[]) {
 
         exit(-1);
     }
+
+    pid_t tid;
+    tid = syscall(SYS_gettid);
+    int ret = setpriority(PRIO_PROCESS, tid, -20);
+    if (ret == -1) throw runtime_error("cannot set nice");
 
     string device_name = string(argv[1]);
     int udp_port = atoi(argv[2]);
