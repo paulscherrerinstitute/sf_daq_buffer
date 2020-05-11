@@ -2,7 +2,6 @@
 #include <iostream>
 #include "UdpReceiver.hpp"
 #include "jungfrau.hpp"
-#include "date.h"
 #include <unistd.h>
 #include <cstring>
 #include "buffer_config.hpp"
