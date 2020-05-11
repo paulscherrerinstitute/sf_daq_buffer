@@ -30,11 +30,6 @@ int main (int argc, char *argv[]) {
         exit(-1);
     }
 
-    pid_t tid;
-    tid = syscall(SYS_gettid);
-    int ret = setpriority(PRIO_PROCESS, tid, -20);
-    if (ret == -1) throw runtime_error("cannot set nice");
-
     string device_name = string(argv[1]);
     int udp_port = atoi(argv[2]);
     string root_folder = string(argv[3]);
@@ -66,6 +61,11 @@ int main (int argc, char *argv[]) {
 
     BufferH5Writer writer(device_name, root_folder);
     BufferUdpReceiver receiver(udp_port, source_id);
+
+    pid_t tid;
+    tid = syscall(SYS_gettid);
+    int ret = setpriority(PRIO_PROCESS, tid, -20);
+    if (ret == -1) throw runtime_error("cannot set nice");
 
     ModuleFrame metadata;
     auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
