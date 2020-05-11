@@ -4,8 +4,11 @@
 #include "jungfrau.hpp"
 #include "date.h"
 #include <unistd.h>
+#include <cstring>
+#include "buffer_config.hpp"
 
 using namespace std;
+using namespace core_buffer;
 
 UdpReceiver::UdpReceiver() :
     socket_fd_(-1)
@@ -17,7 +20,7 @@ UdpReceiver::~UdpReceiver()
     disconnect();
 }
 
-void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
+void UdpReceiver::bind(const uint16_t port)
 {
     if (socket_fd_ > -1) {
         throw runtime_error("Socket already bound.");
@@ -44,14 +47,19 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
 
     struct timeval udp_socket_timeout;
     udp_socket_timeout.tv_sec = 0;
-    udp_socket_timeout.tv_usec = usec_timeout;
+    udp_socket_timeout.tv_usec = BUFFER_UDP_US_TIMEOUT;
 
-    setsockopt(
-            socket_fd_,
-            SOL_SOCKET,
-            SO_RCVTIMEO,
-            (const char*)&udp_socket_timeout,
-            sizeof(struct timeval));
+    if (setsockopt(socket_fd_, SOL_SOCKET, SO_RCVTIMEO,
+            (const char*)&udp_socket_timeout, sizeof(struct timeval) == -1)) {
+        throw runtime_error(
+                "Cannot set SO_RCVTIMEO. " + string(strerror(errno)));
+    }
+
+    if (setsockopt(socket_fd_, SOL_SOCKET, SO_RCVBUF,
+            &BUFFER_UDP_RCVBUF, sizeof(BUFFER_UDP_RCVBUF)) == -1) {
+        throw runtime_error(
+                "Cannot set SO_RCVBUF. " + string(strerror(errno)));
+    };
     //TODO: try to set SO_RCVLOWAT
 }
 

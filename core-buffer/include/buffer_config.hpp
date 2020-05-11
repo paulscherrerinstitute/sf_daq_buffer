@@ -34,6 +34,9 @@ namespace core_buffer {
     // Time to sleep before retrying to read the queue.
     const size_t BUFFER_QUEUE_RETRY_MS = 5;
 
+    // Size of UDP recv buffer.
+    const int BUFFER_UDP_RCVBUF = MODULE_N_BYTES * 10;
+
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 5 * 1000;
 
