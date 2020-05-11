@@ -13,17 +13,17 @@ using namespace std;
 using namespace core_buffer;
 
 inline void init_frame (
-        ModuleFrame* frame_metadata,
+        ModuleFrame& frame_metadata,
         jungfrau_packet& packet_buffer,
         uint64_t source_id)
 {
-    frame_metadata->pulse_id = packet_buffer.bunchid;
-    frame_metadata->frame_index = packet_buffer.framenum;
-    frame_metadata->daq_rec = (uint64_t)packet_buffer.debug;
-    frame_metadata->module_id = source_id;
+    frame_metadata.pulse_id = packet_buffer.bunchid;
+    frame_metadata.frame_index = packet_buffer.framenum;
+    frame_metadata.daq_rec = (uint64_t)packet_buffer.debug;
+    frame_metadata.module_id = source_id;
 }
 
-void save_and_send(
+inline void save_and_send(
         BufferH5Writer& writer,
         void* socket,
         ModuleFrame *metadata,
@@ -88,7 +88,7 @@ int main (int argc, char *argv[]) {
     BufferH5Writer writer(device_name, root_folder);
 
     jungfrau_packet packet_buffer;
-    ModuleFrame* metadata;
+    ModuleFrame metadata;
     auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
 
     while (true) {
@@ -100,15 +100,15 @@ int main (int argc, char *argv[]) {
         }
 
         // First packet for this frame.
-        if (metadata->pulse_id == 0) {
+        if (metadata.pulse_id == 0) {
             init_frame(metadata, packet_buffer, source_id);
 
-            // Happens if the last packet from the previous frame gets lost.
-        } else if (metadata->pulse_id != packet_buffer.bunchid) {
-            save_and_send(writer, socket, metadata, frame_buffer);
+        // Happens if the last packet from the previous frame gets lost.
+        } else if (metadata.pulse_id != packet_buffer.bunchid) {
+            save_and_send(writer, socket, &metadata, frame_buffer);
 
-            metadata->pulse_id = 0;
-            metadata->n_received_packets = 0;
+            metadata.pulse_id = 0;
+            metadata.n_received_packets = 0;
             memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
             init_frame(metadata, packet_buffer, source_id);
@@ -116,32 +116,31 @@ int main (int argc, char *argv[]) {
 
         size_t frame_buffer_offset =
                 JUNGFRAU_DATA_BYTES_PER_PACKET * packet_buffer.packetnum;
-
         memcpy(
                 (void*) (frame_buffer + frame_buffer_offset),
                 packet_buffer.data,
                 JUNGFRAU_DATA_BYTES_PER_PACKET);
 
-        metadata->n_received_packets++;
+        metadata.n_received_packets++;
 
         // Last frame packet received. Frame finished.
         if (packet_buffer.packetnum == JUNGFRAU_N_PACKETS_PER_FRAME-1)
         {
-            save_and_send(writer, socket, metadata, frame_buffer);
-            metadata->pulse_id = 0;
-            metadata->n_received_packets = 0;
+            save_and_send(writer, socket, &metadata, frame_buffer);
+            metadata.pulse_id = 0;
+            metadata.n_received_packets = 0;
             memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
         }
 
 
 
         // TODO: Make real statistics, please.
-        auto pulse_id = metadata->pulse_id;
+        auto pulse_id = metadata.pulse_id;
         stats_counter++;
 
-        if (metadata->n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
+        if (metadata.n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
             n_missed_packets +=
-                    JUNGFRAU_N_PACKETS_PER_FRAME - metadata->n_received_packets;
+                    JUNGFRAU_N_PACKETS_PER_FRAME - metadata.n_received_packets;
             n_corrupted_frames++;
         }
 
