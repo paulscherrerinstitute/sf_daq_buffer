@@ -55,7 +55,7 @@ void UdpReceiver::bind(const uint16_t port)
     }
 
     if (setsockopt(socket_fd_, SOL_SOCKET, SO_RCVBUF,
-            &BUFFER_UDP_RCVBUF, sizeof(BUFFER_UDP_RCVBUF)) == -1) {
+                   &BUFFER_UDP_RCVBUF_BYTES, sizeof(int)) == -1) {
         throw runtime_error(
                 "Cannot set SO_RCVBUF. " + string(strerror(errno)));
     };
