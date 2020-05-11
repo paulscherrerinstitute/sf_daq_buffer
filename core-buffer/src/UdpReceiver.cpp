@@ -67,7 +67,7 @@ int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
     return recvmmsg(socket_fd_, msgs, n_msgs, 0, 0);
 }
 
-bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
+bool UdpReceiver::receive(void* buffer, const size_t buffer_n_bytes)
 {
     auto data_len = recv(socket_fd_, buffer, buffer_n_bytes, 0);
 

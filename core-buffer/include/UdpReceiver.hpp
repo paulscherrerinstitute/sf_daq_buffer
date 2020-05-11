@@ -11,7 +11,7 @@ public:
     UdpReceiver();
     virtual ~UdpReceiver();
 
-    bool receive(void* buffer, size_t buffer_n_bytes);
+    bool receive(void* buffer, const size_t buffer_n_bytes);
     int receive_many(mmsghdr* msgs, const size_t n_msgs);
 
     void bind(const uint16_t port);
