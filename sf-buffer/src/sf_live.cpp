@@ -36,16 +36,6 @@ void sf_live (
                  MODULE_N_BYTES,
                  0);
 
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            using namespace chrono;
-
-            cout << "[" << system_clock::now() << "]";
-            cout << "[sf_live::sf_live]";
-            cout << " Sent pulse_id ";
-            cout << current_pulse_id << endl;
-        #endif
-
         current_pulse_id++;
     }
 
@@ -73,21 +63,6 @@ int main (int argc, char *argv[]) {
     stringstream ipc_stream;
     ipc_stream << BUFFER_LIVE_IPC_URL << (int)source_id;
     const auto ipc_address = ipc_stream.str();
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-
-        cout << "[" << system_clock::now() << "]";
-        cout << "[sf_live::main]";
-
-        cout << " device " << device;
-        cout << " channel_name " << channel_name;
-        cout << " source_id " << source_id;
-        cout << " start_pulse_id " << start_pulse_id;
-        cout << " ipc_address " << ipc_address;
-        cout << endl;
-    #endif
 
     auto ctx = zmq_ctx_new();
     auto socket = zmq_socket(ctx, ZMQ_PUSH);

@@ -11,14 +11,6 @@ RingBuffer<T>::RingBuffer(size_t n_slots) :
         n_slots_(n_slots),
         ringbuffer_slots_(n_slots, 0)
 {
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono; 
-        cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::RingBuffer]";
-        cout << " Creating ring buffer";
-        cout << " with n_slots " << n_slots << endl;
-    #endif
 }
 
 template <class T>
@@ -65,17 +57,6 @@ void RingBuffer<T>::initialize(const size_t requested_slot_size)
     buffer_used_slots_ = 0;
 
     initialized_ = true;
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::initialize]";
-        cout << " Ringbuffer initialized";
-        cout << " with slot_size " << slot_size_;
-        cout << " and n_slots " << n_slots_;
-        cout << " and buffer_size " << buffer_size_ << endl;
-    #endif
 }
 
 template <class T>
@@ -117,17 +98,6 @@ char* RingBuffer<T>::reserve(shared_ptr<T> frame_metadata)
             
             frame_metadata->buffer_slot_index = write_index_;
 
-            #ifdef DEBUG_OUTPUT
-                using namespace date;
-                using namespace chrono; 
-                cout << "[" << system_clock::now() << "]";
-                cout << "[RingBuafer::reserve]";
-                cout << " Ring buffer slot ";
-                cout << frame_metadata->buffer_slot_index;
-                cout << " reserved for frame_index ";
-                cout << frame_metadata->frame_index << endl;
-            #endif
-
             write_index_ = (write_index_ + 1) % n_slots_;
             buffer_used_slots_++;
 
@@ -145,15 +115,6 @@ void RingBuffer<T>::commit(shared_ptr<T> frame_metadata)
     lock_guard<mutex> lock(frame_metadata_queue_mutex_);
 
     frame_metadata_queue_.push_back(frame_metadata);
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::commit]";
-        cout << " Metadata for frame_index " << frame_metadata->frame_index;
-        cout << " added to metadata queue." << endl;
-    #endif
 }
 
 template <class T>
@@ -194,15 +155,6 @@ pair<shared_ptr<T>, char*> RingBuffer<T>::read()
         frame_metadata = frame_metadata_queue_.front();
         frame_metadata_queue_.pop_front();
     }
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono; 
-        cout << "[" << system_clock::now() << "]";
-        cout << "[RingBuffer::read]";
-        cout << " Received metadata for frame_index ";
-        cout << frame_metadata->frame_index << endl;
-    #endif
 
     // Check if the references ring buffer slot is valid.
     {

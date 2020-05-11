@@ -20,17 +20,6 @@ BinaryWriter::BinaryWriter(
         current_output_filename_(""),
         output_file_fd_(-1)
 {
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[BinaryWriter::BinaryWriter]";
-        cout << " Starting with";
-        cout << " device_name " << device_name_;
-        cout << " root_folder_ " << root_folder_;
-        cout << " latest_filename_ " << latest_filename_;
-        cout << endl;
-    #endif
 }
 
 BinaryWriter::~BinaryWriter()

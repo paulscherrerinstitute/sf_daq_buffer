@@ -28,15 +28,6 @@ void UdpReceiver::bind(const uint16_t port, const size_t usec_timeout)
         throw runtime_error("Cannot open socket.");
     }
 
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[UdpReceiver::bind]";
-        cout << " port " << port;
-        cout << " usec_timeout " << usec_timeout << endl;
-    #endif
-
     sockaddr_in server_address = {0};
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
@@ -78,14 +69,6 @@ bool UdpReceiver::receive(void* buffer, size_t buffer_n_bytes)
     }
 
     if (data_len != buffer_n_bytes) {
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            using namespace chrono;
-            cout << "[" << system_clock::now() << "]";
-            cout << "[UdpReceiver::receive]";
-            cout << " Expected buffer_n_bytes " << buffer_n_bytes;
-            cout << " but got data_len " << data_len << endl;
-        #endif
         return false;
     }
 

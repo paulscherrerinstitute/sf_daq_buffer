@@ -19,14 +19,6 @@ LiveRecvModule::LiveRecvModule(
         ipc_prefix_(ipc_prefix),
         is_receiving_(true)
 {
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[LiveRecvModule::LiveRecvModule]";
-        cout << endl;
-    #endif
-
     receiving_thread_ = thread(&LiveRecvModule::receive_thread, this);
 }
 

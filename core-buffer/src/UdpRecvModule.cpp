@@ -11,15 +11,6 @@ UdpRecvModule::UdpRecvModule(
             queue_(queue),
             is_receiving_(true)
 {
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        using namespace chrono;
-        cout << "[" << system_clock::now() << "]";
-        cout << "[UdpRecvModule::UdpRecvModule]";
-        cout << " Starting with ";
-        cout << "udp_port " << udp_port << endl;
-    #endif
-
     receiving_thread_ = thread(
             &UdpRecvModule::receive_thread, this,
             udp_port);
