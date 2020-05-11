@@ -44,12 +44,12 @@ void UdpReceiver::bind(const uint16_t port)
         throw runtime_error("Cannot bind socket.");
     }
 
-    struct timeval udp_socket_timeout;
+    timeval udp_socket_timeout;
     udp_socket_timeout.tv_sec = 0;
     udp_socket_timeout.tv_usec = BUFFER_UDP_US_TIMEOUT;
 
     if (setsockopt(socket_fd_, SOL_SOCKET, SO_RCVTIMEO,
-            (const char*)&udp_socket_timeout, sizeof(struct timeval) == -1)) {
+            &udp_socket_timeout, sizeof(timeval)) == -1) {
         throw runtime_error(
                 "Cannot set SO_RCVTIMEO. " + string(strerror(errno)));
     }
