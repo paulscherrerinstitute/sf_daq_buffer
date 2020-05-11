@@ -64,16 +64,15 @@ int main (int argc, char *argv[]) {
 
     while (true) {
 
-        receiver.get_frame_from_udp(metadata, frame_buffer);
+        auto pulse_id = receiver.get_frame_from_udp(metadata, frame_buffer);
 
-        writer.set_pulse_id(metadata.pulse_id);
+        writer.set_pulse_id(pulse_id);
         writer.write(&metadata, frame_buffer);
 
         zmq_send(socket, &metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
         zmq_send(socket, frame_buffer, MODULE_N_BYTES, 0);
 
         // TODO: Make real statistics, please.
-        auto pulse_id = metadata.pulse_id;
         stats_counter++;
 
         if (metadata.n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
