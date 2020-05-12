@@ -26,6 +26,8 @@ https://blog.cloudflare.com/how-to-achieve-low-latency/
 https://opensource.com/article/19/2/fair-scheduling-linux
 - Caching and Buffering in HDF5
 https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
+- Cpusets
+https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 
 
 
