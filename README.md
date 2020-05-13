@@ -6,40 +6,45 @@ Overview of current architecture and component interaction.
 
 ## Useful links
 
-- Hyperslab selection 
-https://support.hdfgroup.org/HDF5/Tutor/phypecont.html
-- Intro to lock free programming
-https://preshing.com/20120612/an-introduction-to-lock-free-programming/
+### Architecture
 - POSIX compliant write order test on GPFS
 https://svn.hdfgroup.org/hdf5/branches/hdf5_1_10_0/test/POSIX_Order_Write_Test_Report.pdf
 - Best Practice Guide - Parallel I/O
 https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Parallel-IO.pdf
 - MPI-IO/GPFS, an Optimized Implementation of MPI-IO on top of GPFS
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1592834
+
+### Software
+- Intro to lock free programming
+https://preshing.com/20120612/an-introduction-to-lock-free-programming/
 - JSON library benchmarks
 https://github.com/miloyip/nativejson-benchmark
-- Tuning CPU scheduler for reducing latency
-https://www.scylladb.com/2016/06/10/read-latency-and-scylla-jmx-process/
-- Low latency 10Gbps Ethernet
-https://blog.cloudflare.com/how-to-achieve-low-latency/
-- CFS intro
-https://opensource.com/article/19/2/fair-scheduling-linux
-- Caching and Buffering in HDF5
-https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
-- Cpusets
-https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
-- RHEL7: How to get started with CGroups.
-https://www.certdepot.net/rhel7-get-started-cgroups/
-- Understanding mlx5 ethtool Counters
-https://community.mellanox.com/s/article/understanding-mlx5-ethtool-counters
-- Red Hat Enterprise Linux Network Performance Tuning Guide
-https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf
 - Kernel bypass
 https://blog.cloudflare.com/kernel-bypass/
 - PACKET_MMAP
 https://www.kernel.org/doc/Documentation/networking/packet_mmap.txt
+- Hyperslab selection 
+https://support.hdfgroup.org/HDF5/Tutor/phypecont.html
+- Caching and Buffering in HDF5
+https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
 
-
+### Linux configuration
+- CFS intro
+https://opensource.com/article/19/2/fair-scheduling-linux
+- perf sched for Linux CPU scheduler analysis
+http://www.brendangregg.com/blog/2017-03-16/perf-sched.html
+- Tuning CPU scheduler for reducing latency
+https://www.scylladb.com/2016/06/10/read-latency-and-scylla-jmx-process/
+- RHEL7: How to get started with CGroups.
+https://www.certdepot.net/rhel7-get-started-cgroups/
+- Cpusets
+https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
+- Understanding mlx5 ethtool Counters
+https://community.mellanox.com/s/article/understanding-mlx5-ethtool-counters
+- Red Hat Enterprise Linux Network Performance Tuning Guide
+https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf
+- Low latency 10Gbps Ethernet
+https://blog.cloudflare.com/how-to-achieve-low-latency/
 
 ## Build
 
