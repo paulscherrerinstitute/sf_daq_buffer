@@ -29,8 +29,6 @@ namespace core_buffer {
     // How many frames do we read at once during replay.
     const size_t REPLAY_READ_BLOCK_SIZE = 100;
 
-    const
-
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
 
