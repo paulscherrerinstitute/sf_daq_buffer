@@ -27,23 +27,22 @@ namespace core_buffer {
     // How many frames do we read at once during replay.
     const size_t REPLAY_READ_BLOCK_SIZE = 100;
 
-
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
 
-    // Time to sleep before retrying to read the queue.
-    const size_t BUFFER_QUEUE_RETRY_MS = 5;
+//    // Time to sleep before retrying to read the queue.
+//    const size_t BUFFER_QUEUE_RETRY_MS = 5;
 
-    const size_t BUFFER_UDP_N_RECV_MSG = 128;
+    const size_t BUFFER_UDP_N_RECV_MSG = 64;
 
     // Size of UDP recv buffer
-    const int BUFFER_UDP_RCVBUF_N_SLOTS = 10;
+    const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // +1 for packet headers.
     const int BUFFER_UDP_RCVBUF_BYTES = (
             MODULE_N_BYTES * (BUFFER_UDP_RCVBUF_N_SLOTS + 1));
 
     // Microseconds timeout for UDP recv.
-    const int BUFFER_UDP_US_TIMEOUT = 5 * 1000;
+    const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
 
     // HWM for live stream from buffer.
     const int BUFFER_ZMQ_SNDHWM = 100;
