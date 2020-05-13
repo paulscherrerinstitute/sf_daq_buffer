@@ -8,6 +8,7 @@
 #include "test_FastQueue.cpp"
 #include "test_LiveRecvModule.cpp"
 #include "test_BufferUdpReceiver.cpp"
+#include "test_bitshuffle.cpp"
 
 using namespace std;
 

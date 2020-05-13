@@ -1,6 +1,7 @@
 add_executable(core-buffer_tests main.cpp)
 
 target_link_libraries(core-buffer_tests
+        external
         core-buffer
         hdf5
         hdf5_hl
