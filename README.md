@@ -14,7 +14,7 @@ https://preshing.com/20120612/an-introduction-to-lock-free-programming/
 https://svn.hdfgroup.org/hdf5/branches/hdf5_1_10_0/test/POSIX_Order_Write_Test_Report.pdf
 - Best Practice Guide - Parallel I/O
 https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Parallel-IO.pdf
-- MPI-IO/GPFS, an Optimized Implementationof MPI-IO on top of GPFS
+- MPI-IO/GPFS, an Optimized Implementation of MPI-IO on top of GPFS
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1592834
 - JSON library benchmarks
 https://github.com/miloyip/nativejson-benchmark
@@ -28,6 +28,14 @@ https://opensource.com/article/19/2/fair-scheduling-linux
 https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
 - Cpusets
 https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
+- RHEL7: How to get started with CGroups.
+https://www.certdepot.net/rhel7-get-started-cgroups/
+- Understanding mlx5 ethtool Counters
+https://community.mellanox.com/s/article/understanding-mlx5-ethtool-counters
+- Red Hat Enterprise Linux Network Performance Tuning Guide
+https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf
+- Kernel bypass
+https://blog.cloudflare.com/kernel-bypass/
 
 
 
