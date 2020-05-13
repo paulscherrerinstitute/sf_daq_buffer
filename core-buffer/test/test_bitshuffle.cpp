@@ -38,12 +38,8 @@ TEST(bitshuffle, simple_compression)
 
 TEST(bitshuffle, separate_compression)
 {
-    auto size = MODULE_N_PIXELS;
-    auto elem_size = 2; // uint16_t
-    auto block_size = MODULE_N_PIXELS;
-
     auto compress_buffer_size = bshuf_compress_lz4_bound(
-            size, elem_size, block_size);
+            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
     auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
 
     // Set specific values to pixels and compress each chunk individually.
@@ -53,7 +49,7 @@ TEST(bitshuffle, separate_compression)
     }
     auto compressed_size_1 = bshuf_compress_lz4(
             frame_buffer.get(), compress_buffer_1.get(),
-            size, elem_size, block_size);
+            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
     ASSERT_TRUE(compressed_size_1 > 0);
 
     auto compress_buffer_2 = make_unique<char[]>(compress_buffer_size);
@@ -62,7 +58,7 @@ TEST(bitshuffle, separate_compression)
     }
     auto compressed_size_2 = bshuf_compress_lz4(
             frame_buffer.get(), compress_buffer_2.get(),
-            size, elem_size, block_size);
+            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
     ASSERT_TRUE(compressed_size_2 > 0);
 
     // Allocate common compression buffer to concat them together.
@@ -92,7 +88,7 @@ TEST(bitshuffle, separate_compression)
     auto out_frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS*2);
     auto consumed_bytes = bshuf_decompress_lz4(
             sum_compressed_buffer.get(), out_frame_buffer.get(),
-            size*2, elem_size, block_size);
+            MODULE_N_PIXELS*2, PIXEL_N_BYTES, MODULE_N_PIXELS);
     ASSERT_EQ(consumed_bytes, sum_compressed_size);
 
     // Verify that concat output buffer has correct specific values.
