@@ -64,7 +64,7 @@ int main (int argc, char *argv[]) {
 
     pid_t tid;
     tid = syscall(SYS_gettid);
-    int ret = setpriority(PRIO_PROCESS, tid, -20);
+    int ret = setpriority(PRIO_PROCESS, tid, 0);
     if (ret == -1) throw runtime_error("cannot set nice");
 
     ModuleFrame metadata;
