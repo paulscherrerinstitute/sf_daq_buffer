@@ -36,6 +36,8 @@ https://community.mellanox.com/s/article/understanding-mlx5-ethtool-counters
 https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf
 - Kernel bypass
 https://blog.cloudflare.com/kernel-bypass/
+- PACKET_MMAP
+https://www.kernel.org/doc/Documentation/networking/packet_mmap.txt
 
 
 
