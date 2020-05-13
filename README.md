@@ -54,6 +54,10 @@ https://access.redhat.com/sites/default/files/attachments/20150325_network_perfo
 https://blog.cloudflare.com/how-to-achieve-low-latency/
 - Monitoring and Tuning the Linux Networking Stack: Receiving Data
 https://blog.packagecloud.io/eng/2016/06/22/monitoring-tuning-linux-networking-stack-receiving-data/#procnetsoftnet_stat
+- Making linux do hard real-time
+https://www.slideshare.net/jserv/realtime-linux
+- Linux timing and scheduling granularity
+https://fritshoogland.wordpress.com/2018/03/13/linux-timing-and-scheduling-granularity/
 
 ## Build
 
