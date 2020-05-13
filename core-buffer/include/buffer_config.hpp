@@ -11,7 +11,9 @@ namespace core_buffer {
     const size_t MODULE_X_SIZE = 1024;
     const size_t MODULE_Y_SIZE = 512;
     const size_t MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE;
-    const size_t MODULE_N_BYTES = MODULE_N_PIXELS * 2;
+    const size_t PIXEL_N_BYTES = 2;
+    const size_t MODULE_N_BYTES = MODULE_N_PIXELS * PIXEL_N_BYTES;
+
 
     // How many frames we store in each file.
     // Must be power of 10 and <= than FOLDER_MOD
@@ -26,6 +28,8 @@ namespace core_buffer {
 
     // How many frames do we read at once during replay.
     const size_t REPLAY_READ_BLOCK_SIZE = 100;
+
+    const
 
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
