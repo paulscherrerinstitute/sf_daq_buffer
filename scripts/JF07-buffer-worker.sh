@@ -9,7 +9,7 @@ fi
 M=$1
 
 # Add ourselves to the user cpuset.
-echo $$ > /sys/fs/cgroup/cpuset/user/tasks
+# echo $$ > /sys/fs/cgroup/cpuset/user/tasks
 
 #8 udp2buffer workers per core
 #coreAssociatedBuffer=(1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 4 4 4 4 4 4 4 4)
