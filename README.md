@@ -31,7 +31,7 @@ https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
 https://portal.hdfgroup.org/display/HDF5/Chunking+in+HDF5
 
 ### Linux configuration
-- CFS intro
+- CFS: Completely fair process scheduling in Linux
 https://opensource.com/article/19/2/fair-scheduling-linux
 - perf sched for Linux CPU scheduler analysis
 http://www.brendangregg.com/blog/2017-03-16/perf-sched.html
