@@ -27,6 +27,8 @@ https://www.kernel.org/doc/Documentation/networking/packet_mmap.txt
 https://support.hdfgroup.org/HDF5/Tutor/phypecont.html
 - Caching and Buffering in HDF5
 https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
+- Chunking in HDF5
+https://portal.hdfgroup.org/display/HDF5/Chunking+in+HDF5
 
 ### Linux configuration
 - CFS intro
