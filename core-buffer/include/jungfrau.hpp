@@ -47,6 +47,14 @@ struct ModuleFrame {
 };
 #pragma pack(pop)
 
+#pragma pack(push)
+#pragma pack(1)
+struct CompressedModuleFrame {
+    ModuleFrame module_frame;
+    uint64_t compressed_size;
+};
+#pragma pack(pop)
+
 struct ModuleFrameBuffer {
     ModuleFrame module[JUNGFRAU_N_MODULES];
 };
