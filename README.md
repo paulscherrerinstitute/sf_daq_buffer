@@ -13,6 +13,8 @@ https://svn.hdfgroup.org/hdf5/branches/hdf5_1_10_0/test/POSIX_Order_Write_Test_R
 https://prace-ri.eu/wp-content/uploads/Best-Practice-Guide_Parallel-IO.pdf
 - MPI-IO/GPFS, an Optimized Implementation of MPI-IO on top of GPFS
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1592834
+- 10GE network tests with UDP - European XFEL
+https://indico.cern.ch/event/212228/contributions/1507212/attachments/333941/466017/10GE_network_tests_with_UDP.pdf
 
 ### Software
 - Intro to lock free programming
