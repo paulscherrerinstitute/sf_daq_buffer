@@ -58,6 +58,10 @@ https://blog.packagecloud.io/eng/2016/06/22/monitoring-tuning-linux-networking-s
 https://www.slideshare.net/jserv/realtime-linux
 - Linux timing and scheduling granularity
 https://fritshoogland.wordpress.com/2018/03/13/linux-timing-and-scheduling-granularity/
+- Raw Ethernet Programming: Basic Introduction - Code Example
+https://community.mellanox.com/s/article/raw-ethernet-programming--basic-introduction---code-example
+- Performance Tuning for Mellanox Adapters
+https://community.mellanox.com/s/article/performance-tuning-for-mellanox-adapters
 
 ## Build
 
