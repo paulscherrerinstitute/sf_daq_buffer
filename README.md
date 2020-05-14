@@ -62,6 +62,7 @@ https://fritshoogland.wordpress.com/2018/03/13/linux-timing-and-scheduling-granu
 https://community.mellanox.com/s/article/raw-ethernet-programming--basic-introduction---code-example
 - Performance Tuning for Mellanox Adapters
 https://community.mellanox.com/s/article/performance-tuning-for-mellanox-adapters
+- UEFI Workload-based Performance and TuningGuide for HPE ProLiant Gen10 https://support.hpe.com/hpesc/public/docDisplay?docId=a00016408en_us
 
 ## Build
 
