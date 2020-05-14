@@ -31,12 +31,6 @@ namespace core_buffer {
 
     const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
 
-    // Size of sf_buffer RB in elements.
-    const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
-
-//    // Time to sleep before retrying to read the queue.
-//    const size_t BUFFER_QUEUE_RETRY_MS = 5;
-
     const size_t BUFFER_UDP_N_RECV_MSG = 64;
 
     // Size of UDP recv buffer
@@ -66,6 +60,9 @@ namespace core_buffer {
     // How long should the RECV queue be.
     const size_t STREAM_RCVHWM = 100;
 
+    // Writer RECV queue on ZMQ.
+    const int WRITER_RCVHWM = 100;
+
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
 
@@ -80,8 +77,6 @@ namespace core_buffer {
 
     // If the RB is empty, how much time to wait before trying to read it again.
     const size_t RB_READ_RETRY_INTERVAL_MS = 5;
-
-    const size_t LIVE_READ_BLOCK_SIZE = 10;
 }
 
 #endif //BUFFERCONFIG_HPP
