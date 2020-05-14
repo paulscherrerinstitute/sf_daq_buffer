@@ -49,7 +49,7 @@ void ReplayH5Reader::close_file()
     }
 }
 
-void ReplayH5Reader::get_frame(
+bool ReplayH5Reader::get_frame(
         const uint64_t pulse_id, ModuleFrame* metadata, char* frame_buffer)
 {
     prepare_file_for_pulse(pulse_id);
@@ -86,18 +86,11 @@ void ReplayH5Reader::get_frame(
     dset_frame_.read(frame_buffer, H5::PredType::NATIVE_UINT16,
             b_f_space, f_f_space);
 
-    // The buffer did not write this pulse id.
     if (metadata->pulse_id == 0) {
-        // TODO: Figure out a better way of reporting this.
-        cout << "[ReplayH5Reader::get_frame]";
-        cout << " ERROR:";
-        cout << " pulse_id " << pulse_id;
-        cout << " missing in buffer for device " << device_;
-        cout << " channel_name " << channel_name_;
-        cout << endl;
-    }
+        // Signal that there is no frame at this pulse_id.
+        return false;
 
-    if (metadata->pulse_id != pulse_id) {
+    }else if (metadata->pulse_id != pulse_id) {
         stringstream err_msg;
 
         using namespace date;
@@ -105,10 +98,12 @@ void ReplayH5Reader::get_frame(
         err_msg << "[" << system_clock::now() << "]";
         err_msg << "[ReplayH5Reader::get_frame]";
         err_msg << " Corrupted file " << current_filename_;
-        err_msg << " index_in_file" << index_in_file;
+        err_msg << " index_in_file " << index_in_file;
         err_msg << " expected pulse_id " << pulse_id;
         err_msg << " but read " << metadata->pulse_id << endl;
 
         throw runtime_error(err_msg.str());
     }
+
+    return true;
 }

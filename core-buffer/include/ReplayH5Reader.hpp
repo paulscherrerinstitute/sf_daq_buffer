@@ -22,7 +22,7 @@ public:
     ReplayH5Reader(const std::string device, const std::string channel_name);
     virtual ~ReplayH5Reader();
     void close_file();
-    void get_frame(
+    bool get_frame(
             const uint64_t pulse_id, ModuleFrame* metadata, char* frame_buffer);
 };
 
