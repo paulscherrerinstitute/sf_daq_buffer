@@ -2,6 +2,9 @@
 
 #include "BufferUtils.hpp"
 #include "buffer_config.hpp"
+#include <iostream>
+#include <chrono>
+#include "date.h"
 
 using namespace std;
 using namespace core_buffer;
@@ -47,66 +50,65 @@ void ReplayH5Reader::close_file()
 }
 
 void ReplayH5Reader::get_frame(
-        const uint64_t pulse_id, ModuleFrame* metadata, char* data)
+        const uint64_t pulse_id, ModuleFrame* metadata, char* frame_buffer)
 {
     prepare_file_for_pulse(pulse_id);
 
-    hsize_t b_image_dims[3] =
-            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
-    H5::DataSpace b_i_space (3, b_image_dims);
-    hsize_t b_i_count[] =
-            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
-    hsize_t b_i_start[] = {0, 0, 0};
-    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
+    auto index_in_file = BufferUtils::get_file_frame_index(pulse_id);
 
-    hsize_t f_image_dims[3] = {FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE};
-    H5::DataSpace f_i_space (3, f_image_dims);
-    hsize_t f_i_count[] =
-            {REPLAY_READ_BLOCK_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
-    hsize_t f_i_start[] = {start_index, 0, 0};
-    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    image_dataset.read(
-            image_buffer, H5::PredType::NATIVE_UINT16,
-            b_i_space, f_i_space);
-
-    hsize_t b_metadata_dims[2] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
+    hsize_t b_metadata_dims[2] = {1, ModuleFrame_N_FIELDS};
     H5::DataSpace b_m_space (2, b_metadata_dims);
-    hsize_t b_m_count[] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
+    hsize_t b_m_count[] = {1, ModuleFrame_N_FIELDS};
     hsize_t b_m_start[] = {0, 0};
     b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
 
     hsize_t f_metadata_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
     H5::DataSpace f_m_space (2, f_metadata_dims);
-    hsize_t f_m_count[] = {REPLAY_READ_BLOCK_SIZE, ModuleFrame_N_FIELDS};
-    hsize_t f_m_start[] = {start_index, 0};
+    hsize_t f_m_count[] = {1, ModuleFrame_N_FIELDS};
+    hsize_t f_m_start[] = {index_in_file, 0};
     f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
 
-    metadata_dataset.read(
-            (char*) metadata_buffer, H5::PredType::NATIVE_UINT64,
+    dset_metadata_.read(metadata, H5::PredType::NATIVE_UINT64,
             b_m_space, f_m_space);
 
+    hsize_t b_image_dims[3] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace b_f_space (3, b_image_dims);
+    hsize_t b_i_count[] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t b_i_start[] = {0, 0, 0};
+    b_f_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
+
+    hsize_t f_frame_dims[3] = {FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace f_f_space (3, f_frame_dims);
+    hsize_t f_f_count[] = {1, MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t f_f_start[] = {index_in_file, 0, 0};
+    f_f_space.selectHyperslab(H5S_SELECT_SET, f_f_count, f_f_start);
+
+    dset_frame_.read(frame_buffer, H5::PredType::NATIVE_UINT16,
+            b_f_space, f_f_space);
 
     // The buffer did not write this pulse id.
-    if (current_frame.pulse_id == 0) {
-        cout << "pulse_id " << current_pulse_id;
-        cout << " missing in buffer file." << endl;
-        // Wrong frame in the buffer file.
-    } else if (current_pulse_id != current_frame.pulse_id) {
+    if (metadata->pulse_id == 0) {
+        // TODO: Figure out a better way of reporting this.
+        cout << "[ReplayH5Reader::get_frame]";
+        cout << " ERROR:";
+        cout << " pulse_id " << pulse_id;
+        cout << " missing in buffer for device " << device_;
+        cout << " channel_name " << channel_name_;
+        cout << endl;
+    }
+
+    if (metadata->pulse_id != pulse_id) {
         stringstream err_msg;
 
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[sf_replay::receive]";
-        err_msg << " Read unexpected pulse_id. ";
-        err_msg << " Expected " << current_pulse_id;
-        err_msg << " received " << current_frame.pulse_id;
-        err_msg << endl;
+        err_msg << "[ReplayH5Reader::get_frame]";
+        err_msg << " Corrupted file " << current_filename_;
+        err_msg << " index_in_file" << index_in_file;
+        err_msg << " expected pulse_id " << pulse_id;
+        err_msg << " but read " << metadata->pulse_id << endl;
 
         throw runtime_error(err_msg.str());
     }
-
-    current_pulse_id++;
-
 }
