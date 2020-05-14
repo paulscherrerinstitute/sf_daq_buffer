@@ -97,3 +97,11 @@ ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
 ln -s "$(pwd)""/""sf_replay" /usr/bin/sf_replay
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
+
+## Terminology
+
+In order to unify the way we write code and talk about concept the following 
+terminology definitions should be followed:
+
+- frame (data from a single module)
+- image (data of the assembled image)
