@@ -26,8 +26,10 @@ namespace core_buffer {
     // Extension of our file format.
     const std::string FILE_EXTENSION = ".h5";
 
-    // How many frames do we read at once during replay.
-    const size_t REPLAY_READ_BLOCK_SIZE = 100;
+    // How many frames do we buffer in send.
+    const size_t REPLAY_SNDHWM = 100;
+
+    const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
 
     // Size of sf_buffer RB in elements.
     const size_t BUFFER_INTERNAL_QUEUE_SIZE = 1000;
