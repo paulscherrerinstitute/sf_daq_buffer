@@ -27,8 +27,7 @@ void sf_replay (
             MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
     auto compressed_buffer = make_unique<char[]>(compressed_buffer_size);
 
-    ReplayH5Reader file_reader(
-            device, channel_name, start_pulse_id, stop_pulse_id);
+    ReplayH5Reader file_reader(device, channel_name);
 
     //TODO: Add statstics.
     uint64_t stats_counter = 0;
