@@ -38,7 +38,7 @@ void BufferH5Writer::create_file(const string& filename)
     data_dset_prop.setChunk(3, data_dset_chunking);
 
     current_image_dataset_ = h5_file_.createDataSet(
-            "image",
+            BUFFER_H5_FRAME_DATASET,
             H5::PredType::NATIVE_UINT16,
             data_dspace,
             data_dset_prop);
@@ -49,7 +49,7 @@ void BufferH5Writer::create_file(const string& filename)
     meta_dset_prop.setChunk(2, meta_dset_chunking);
 
     current_metadata_dataset_ = h5_file_.createDataSet(
-            "metadata",
+            BUFFER_H5_METADATA_DATASET,
             H5::PredType::NATIVE_UINT64,
             meta_dspace,
             meta_dset_prop);

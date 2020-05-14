@@ -51,6 +51,13 @@ namespace core_buffer {
     // HWM for live stream from buffer.
     const int BUFFER_ZMQ_SNDHWM = 100;
 
+    // Name of the dataset where we store the images.
+    const std::string BUFFER_H5_FRAME_DATASET = "image";
+
+    // Name of the dataset where we store metadata.
+    const std::string BUFFER_H5_METADATA_DATASET = "metadata";
+
+    // IPC address of the live stream.
     const std::string BUFFER_LIVE_IPC_URL = "ipc:///tmp/sf-live-";
 
     // N of IO threads to receive data from modules.
