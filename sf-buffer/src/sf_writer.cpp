@@ -10,6 +10,7 @@
 #include <FastQueue.hpp>
 #include <cstring>
 #include "date.h"
+#include "bitshuffle/bitshuffle.h"
 
 using namespace std;
 using namespace core_buffer;
@@ -27,7 +28,8 @@ void receive_replay(
         void *sockets[n_modules];
         for (size_t i = 0; i < n_modules; i++) {
             sockets[i] = zmq_socket(ctx, ZMQ_PULL);
-            int rcvhwm = REPLAY_READ_BLOCK_SIZE;
+
+            int rcvhwm = WRITER_RCVHWM;
             if (zmq_setsockopt(sockets[i], ZMQ_RCVHWM, &rcvhwm,
                                sizeof(rcvhwm)) != 0) {
                 throw runtime_error(strerror(errno));
@@ -47,7 +49,6 @@ void receive_replay(
             }
         }
 
-        auto module_meta_buffer = make_unique<ModuleFrame>();
         uint64_t current_pulse_id = start_pulse_id;
 
         while (true) {
@@ -193,12 +194,11 @@ int main (int argc, char *argv[])
             n_modules * MODULE_N_BYTES * WRITER_N_FRAMES_BUFFER,
             WRITER_RB_BUFFER_SLOTS);
 
-    string ipc_prefix = "ipc:///tmp/sf-replay-";
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
     thread replay_receive_thread(
-            receive_replay, ipc_prefix, n_modules,
+            receive_replay, REPLAY_STREAM_IPC_URL, n_modules,
             ref(queue), ctx, start_pulse_id, stop_pulse_id);
 
     size_t n_frames = stop_pulse_id - start_pulse_id + 1;
