@@ -23,8 +23,8 @@ class BufferH5Writer {
             core_buffer::MODULE_X_SIZE
     };
 
-    const std::string device_name_;
     const std::string root_folder_;
+    const std::string device_name_;
     const std::string LATEST_filename_;
     const std::string CURRENT_filename_;
 
@@ -42,8 +42,8 @@ class BufferH5Writer {
 
 public:
     BufferH5Writer(
-            const std::string& device_name,
-            const std::string& root_folder);
+            const std::string& root_folder,
+            const std::string& device_name);
 
     virtual ~BufferH5Writer();
 

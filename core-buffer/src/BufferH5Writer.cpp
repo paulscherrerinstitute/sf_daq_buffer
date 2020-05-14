@@ -13,10 +13,10 @@ using namespace std;
 using namespace core_buffer;
 
 BufferH5Writer::BufferH5Writer(
-        const string& device_name,
-        const string& root_folder) :
-            device_name_(device_name),
+        const string& root_folder,
+        const string& device_name) :
             root_folder_(root_folder),
+            device_name_(device_name),
             LATEST_filename_(root_folder + "/" + device_name + "/LATEST"),
             CURRENT_filename_(root_folder + "/" + device_name + "/CURRENT"),
             output_filename_(""),

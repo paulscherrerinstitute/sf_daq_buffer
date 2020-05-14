@@ -59,7 +59,7 @@ int main (int argc, char *argv[]) {
     uint64_t n_corrupted_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    BufferH5Writer writer(device_name, root_folder);
+    BufferH5Writer writer(root_folder, device_name);
     BufferUdpReceiver receiver(udp_port, source_id);
 
     pid_t tid;

@@ -17,7 +17,7 @@ TEST(BufferH5Writer, basic_interaction)
     metadata.daq_rec = 3;
     metadata.n_received_packets = 128;
 
-    BufferH5Writer writer(device_name, root_folder);
+    BufferH5Writer writer(root_folder, device_name);
     writer.set_pulse_id(pulse_id);
     writer.write(&metadata, buffer.get());
     writer.close_file();
