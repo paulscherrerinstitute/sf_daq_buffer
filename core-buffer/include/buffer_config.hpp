@@ -73,6 +73,9 @@ namespace core_buffer {
     // Size of buffer between the receiving and writing part.
     const int WRITER_FASTQUEUE_N_SLOTS = 5;
 
+    // How large are metadata chunks in the HDF5.
+    const size_t WRITER_METADATA_CHUNK_N_IMAGES = 100;
+
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
 

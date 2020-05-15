@@ -33,7 +33,7 @@ WriterH5Writer::WriterH5Writer(
     uint compression_prop[] = {MODULE_N_PIXELS, BSHUF_H5_COMPRESS_LZ4};
     H5Pset_filter(image_dataset_properties.getId(),
             BSHUF_H5FILTER,
-            H5Z_FLAG_MANDATORY,
+            H5Z_FLAG_OPTIONAL,
             2,
             &(compression_prop[0]));
 
@@ -46,7 +46,13 @@ WriterH5Writer::WriterH5Writer(
     hsize_t metadata_dataset_dims[] = {n_frames_, 1};
     H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
-    hsize_t metadata_dataset_chunking[] = {100, 1};
+    // Chunk cannot be larger than n_frames.
+    auto metadata_chunk_size = WRITER_METADATA_CHUNK_N_IMAGES;
+    if (n_frames < metadata_chunk_size) {
+        metadata_chunk_size = n_frames;
+    }
+
+    hsize_t metadata_dataset_chunking[] = {metadata_chunk_size, 1};
     H5::DSetCreatPropList metadata_dataset_properties;
     metadata_dataset_properties.setChunk(2, metadata_dataset_chunking);
 
