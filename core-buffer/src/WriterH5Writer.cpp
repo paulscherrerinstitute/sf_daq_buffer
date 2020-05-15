@@ -84,7 +84,7 @@ void WriterH5Writer::close_file()
     file_.close();
 }
 
-void WriterH5Writer::write(const DetectorFrame* metadata, const char* data) {
+void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
     auto pulse_id_data = (char*)(metadata->pulse_id);
     auto frame_index_data = (char*)(metadata->frame_index);
     auto daq_rec_data = (char*)(metadata->daq_rec);

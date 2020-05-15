@@ -6,13 +6,13 @@
 #include <H5Cpp.h>
 #include "buffer_config.hpp"
 
-struct DetectorFrame
+struct ImageMetadata
 {
-    uint64_t pulse_id[core_buffer::WRITER_N_FRAMES_BUFFER];
-    uint64_t frame_index[core_buffer::WRITER_N_FRAMES_BUFFER];
-    uint32_t daq_rec[core_buffer::WRITER_N_FRAMES_BUFFER];
-    uint16_t n_received_packets[core_buffer::WRITER_N_FRAMES_BUFFER];
-    bool     is_good_frame[core_buffer::WRITER_N_FRAMES_BUFFER];
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint32_t daq_rec;
+    uint16_t n_received_packets;
+    bool is_good_frame;
 };
 
 class WriterH5Writer {
@@ -35,7 +35,7 @@ public:
             const size_t n_frames,
             const size_t n_modules);
     ~WriterH5Writer();
-    void write(const DetectorFrame* metadata, const char* data);
+    void write(const ImageMetadata* metadata, const char* data);
     void close_file();
 };
 
