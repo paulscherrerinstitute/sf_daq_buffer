@@ -14,7 +14,6 @@ WriterH5Writer::WriterH5Writer(
         const size_t n_frames,
         const size_t n_modules) :
         n_frames_(n_frames),
-        n_modules_(n_modules),
         current_write_index_(0)
 {
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);

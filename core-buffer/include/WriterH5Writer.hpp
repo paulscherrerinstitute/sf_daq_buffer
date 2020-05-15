@@ -21,7 +21,6 @@ struct ImageMetadata
 class WriterH5Writer {
 
     const size_t n_frames_;
-    const size_t n_modules_;
     size_t current_write_index_;
 
     H5::H5File file_;
