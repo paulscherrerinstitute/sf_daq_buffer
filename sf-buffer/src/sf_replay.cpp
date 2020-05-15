@@ -50,7 +50,7 @@ void sf_replay (
 
         auto start_time = chrono::steady_clock::now();
 
-        metadata_buffer.is_valid_frame = file_reader.get_frame(
+        metadata_buffer.is_frame_present = file_reader.get_frame(
                 curr_pulse_id,
                 &(metadata_buffer.module_frame),
                 (char*)(frame_buffer.get()));

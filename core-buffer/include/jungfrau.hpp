@@ -53,7 +53,7 @@ struct ModuleFrame {
 struct CompressedModuleFrame {
     ModuleFrame module_frame;
     uint64_t compressed_size;
-    bool is_valid_frame;
+    bool is_frame_present;
 };
 #pragma pack(pop)
 
