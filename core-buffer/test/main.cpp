@@ -10,6 +10,7 @@
 #include "test_LiveRecvModule.cpp"
 #include "test_BufferUdpReceiver.cpp"
 #include "test_bitshuffle.cpp"
+#include "test_WriterZmqReceiver.cpp"
 
 using namespace std;
 
