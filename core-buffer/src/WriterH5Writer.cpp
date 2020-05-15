@@ -1,5 +1,6 @@
 #include "WriterH5Writer.hpp"
 #include <sstream>
+#include <bitshuffle/bshuf_h5filter.h>
 
 extern "C"
 {
@@ -28,8 +29,8 @@ WriterH5Writer::WriterH5Writer(
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
-    // block_size, 2==LZ4 compression
-    uint compression_prop[] = {MODULE_N_PIXELS, 2};
+    // block_size, compression type
+    uint compression_prop[] = {MODULE_N_PIXELS, BSHUF_H5_COMPRESS_LZ4};
     H5Pset_filter(image_dataset_properties.getId(),
             BSHUF_H5FILTER,
             H5Z_FLAG_MANDATORY,

@@ -6,9 +6,6 @@
 #include <H5Cpp.h>
 #include "buffer_config.hpp"
 
-// Bitshuffle LZ4.
-const H5Z_filter_t BSHUF_H5FILTER = 32008;
-
 struct ImageMetadata
 {
     uint64_t pulse_id;
