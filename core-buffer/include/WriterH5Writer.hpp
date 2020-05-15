@@ -28,7 +28,8 @@ class WriterH5Writer {
     H5::DataSet pulse_id_dataset_;
     H5::DataSet frame_index_dataset_;
     H5::DataSet daq_rec_dataset_;
-    H5::DataSet n_received_packets_dataset_;
+    H5::DataSet is_good_frame_dataset_;
+
 
 public:
     WriterH5Writer(

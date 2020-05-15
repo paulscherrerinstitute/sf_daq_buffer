@@ -30,6 +30,18 @@ WriterH5Writer::WriterH5Writer(
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
+    // Bitshuffle LZ4.
+    const H5Z_filter_t BSHUF_H5FILTER = 32008;
+    // block_size, 2==LZ4 compression
+    uint compression_prop[] = {MODULE_N_PIXELS, 2};
+
+    H5Pset_filter(image_dataset_properties.getId(),
+            BSHUF_H5FILTER,
+            H5Z_FLAG_MANDATORY,
+            2,
+            &(compression_prop[0]));
+
+
     image_dataset_ = file_.createDataSet(
             "image",
             H5::PredType::NATIVE_UINT16,
@@ -39,7 +51,7 @@ WriterH5Writer::WriterH5Writer(
     hsize_t metadata_dataset_dims[] = {n_frames_, 1};
     H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
-    hsize_t metadata_dataset_chunking[] = {1, 1};
+    hsize_t metadata_dataset_chunking[] = {100, 1};
     H5::DSetCreatPropList metadata_dataset_properties;
     metadata_dataset_properties.setChunk(2, metadata_dataset_chunking);
 
@@ -61,11 +73,12 @@ WriterH5Writer::WriterH5Writer(
             metadata_dataspace,
             metadata_dataset_properties);
 
-    n_received_packets_dataset_ = file_.createDataSet(
-            "n_received_packets",
-            H5::PredType::NATIVE_UINT16,
+    is_good_frame_dataset_ = file_.createDataSet(
+            "is_good_frame",
+            H5::PredType::NATIVE_UINT32,
             metadata_dataspace,
             metadata_dataset_properties);
+
 }
 
 WriterH5Writer::~WriterH5Writer()
@@ -79,7 +92,7 @@ void WriterH5Writer::close_file()
     pulse_id_dataset_.close();
     frame_index_dataset_.close();
     daq_rec_dataset_.close();
-    n_received_packets_dataset_.close();
+    is_good_frame_dataset_.close();
 
     file_.close();
 }
