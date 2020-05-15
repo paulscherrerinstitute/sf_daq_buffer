@@ -35,15 +35,6 @@ void UdpReceiver::bind(const uint16_t port)
     server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(port);
 
-    auto bind_result = ::bind(
-            socket_fd_,
-            reinterpret_cast<const sockaddr *>(&server_address),
-            sizeof(server_address));
-
-    if (bind_result < 0) {
-        throw runtime_error("Cannot bind socket.");
-    }
-
     timeval udp_socket_timeout;
     udp_socket_timeout.tv_sec = 0;
     udp_socket_timeout.tv_usec = BUFFER_UDP_US_TIMEOUT;
@@ -60,6 +51,15 @@ void UdpReceiver::bind(const uint16_t port)
                 "Cannot set SO_RCVBUF. " + string(strerror(errno)));
     };
     //TODO: try to set SO_RCVLOWAT
+
+    auto bind_result = ::bind(
+            socket_fd_,
+            reinterpret_cast<const sockaddr *>(&server_address),
+            sizeof(server_address));
+
+    if (bind_result < 0) {
+        throw runtime_error("Cannot bind socket.");
+    }
 }
 
 int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
