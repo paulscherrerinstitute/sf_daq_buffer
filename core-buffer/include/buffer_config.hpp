@@ -69,9 +69,6 @@ namespace core_buffer {
     // Size of buffer between the receiving and writing part of sf_writer
     const int WRITER_FASTQUEUE_SLOTS = 5;
 
-    // How many frames to buffer before flushing to file.
-    const int WRITER_N_FRAMES_BUFFER = 50;
-
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
 
