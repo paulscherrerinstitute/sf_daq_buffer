@@ -82,7 +82,7 @@ TEST(FastQueue, data_transfer)
     w_metadata->pulse_id = 1;
     w_metadata->frame_index = 2;
     w_metadata->daq_rec = 3;
-    w_metadata->n_received_packets = 4;
+    w_metadata->is_good_frame = 4;
 
     auto w_data = (uint16_t*)(queue.get_data_buffer(write_slot_id));
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {
@@ -100,8 +100,8 @@ TEST(FastQueue, data_transfer)
             r_metadata->frame_index);
     EXPECT_EQ(w_metadata->daq_rec,
             r_metadata->daq_rec);
-    EXPECT_EQ(w_metadata->n_received_packets,
-            r_metadata->n_received_packets);
+    EXPECT_EQ(w_metadata->is_good_frame,
+            r_metadata->is_good_frame);
 
     auto r_data = (uint16_t*)(queue.get_data_buffer(read_slot_id));
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {
