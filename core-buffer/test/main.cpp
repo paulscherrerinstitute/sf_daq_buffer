@@ -5,7 +5,7 @@
 #include "test_buffer_utils.cpp"
 #include "test_BufferH5Writer.cpp"
 #include "test_ReplayH5Reader.cpp"
-#include "test_SFWriter.cpp"
+#include "test_WriterH5Writer.cpp"
 #include "test_FastQueue.cpp"
 #include "test_LiveRecvModule.cpp"
 #include "test_BufferUdpReceiver.cpp"
