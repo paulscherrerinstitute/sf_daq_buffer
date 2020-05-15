@@ -8,6 +8,7 @@ using namespace std;
 using namespace core_buffer;
 
 TEST(LiveRecvModule, transfer_test) {
+    // TODO: Make this test work again.
 //    auto ctx = zmq_ctx_new();
 //
 //    size_t n_modules = 32;
