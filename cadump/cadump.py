@@ -92,7 +92,9 @@ def read_channels(filename):
 
 
 def get_data(channel_list, start=None, end=None, base_url=None):
-    query = {"range": {"startDate": datetime.datetime.isoformat(start), "endDate": datetime.datetime.isoformat(end), "startExpansion": True},
+    query = {"range": {"startDate": datetime.datetime.isoformat(start),
+                       "endDate": datetime.datetime.isoformat(end),
+                       "startExpansion": True},
              "channels": channel_list,
              "fields": ["pulseId", "globalSeconds", "globalDate", "value", "eventCount"]}
 
@@ -132,10 +134,11 @@ def get_pulse_id_date_mapping(pulse_ids):
         dates = []
         for pulse_id in pulse_ids:
 
-            query = {"range": {"startPulseId": 0,"endPulseId": pulse_id},
+            query = {"range": {"startPulseId": 0,
+                               "endPulseId": pulse_id},
                      "limit": 1,
                      "ordering": "desc",
-                     "channels": ["SIN-CVME-TIFGUN-EVR0:BEAMOK"],
+                     "channels": ["SIN-CVME-TIFGUN-EVR0:BUNCH-1-OK"],
                      "fields": ["pulseId", "globalDate"]}
 
             for c in range(10):

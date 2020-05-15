@@ -1,6 +1,6 @@
 package:
   name: cadump
-  version: 0.0.8
+  version: 0.0.9
 
 source:
     path: ..
@@ -13,7 +13,7 @@ build:
 requirements:
   build:
     - python
-    - data_api
+    - data_api >=0.7.6
   run:
     - python
-    - data_api
+    - data_api >=0.7.6
