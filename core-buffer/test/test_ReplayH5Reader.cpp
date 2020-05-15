@@ -92,8 +92,8 @@ TEST(ReplayH5Reader, missing_frame)
 
     ASSERT_EQ(frame_present, false);
 
-    // All metadata has to be 0.
-    EXPECT_EQ(r_metadata.pulse_id, 0);
+    // All metadata has to be 0, expect pulse_id.
+    EXPECT_EQ(r_metadata.pulse_id, pulse_id-1);
     EXPECT_EQ(r_metadata.frame_index, 0);
     EXPECT_EQ(r_metadata.daq_rec, 0);
     EXPECT_EQ(r_metadata.n_received_packets, 0);
