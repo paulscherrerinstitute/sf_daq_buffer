@@ -1,6 +1,5 @@
 #include "WriterH5Writer.hpp"
 #include <sstream>
-#include "date.h"
 
 extern "C"
 {
@@ -30,17 +29,13 @@ WriterH5Writer::WriterH5Writer(
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
-    // Bitshuffle LZ4.
-    const H5Z_filter_t BSHUF_H5FILTER = 32008;
     // block_size, 2==LZ4 compression
     uint compression_prop[] = {MODULE_N_PIXELS, 2};
-
     H5Pset_filter(image_dataset_properties.getId(),
             BSHUF_H5FILTER,
             H5Z_FLAG_MANDATORY,
             2,
             &(compression_prop[0]));
-
 
     image_dataset_ = file_.createDataSet(
             "image",
@@ -98,69 +93,44 @@ void WriterH5Writer::close_file()
 }
 
 void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
-    auto pulse_id_data = (char*)(metadata->pulse_id);
-    auto frame_index_data = (char*)(metadata->frame_index);
-    auto daq_rec_data = (char*)(metadata->daq_rec);
-    auto n_received_packets_data = (char*)(metadata->n_received_packets);
-    auto is_good_frame_data = (char*)(metadata->is_good_frame);
 
     hsize_t image_offset[] = {current_write_index_, 0, 0};
-    hsize_t metadata_offset [] = {current_write_index_, 0};
 
-    if( H5DOwrite_chunk(
+    if(H5DOwrite_chunk(
             image_dataset_.getId(),
             H5P_DEFAULT,
-            0,
+            BSHUF_H5FILTER,
             image_offset,
-            MODULE_N_BYTES * n_modules_ * WRITER_N_FRAMES_BUFFER,
+            metadata->compressed_image_size,
             data))
     {
         throw runtime_error("Cannot write image dataset.");
     }
 
-    if( H5DOwrite_chunk(
-            pulse_id_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            metadata_offset,
-            sizeof(uint64_t) * WRITER_N_FRAMES_BUFFER,
-            pulse_id_data))
-    {
-        throw runtime_error("Cannot write pulse_id dataset.");
-    }
+    hsize_t b_m_dims[1] = {1};
+    H5::DataSpace b_m_space (1, b_m_dims);
 
-    if( H5DOwrite_chunk(
-            frame_index_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            metadata_offset,
-            sizeof(uint64_t) * WRITER_N_FRAMES_BUFFER,
-            frame_index_data))
-    {
-        throw runtime_error("Cannot write frame_index dataset.");
-    }
+    hsize_t f_m_dims[] = {n_frames_, 1};
+    H5::DataSpace f_m_space(2, f_m_dims);
+    hsize_t meta_count[] = {1, 1};
+    hsize_t meta_start[] = {current_write_index_, 0};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, meta_count, meta_start);
 
-    if( H5DOwrite_chunk(
-            daq_rec_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            metadata_offset,
-            sizeof(uint32_t) * WRITER_N_FRAMES_BUFFER,
-            daq_rec_data))
-    {
-        throw runtime_error("Cannot write daq_rec dataset.");
-    }
+    pulse_id_dataset_.write(
+            &(metadata->pulse_id), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
 
-    if( H5DOwrite_chunk(
-            n_received_packets_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            metadata_offset,
-            sizeof(uint16_t) * WRITER_N_FRAMES_BUFFER,
-            n_received_packets_data))
-    {
-        throw runtime_error("Cannot write n_received_packets dataset.");
-    }
+    frame_index_dataset_.write(
+            &(metadata->frame_index), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
 
-    current_write_index_ += WRITER_N_FRAMES_BUFFER;
+    daq_rec_dataset_.write(
+            &(metadata->daq_rec), H5::PredType::NATIVE_UINT32,
+            b_m_space, f_m_space);
+
+    is_good_frame_dataset_.write(
+            &(metadata->is_good_frame), H5::PredType::NATIVE_UINT8,
+            b_m_space, f_m_space);
+
+    current_write_index_++;
 }

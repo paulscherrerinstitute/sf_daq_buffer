@@ -6,13 +6,15 @@
 #include <H5Cpp.h>
 #include "buffer_config.hpp"
 
+// Bitshuffle LZ4.
+const H5Z_filter_t BSHUF_H5FILTER = 32008;
+
 struct ImageMetadata
 {
     uint64_t pulse_id;
     uint64_t frame_index;
     uint32_t daq_rec;
-    uint16_t n_received_packets;
-    bool is_good_frame;
+    uint8_t is_good_frame;
     uint64_t compressed_image_size;
 };
 
