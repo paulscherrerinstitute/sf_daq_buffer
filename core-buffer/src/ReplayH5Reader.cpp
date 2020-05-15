@@ -88,6 +88,7 @@ bool ReplayH5Reader::get_frame(
 
     if (metadata->pulse_id == 0) {
         // Signal that there is no frame at this pulse_id.
+        metadata->pulse_id = pulse_id;
         return false;
 
     }else if (metadata->pulse_id != pulse_id) {

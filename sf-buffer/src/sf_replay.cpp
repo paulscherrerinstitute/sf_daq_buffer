@@ -50,15 +50,10 @@ void sf_replay (
 
         auto start_time = chrono::steady_clock::now();
 
-        auto is_frame_present = file_reader.get_frame(
+        metadata_buffer.is_valid_frame = file_reader.get_frame(
                 curr_pulse_id,
                 &(metadata_buffer.module_frame),
                 (char*)(frame_buffer.get()));
-
-        if (!is_frame_present) {
-            // TODO: Improve signaling to sf_writer about missing frame.
-            metadata_buffer.module_frame.pulse_id = curr_pulse_id;
-        }
 
         auto end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
