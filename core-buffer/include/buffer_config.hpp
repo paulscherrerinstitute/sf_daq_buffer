@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <string>
+#include "jungfrau.hpp"
 
 namespace core_buffer {
 
@@ -36,8 +37,8 @@ namespace core_buffer {
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // +1 for packet headers.
-    const int BUFFER_UDP_RCVBUF_BYTES = (
-            MODULE_N_BYTES * (BUFFER_UDP_RCVBUF_N_SLOTS + 1));
+    const int BUFFER_UDP_RCVBUF_BYTES =
+            (JUNGFRAU_BYTES_PER_PACKET * BUFFER_UDP_RCVBUF_N_SLOTS);
 
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
