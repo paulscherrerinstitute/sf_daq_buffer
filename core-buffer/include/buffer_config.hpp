@@ -71,7 +71,7 @@ namespace core_buffer {
     const int WRITER_ZMQ_IO_THREADS = 2;
 
     // Size of buffer between the receiving and writing part.
-    const int WRITER_FASTQUEUE_SLOTS = 5;
+    const int WRITER_FASTQUEUE_N_SLOTS = 5;
 
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;

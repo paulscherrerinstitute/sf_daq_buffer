@@ -90,7 +90,7 @@ int main (int argc, char *argv[])
             MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
 
     FastQueue<ImageMetadata> queue(
-            compress_frame_size * n_modules, WRITER_FASTQUEUE_SLOTS);
+            compress_frame_size * n_modules, WRITER_FASTQUEUE_N_SLOTS);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);

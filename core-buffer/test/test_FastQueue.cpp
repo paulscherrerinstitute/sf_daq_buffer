@@ -114,7 +114,7 @@ TEST(FaseQueue, array_parameter)
     size_t n_modules = 32;
     FastQueue<ModuleFrameBuffer> queue(
             n_modules * MODULE_N_BYTES,
-            WRITER_FASTQUEUE_SLOTS);
+            WRITER_FASTQUEUE_N_SLOTS);
 
     ModuleFrame frame;
 
