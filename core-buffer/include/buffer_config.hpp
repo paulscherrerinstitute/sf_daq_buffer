@@ -60,13 +60,16 @@ namespace core_buffer {
     // How long should the RECV queue be.
     const size_t STREAM_RCVHWM = 100;
 
+    // Size of buffer between the receiving and sending part.
+    const int STREAM_FASTQUEUE_SLOTS = 5;
+
     // Writer RECV queue on ZMQ.
     const int WRITER_RCVHWM = 100;
 
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
 
-    // Size of buffer between the receiving and writing part of sf_writer
+    // Size of buffer between the receiving and writing part.
     const int WRITER_FASTQUEUE_SLOTS = 5;
 
     // Number of pulses between each statistics print out.

@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
     size_t n_modules = 32;
     FastQueue<ModuleFrameBuffer> queue(
             n_modules * MODULE_N_BYTES,
-            WRITER_RB_BUFFER_SLOTS);
+            STREAM_FASTQUEUE_SLOTS);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
