@@ -73,7 +73,9 @@ void LiveRecvModule::recv_single_module(
             sizeof(ModuleFrame),
             0);
 
-    if (n_bytes_metadata != sizeof(ModuleFrame)) {
+    if (n_bytes_metadata == -1) {
+        throw runtime_error(zmq_strerror(errno));
+    }else if (n_bytes_metadata != sizeof(ModuleFrame)) {
         throw runtime_error("Stream header of wrong size.");
     }
 
@@ -87,7 +89,9 @@ void LiveRecvModule::recv_single_module(
             MODULE_N_BYTES,
             0);
 
-    if (n_bytes_image != MODULE_N_BYTES) {
+    if (n_bytes_image == -1) {
+        throw runtime_error(zmq_strerror(errno));
+    } else if (n_bytes_image != MODULE_N_BYTES) {
         throw runtime_error("Stream data of wrong size.");
     }
 }
