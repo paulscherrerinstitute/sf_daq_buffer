@@ -1,4 +1,4 @@
-#include "SFWriter.hpp"
+#include "WriterH5Writer.hpp"
 #include "gtest/gtest.h"
 
 using namespace core_buffer;
@@ -11,7 +11,7 @@ TEST(SFWriter, basic_interaction)
     auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES);
     auto metadata = make_shared<DetectorFrame>();
 
-    SFWriter writer("ignore.h5", n_frames, n_modules);
+    WriterH5Writer writer("ignore.h5", n_frames, n_modules);
     writer.write(metadata.get(), data.get());
     writer.close_file();
 

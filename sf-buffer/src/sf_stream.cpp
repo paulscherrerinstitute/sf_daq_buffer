@@ -6,7 +6,7 @@
 #include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
-#include "SFWriter.hpp"
+#include "WriterH5Writer.hpp"
 #include <FastQueue.hpp>
 #include <cstring>
 #include <zmq.h>

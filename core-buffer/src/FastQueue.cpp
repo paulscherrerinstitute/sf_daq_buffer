@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <SFWriter.hpp>
+#include <WriterH5Writer.hpp>
 #include <jungfrau.hpp>
 #include "FastQueue.hpp"
 

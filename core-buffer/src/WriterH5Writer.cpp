@@ -1,4 +1,4 @@
-#include "SFWriter.hpp"
+#include "WriterH5Writer.hpp"
 #include <sstream>
 #include "date.h"
 
@@ -10,7 +10,7 @@ extern "C"
 using namespace std;
 using namespace core_buffer;
 
-SFWriter::SFWriter(
+WriterH5Writer::WriterH5Writer(
         const string& output_file,
         const size_t n_frames,
         const size_t n_modules) :
@@ -68,12 +68,12 @@ SFWriter::SFWriter(
             metadata_dataset_properties);
 }
 
-SFWriter::~SFWriter()
+WriterH5Writer::~WriterH5Writer()
 {
     close_file();
 }
 
-void SFWriter::close_file()
+void WriterH5Writer::close_file()
 {
     image_dataset_.close();
     pulse_id_dataset_.close();
@@ -84,7 +84,7 @@ void SFWriter::close_file()
     file_.close();
 }
 
-void SFWriter::write(const DetectorFrame* metadata, const char* data) {
+void WriterH5Writer::write(const DetectorFrame* metadata, const char* data) {
     auto pulse_id_data = (char*)(metadata->pulse_id);
     auto frame_index_data = (char*)(metadata->frame_index);
     auto daq_rec_data = (char*)(metadata->daq_rec);

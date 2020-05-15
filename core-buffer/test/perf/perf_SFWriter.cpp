@@ -5,7 +5,7 @@
 #include <RingBuffer.hpp>
 #include <thread>
 #include <chrono>
-#include "SFWriter.hpp"
+#include "WriterH5Writer.hpp"
 
 using namespace std;
 using namespace core_buffer;
@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
     size_t n_modules = 32;
 
     size_t n_frames = stop_pulse_id - start_pulse_id;
-    SFWriter writer(output_file, n_frames, n_modules);
+    WriterH5Writer writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
     int i_write = 0;

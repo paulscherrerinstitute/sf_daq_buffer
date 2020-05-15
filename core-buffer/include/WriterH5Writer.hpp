@@ -15,7 +15,7 @@ struct DetectorFrame
     bool     is_good_frame[core_buffer::WRITER_N_FRAMES_BUFFER];
 };
 
-class SFWriter {
+class WriterH5Writer {
 
     const size_t n_frames_;
     const size_t n_modules_;
@@ -30,11 +30,11 @@ class SFWriter {
     H5::DataSet n_received_packets_dataset_;
 
 public:
-    SFWriter(
+    WriterH5Writer(
             const std::string& output_file,
             const size_t n_frames,
             const size_t n_modules);
-    ~SFWriter();
+    ~WriterH5Writer();
     void write(const DetectorFrame* metadata, const char* data);
     void close_file();
 };
