@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
 
     auto start_time = chrono::steady_clock::now();
 
-    auto metadata = make_shared<DetectorFrame>();
+    auto metadata = make_shared<ImageMetadata>();
     auto data = make_unique<char[]>(MODULE_N_BYTES*n_modules);
 
     auto current_pulse_id = start_pulse_id;
