@@ -1,6 +1,9 @@
 #include "gtest/gtest.h"
 #include "buffer_config.hpp"
-#include "bitshuffle/bitshuffle.h"
+
+extern "C" {
+    #include "bitshuffle/bitshuffle.h"
+}
 
 using namespace std;
 
