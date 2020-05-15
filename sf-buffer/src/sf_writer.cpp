@@ -42,7 +42,8 @@ void receive_replay(
             auto image_metadata = queue.get_metadata_buffer(slot_id);
             auto image_buffer = queue.get_data_buffer(slot_id);
 
-            receiver.get_next_image(image_metadata, image_buffer);
+            receiver.get_next_image(
+                    current_pulse_id, image_metadata, image_buffer);
 
             if (image_metadata->pulse_id != current_pulse_id) {
                 throw runtime_error("Wrong pulse id from zmq receiver.");
