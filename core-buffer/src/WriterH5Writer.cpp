@@ -76,7 +76,7 @@ WriterH5Writer::WriterH5Writer(
 
     is_good_frame_dataset_ = file_.createDataSet(
             "is_good_frame",
-            H5::PredType::NATIVE_UINT32,
+            H5::PredType::NATIVE_UINT8,
             metadata_dataspace,
             metadata_dataset_properties);
 
