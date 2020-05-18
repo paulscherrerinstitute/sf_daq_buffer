@@ -1,6 +1,11 @@
 # Overview
+
 Simple server to dump Epics Channel Access data to an HDF5 file.
 The server gets an http callback from the Broker whenever there was an acquisition.
+
+
+__Note: THIS IS/WAS A FRIDAY AFTERNOON HACK TO MAKE THE SWISSFEL DAQ WORK__
+
 
 The format of the request is as follows:
 ```
