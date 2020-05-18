@@ -112,7 +112,6 @@ def get_data(channel_list, start=None, end=None, base_url=None):
 
     # Check for successful return of data
     if response.status_code != 200:
-        #raise RuntimeError("Unable to retrieve data from server: ", response)
         logger.info("Data retrievali failed, sleep for another time and try")
 
         itry = 0
@@ -161,7 +160,7 @@ def get_pulse_id_date_mapping(pulse_ids):
 
                 data = response.json()
 
-                if len(data[0]["data"]) == 0 or not "pulseID" in data[0]["data"][0]:
+                if len(data[0]["data"]) == 0 or not "pulseId" in data[0]["data"][0]:
                     raise RuntimeError("Didn't get good responce from data_api : %s " % data)
 
                 if not pulse_id == data[0]["data"][0]["pulseId"]:
