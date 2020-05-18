@@ -12,7 +12,10 @@ START_PULSE_ID=$2
 STOP_PULSE_ID=$3
 
 #8 replay workers per core, last (writer) worker occupies 4
-coreAssociated_replay=(20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 22 22 22 22 22 22 22 22 23 23 23 23 23 23 23 23)
+#coreAssociated_replay=(20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 22 22 22 22 22 22 22 22 23 23 23 23 23 23 23 23)
+#4 replay workers per core, last (writer) worker occupies 4
+coreAssociated_replay=(20 20 20 20 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24 25 25 25 25 26 26 26 26 27 27 27 27)
+
 coreAssociated_writer="24,25,26,27"
 
 #latest_file=`cat /gpfs/photonics/swissfel/buffer/JF07T32V01/M00/LATEST`
