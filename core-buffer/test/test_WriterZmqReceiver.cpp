@@ -68,5 +68,6 @@ TEST(WriterZmqReceiver, basic_test)
     EXPECT_EQ(pulse_id, image_metadata.pulse_id);
     EXPECT_EQ(image_metadata.is_good_frame, 1);
     EXPECT_EQ(image_metadata.daq_rec, 4);
-    EXPECT_EQ(image_metadata.compressed_image_size, 5000*n_modules);
+    EXPECT_EQ(image_metadata.compressed_image_size,
+            5000*n_modules+BSHUF_LZ4_HEADER_BYTES);
 }

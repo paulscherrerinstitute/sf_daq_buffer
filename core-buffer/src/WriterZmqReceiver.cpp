@@ -1,4 +1,5 @@
 #include "WriterZmqReceiver.hpp"
+#include "bitshuffle/bitshuffle.h"
 #include "zmq.h"
 #include "date.h"
 #include <chrono>
@@ -59,7 +60,13 @@ void WriterZmqReceiver::get_next_image(
     image_metadata->is_good_frame = 1;
     bool image_metadata_init = false;
 
-    size_t image_buffer_offset = 0;
+    // Set compression header.
+    bshuf_write_uint64_BE(image_buffer,
+                          MODULE_N_BYTES * n_modules_);
+    bshuf_write_uint32_BE(image_buffer + 8,
+                          MODULE_N_PIXELS * PIXEL_N_BYTES);
+
+    size_t image_buffer_offset = BSHUF_LZ4_HEADER_BYTES;
 
     for (size_t i_module = 0; i_module < n_modules_; i_module++) {
 
