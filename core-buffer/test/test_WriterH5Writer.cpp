@@ -34,7 +34,7 @@ TEST(WriterH5Writer, test_compression)
     auto f_comp_buffer = make_unique<char[]>(comp_buffer_size);
 
     auto i_comp_buffer = make_unique<char[]>(
-            (comp_buffer_size * n_modules) + WRITER_COMPRESSION_HEADER_BYTES);
+            (comp_buffer_size * n_modules) + BSHUF_LZ4_HEADER_BYTES);
     auto i_raw_buffer = make_unique<uint16_t[]>(
             MODULE_N_PIXELS * n_modules * n_frames);
 
@@ -43,7 +43,7 @@ TEST(WriterH5Writer, test_compression)
     bshuf_write_uint32_BE(&i_comp_buffer[8],
             MODULE_N_PIXELS * PIXEL_N_BYTES);
 
-    size_t total_compressed_size = WRITER_COMPRESSION_HEADER_BYTES;
+    size_t total_compressed_size = BSHUF_LZ4_HEADER_BYTES;
     for (int i_module=0; i_module<n_modules; i_module++) {
 
         for (size_t i=0; i<MODULE_N_PIXELS; i++) {

@@ -6,6 +6,9 @@
 #include <H5Cpp.h>
 #include "buffer_config.hpp"
 
+// Size of compression header in bytes.
+const int BSHUF_LZ4_HEADER_BYTES = 12;
+
 struct ImageMetadata
 {
     uint64_t pulse_id;
