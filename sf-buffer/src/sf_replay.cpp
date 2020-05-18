@@ -166,7 +166,7 @@ int main (int argc, char *argv[]) {
     if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0)
         throw runtime_error(strerror (errno));
 
-    const int linger_ms = 0;
+    const int linger_ms = -1;
     if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms)) != 0)
         throw runtime_error(strerror (errno));
 
