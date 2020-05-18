@@ -47,7 +47,6 @@ def put_document():
 def download_data(config):
 
     logger.info("Dump data to hdf5 ...")
-    # logger.info(config)
 
     start_pulse = config["range"]["startPulseId"]
     end_pulse = config["range"]["endPulseId"]
@@ -57,22 +56,24 @@ def download_data(config):
     if "channels" in config:
         channels = config["channels"]
 
-    logger.info("Retrieve data for channels: ", channels)
+    logger.info("Retrieve data for channels: %s" % channels)
+
+    if "retrieval_url" in config:
+        new_base_url = config["retrieval_url"]
+    else:
+        new_base_url = base_url
 
     logger.info("Retrieve pulse-id / data mapping for pulse ids")
-    # start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
     start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
 
-    # append _CA to the filename
     filename = config["parameters"]["output_file"]
     if filename != "/dev/null":
-        new_filename = filename[:-3]+"_CA"+filename[-3:]
+        new_filename = filename
     else:
         new_filename = None
 
-    logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date) + " . From " + base_url)
-    # data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
-    data = get_data(channels, start=start_date, end=end_date, base_url=base_url)
+    logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date) + " . From " + new_base_url)
+    data = get_data(channels, start=start_date, end=end_date, base_url=new_base_url)
 
     if len(data) < 1:
         logger.error("No data retrieved")
@@ -159,6 +160,9 @@ def get_pulse_id_date_mapping(pulse_ids):
                     raise RuntimeError("Unable to retrieve data from server: ", response)
 
                 data = response.json()
+
+                if len(data[0]["data"]) == 0 or not "pulseID" in data[0]["data"][0]:
+                    raise RuntimeError("Didn't get good responce from data_api : %s " % data)
 
                 if not pulse_id == data[0]["data"][0]["pulseId"]:
                     logger.info("retrieval failed")
