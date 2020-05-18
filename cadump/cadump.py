@@ -52,6 +52,13 @@ def download_data(config):
     start_pulse = config["range"]["startPulseId"]
     end_pulse = config["range"]["endPulseId"]
 
+    # Overwrite the channels list if specified in the request
+    channels = channel_list
+    if "channels" in config:
+        channels = config["channels"]
+
+    logger.info("Retrieve data for channels: ", channels)
+
     logger.info("Retrieve pulse-id / data mapping for pulse ids")
     # start_date, end_date = data_api.get_global_date([start_pulse, end_pulse])
     start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
@@ -65,7 +72,7 @@ def download_data(config):
 
     logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date) + " . From " + base_url)
     # data = data_api.get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
-    data = get_data(channel_list, start=start_date, end=end_date, base_url=base_url)
+    data = get_data(channels, start=start_date, end=end_date, base_url=base_url)
 
     if len(data) < 1:
         logger.error("No data retrieved")
