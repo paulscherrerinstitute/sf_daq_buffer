@@ -64,6 +64,9 @@ namespace core_buffer {
     // Size of buffer between the receiving and sending part.
     const int STREAM_FASTQUEUE_SLOTS = 5;
 
+    // Size of compression header in bytes.
+    const int WRITER_COMPRESSION_HEADER_BYTES = 12;
+
     // Writer RECV queue on ZMQ.
     const int WRITER_RCVHWM = 100;
 
