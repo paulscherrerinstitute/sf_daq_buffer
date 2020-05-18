@@ -116,7 +116,7 @@ void sf_replay (
             cout << " sf_replay:max_send_us " << max_send_us;
 
             cout << " sf_replay:compress_ratio ";
-            cout << total_compressed_size/total_original_size;
+            cout << (float)total_compressed_size/total_original_size;
             cout << endl;
 
             stats_counter = 0;
