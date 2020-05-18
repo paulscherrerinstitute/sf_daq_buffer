@@ -50,7 +50,7 @@ void receive_replay(
             }
 
             queue.commit();
-            current_pulse_id++
+            current_pulse_id++;
         }
 
     } catch (const std::exception& e) {
