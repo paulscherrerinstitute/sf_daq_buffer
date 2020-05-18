@@ -24,6 +24,7 @@ add_executable(sf-replay src/sf_replay.cpp)
 set_target_properties(sf-replay PROPERTIES OUTPUT_NAME sf_replay)
 target_link_libraries(sf-replay
         core-buffer
+        external
         zmq
         hdf5
         hdf5_hl
@@ -46,6 +47,7 @@ add_executable(sf-writer src/sf_writer.cpp)
 set_target_properties(sf-writer PROPERTIES OUTPUT_NAME sf_writer)
 target_link_libraries(sf-writer
         core-buffer
+        external
         zmq
         hdf5
         hdf5_hl
