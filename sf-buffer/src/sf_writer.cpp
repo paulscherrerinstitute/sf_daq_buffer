@@ -27,10 +27,10 @@ void receive_replay(
     try {
         WriterZmqReceiver receiver(ctx, ipc_prefix, n_modules);
 
+        uint64_t current_pulse_id=start_pulse_id;
+
         // "<= stop_pulse_id" because we include the last pulse_id.
-        for (uint64_t current_pulse_id=start_pulse_id;
-             current_pulse_id<=stop_pulse_id;
-             current_pulse_id++) {
+        while(current_pulse_id<=stop_pulse_id) {
 
             auto slot_id = queue.reserve();
 
@@ -50,6 +50,7 @@ void receive_replay(
             }
 
             queue.commit();
+            current_pulse_id++
         }
 
     } catch (const std::exception& e) {
