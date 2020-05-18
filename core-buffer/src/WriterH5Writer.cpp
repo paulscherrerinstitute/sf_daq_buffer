@@ -1,10 +1,11 @@
 #include "WriterH5Writer.hpp"
 #include <sstream>
-#include <bitshuffle/bshuf_h5filter.h>
+
 
 extern "C"
 {
     #include "H5DOpublic.h"
+    #include <bitshuffle/bshuf_h5filter.h>
 }
 
 using namespace std;
@@ -17,6 +18,9 @@ WriterH5Writer::WriterH5Writer(
         n_frames_(n_frames),
         current_write_index_(0)
 {
+
+    bshuf_register_h5filter();
+
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
     hsize_t image_dataset_dims[3] =
@@ -30,10 +34,13 @@ WriterH5Writer::WriterH5Writer(
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
     // block_size, compression type
-    uint compression_prop[] = {MODULE_N_PIXELS, BSHUF_H5_COMPRESS_LZ4};
+    uint compression_prop[] =
+            {MODULE_N_PIXELS, //block size
+             BSHUF_H5_COMPRESS_LZ4}; // Compression type
+
     H5Pset_filter(image_dataset_properties.getId(),
             BSHUF_H5FILTER,
-            H5Z_FLAG_OPTIONAL,
+            H5Z_FLAG_MANDATORY,
             2,
             &(compression_prop[0]));
 
