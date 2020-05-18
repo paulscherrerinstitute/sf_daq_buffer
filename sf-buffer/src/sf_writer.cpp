@@ -58,7 +58,7 @@ void receive_replay(
         using namespace chrono;
 
         cout << "[" << system_clock::now() << "]";
-        cout << "[sf_h5_writer::receive_replay]";
+        cout << "[sf_writer::receive_replay]";
         cout << " Stopped because of exception: " << endl;
         cout << e.what() << endl;
 
