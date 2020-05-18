@@ -149,6 +149,9 @@ int64_t bshuf_bitshuffle(const void* in, void* out, const size_t size,
 int64_t bshuf_bitunshuffle(const void* in, void* out, const size_t size,
         const size_t elem_size, size_t block_size);
 
+void bshuf_write_uint64_BE(void* buf, uint64_t num);
+void bshuf_write_uint32_BE(void* buf, uint32_t num);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
