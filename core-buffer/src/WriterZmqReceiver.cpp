@@ -91,7 +91,8 @@ void WriterZmqReceiver::get_next_image(
             err_msg << " Read unexpected pulse_id. ";
             err_msg << " Expected " << pulse_id;
             err_msg << " received ";
-            err_msg << frame_metadata.module_frame.pulse_id << endl;
+            err_msg << frame_metadata.module_frame.pulse_id;
+            err_msg << " from i_module " << i_module << endl;
 
             throw runtime_error(err_msg.str());
         }
