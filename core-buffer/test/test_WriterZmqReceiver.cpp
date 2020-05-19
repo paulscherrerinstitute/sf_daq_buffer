@@ -69,5 +69,6 @@ TEST(WriterZmqReceiver, basic_test)
     EXPECT_EQ(image_metadata.is_good_frame, 1);
     EXPECT_EQ(image_metadata.daq_rec, 4);
     EXPECT_EQ(image_metadata.data_n_bytes,
-            5000*n_modules+BSHUF_LZ4_HEADER_BYTES);
+            5000*n_modules);
+//            5000*n_modules+BSHUF_LZ4_HEADER_BYTES);
 }
