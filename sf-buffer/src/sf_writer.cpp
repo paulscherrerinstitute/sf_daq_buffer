@@ -153,7 +153,7 @@ int main (int argc, char *argv[])
         write_total_us += write_us_duration;
         write_max_us = max(write_max_us, (uint64_t)write_us_duration);
 
-        if (stats_counter == STATS_MODULO) {
+//        if (stats_counter == STATS_MODULO) {
             cout << "sf_writer:read_us " << read_total_us / STATS_MODULO;
             cout << " sf_writer:read_max_us " << read_max_us;
             cout << " sf_writer:write_us " << write_total_us / STATS_MODULO;
@@ -166,7 +166,7 @@ int main (int argc, char *argv[])
             read_max_us = 0;
             write_total_us = 0;
             write_max_us = 0;
-        }
+//        }
 
         start_time = chrono::steady_clock::now();
     }
