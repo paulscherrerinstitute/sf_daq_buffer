@@ -112,12 +112,10 @@ int main (int argc, char *argv[])
     // "<= stop_pulse_id" because we include the last pulse_id.
     while (current_pulse_id <= stop_pulse_id) {
 
-        auto slot_id = queue.read();
-
-        if(slot_id == -1) {
+        int slot_id; ;
+        while((slot_id = queue.read()) == -1) {
             this_thread::sleep_for(chrono::milliseconds(
                     RB_READ_RETRY_INTERVAL_MS));
-            continue;
         }
 
         auto metadata = queue.get_metadata_buffer(slot_id);
@@ -127,8 +125,13 @@ int main (int argc, char *argv[])
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
                 read_end_time-start_time).count();
 
-        if (metadata->pulse_id != current_pulse_id) {
-            throw runtime_error("Wrong pulse id from receiver thread.");
+        // Verify that all pulse_ids are correct.
+        for (int i=0; i<metadata->n_pulses_in_buffer; i++) {
+            if (metadata->pulse_id[i] != current_pulse_id) {
+                throw runtime_error("Wrong pulse id from receiver thread.");
+            }
+
+            current_pulse_id++;
         }
 
         start_time = chrono::steady_clock::now();
@@ -140,7 +143,6 @@ int main (int argc, char *argv[])
                 write_end_time-start_time).count();
 
         queue.release();
-        current_pulse_id++;
 
         // TODO: Some poor statistics.
         stats_counter++;
