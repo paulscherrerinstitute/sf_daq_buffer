@@ -78,6 +78,9 @@ namespace core_buffer {
     // How large are metadata chunks in the HDF5.
     const size_t WRITER_METADATA_CHUNK_N_IMAGES = 100;
 
+    // How large should the data cache be in N images.
+    const size_t WRITER_DATA_CACHE_N_IMAGES = 100;
+
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
 
