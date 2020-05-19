@@ -87,11 +87,11 @@ int main (int argc, char *argv[])
 
     size_t n_modules = 32;
 
-    auto compress_frame_size = bshuf_compress_lz4_bound(
-            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
+//    auto compress_frame_size = bshuf_compress_lz4_bound(
+//            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
 
     FastQueue<ImageMetadata> queue(
-            (compress_frame_size * n_modules) + BSHUF_LZ4_HEADER_BYTES,
+            MODULE_N_BYTES * n_modules,
             WRITER_FASTQUEUE_N_SLOTS);
 
     auto ctx = zmq_ctx_new();
@@ -102,7 +102,7 @@ int main (int argc, char *argv[])
             ref(queue), start_pulse_id, stop_pulse_id);
 
     size_t n_frames = stop_pulse_id - start_pulse_id + 1;
-    WriterH5Writer writer(output_file, n_frames, n_modules);
+    WriterH5Writer writer(output_file, n_frames, n_modules, 1);
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
