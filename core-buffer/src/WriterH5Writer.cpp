@@ -121,7 +121,7 @@ void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
                            MODULE_X_SIZE};
     H5::DataSpace f_i_space(3, f_i_dims);
     hsize_t i_count[] = {image_cache_n_images_,
-                         MODULE_Y_SIZE,
+                         MODULE_Y_SIZE*n_modules_,
                          MODULE_X_SIZE};
 
     hsize_t i_start[] = {current_write_index_, 0, 0};
