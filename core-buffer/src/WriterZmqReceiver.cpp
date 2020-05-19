@@ -73,15 +73,15 @@ void WriterZmqReceiver::get_next_image(
         auto n_bytes_metadata = zmq_recv(
                 sockets_[i_module],
                 &frame_metadata,
-                sizeof(CompressedModuleFrame),
+                sizeof(StreamModuleFrame),
                 0);
 
-        if (n_bytes_metadata != sizeof(CompressedModuleFrame)) {
+        if (n_bytes_metadata != sizeof(StreamModuleFrame)) {
             throw runtime_error("Wrong number of metadata bytes.");
         }
 
         // sf_replay should always send the right pulse_id.
-        if (frame_metadata.module_frame.pulse_id != pulse_id) {
+        if (frame_metadata.metadata.pulse_id != pulse_id) {
             stringstream err_msg;
 
             using namespace date;
@@ -91,7 +91,7 @@ void WriterZmqReceiver::get_next_image(
             err_msg << " Read unexpected pulse_id. ";
             err_msg << " Expected " << pulse_id;
             err_msg << " received ";
-            err_msg << frame_metadata.module_frame.pulse_id;
+            err_msg << frame_metadata.metadata.pulse_id;
             err_msg << " from i_module " << i_module << endl;
 
             throw runtime_error(err_msg.str());
@@ -105,24 +105,24 @@ void WriterZmqReceiver::get_next_image(
             image_metadata_init = true;
 
             image_metadata->frame_index =
-                    frame_metadata.module_frame.frame_index;
+                    frame_metadata.metadata.frame_index;
             image_metadata->daq_rec =
-                    frame_metadata.module_frame.daq_rec;
+                    frame_metadata.metadata.daq_rec;
         }
 
         // Once the image is not good, we don't care to re-flag it.
         if (image_metadata->is_good_frame == 1) {
-            if (frame_metadata.module_frame.frame_index !=
+            if (frame_metadata.metadata.frame_index !=
                 image_metadata->frame_index) {
                 image_metadata->is_good_frame = 0;
             }
 
-            if (frame_metadata.module_frame.daq_rec !=
+            if (frame_metadata.metadata.daq_rec !=
                 image_metadata->daq_rec) {
                 image_metadata->is_good_frame = 0;
             }
 
-            if (frame_metadata.module_frame.n_received_packets !=
+            if (frame_metadata.metadata.n_received_packets !=
                 JUNGFRAU_N_PACKETS_PER_FRAME) {
                 image_metadata->is_good_frame = 0;
             }
@@ -131,10 +131,10 @@ void WriterZmqReceiver::get_next_image(
         auto n_bytes_image = zmq_recv(
                 sockets_[i_module],
                 (image_buffer + image_buffer_offset),
-                frame_metadata.compressed_size,
+                frame_metadata.frame_size,
                 0);
 
-        if (n_bytes_image != frame_metadata.compressed_size) {
+        if (n_bytes_image != frame_metadata.frame_size) {
             throw runtime_error("Wrong number of data bytes.");
         }
 

@@ -20,7 +20,7 @@ void sf_replay (
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
-    CompressedModuleFrame metadata_buffer;
+    StreamModuleFrame metadata_buffer;
     auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
 
     auto compressed_buffer_size = bshuf_compress_lz4_bound(
@@ -52,7 +52,7 @@ void sf_replay (
 
         metadata_buffer.is_frame_present = file_reader.get_frame(
                 curr_pulse_id,
-                &(metadata_buffer.module_frame),
+                &(metadata_buffer.metadata),
                 (char*)(frame_buffer.get()));
 
         auto end_time = chrono::steady_clock::now();
@@ -69,7 +69,7 @@ void sf_replay (
             throw runtime_error("Error while compressing buffer.");
         }
 
-        metadata_buffer.compressed_size = compressed_size;
+        metadata_buffer.frame_size = compressed_size;
 
         end_time = chrono::steady_clock::now();
         auto compress_us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -79,7 +79,7 @@ void sf_replay (
 
         zmq_send(socket,
                  &metadata_buffer,
-                 sizeof(CompressedModuleFrame),
+                 sizeof(StreamModuleFrame),
                  ZMQ_SNDMORE);
         zmq_send(socket,
                  (char*)(frame_buffer.get()),
@@ -102,7 +102,7 @@ void sf_replay (
         max_send_us = max(max_send_us, (uint64_t)send_us_duration);
 
         total_compressed_size += compressed_size;
-        total_original_size += MODULE_N_BYTES + sizeof(CompressedModuleFrame);
+        total_original_size += MODULE_N_BYTES + sizeof(StreamModuleFrame);
 
         if (stats_counter == STATS_MODULO) {
             cout << "sf_replay:avg_read_us " << total_read_us/STATS_MODULO;

@@ -50,9 +50,9 @@ struct ModuleFrame {
 
 #pragma pack(push)
 #pragma pack(1)
-struct CompressedModuleFrame {
-    ModuleFrame module_frame;
-    uint64_t compressed_size;
+struct StreamModuleFrame {
+    ModuleFrame metadata;
+    uint64_t frame_size;
     bool is_frame_present;
 };
 #pragma pack(pop)

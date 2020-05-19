@@ -11,7 +11,7 @@ class WriterZmqReceiver {
     const size_t n_modules_;
     std::vector<void*> sockets_;
 
-    CompressedModuleFrame frame_metadata;
+    StreamModuleFrame frame_metadata;
 
 public:
     WriterZmqReceiver(

@@ -44,18 +44,18 @@ TEST(WriterZmqReceiver, basic_test)
 
     for (size_t i = 0; i < n_modules; i++) {
 
-        CompressedModuleFrame frame_metadata;
-        frame_metadata.module_frame.pulse_id = pulse_id;
-        frame_metadata.module_frame.frame_index = pulse_id+100;
-        frame_metadata.module_frame.n_received_packets = 128;
-        frame_metadata.module_frame.daq_rec = 4;
+        StreamModuleFrame frame_metadata;
+        frame_metadata.metadata.pulse_id = pulse_id;
+        frame_metadata.metadata.frame_index = pulse_id + 100;
+        frame_metadata.metadata.n_received_packets = 128;
+        frame_metadata.metadata.daq_rec = 4;
 
         frame_metadata.is_frame_present = 1;
-        frame_metadata.compressed_size = compressed_frame_size;
+        frame_metadata.frame_size = compressed_frame_size;
 
         zmq_send(sockets[i],
                  &frame_metadata,
-                 sizeof(CompressedModuleFrame),
+                 sizeof(StreamModuleFrame),
                  ZMQ_SNDMORE);
 
         zmq_send(sockets[i],
