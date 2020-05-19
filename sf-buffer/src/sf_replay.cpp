@@ -23,9 +23,9 @@ void sf_replay (
     StreamModuleFrame metadata_buffer;
     auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
 
-    auto compressed_buffer_size = bshuf_compress_lz4_bound(
-            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-    auto compressed_buffer = make_unique<char[]>(compressed_buffer_size);
+//    auto compressed_buffer_size = bshuf_compress_lz4_bound(
+//            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
+//    auto compressed_buffer = make_unique<char[]>(compressed_buffer_size);
 
     ReplayH5Reader file_reader(device, channel_name);
 
@@ -55,25 +55,27 @@ void sf_replay (
                 &(metadata_buffer.metadata),
                 (char*)(frame_buffer.get()));
 
+        metadata_buffer.data_n_bytes = MODULE_N_BYTES;
+
         auto end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
 
-        start_time = chrono::steady_clock::now();
-
-        auto compressed_size = bshuf_compress_lz4(
-                frame_buffer.get(), compressed_buffer.get(),
-                MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-
-        if (compressed_size < 0) {
-            throw runtime_error("Error while compressing buffer.");
-        }
-
-        metadata_buffer.frame_size = compressed_size;
-
-        end_time = chrono::steady_clock::now();
-        auto compress_us_duration = chrono::duration_cast<chrono::microseconds>(
-                end_time-start_time).count();
+//        start_time = chrono::steady_clock::now();
+//
+//        auto compressed_size = bshuf_compress_lz4(
+//                frame_buffer.get(), compressed_buffer.get(),
+//                MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
+//
+//        if (compressed_size < 0) {
+//            throw runtime_error("Error while compressing buffer.");
+//        }
+//
+//        metadata_buffer.frame_data_n_bytes = compressed_size;
+//
+//        end_time = chrono::steady_clock::now();
+//        auto compress_us_duration = chrono::duration_cast<chrono::microseconds>(
+//                end_time-start_time).count();
 
         start_time = chrono::steady_clock::now();
 
@@ -83,7 +85,7 @@ void sf_replay (
                  ZMQ_SNDMORE);
         zmq_send(socket,
                  (char*)(frame_buffer.get()),
-                 compressed_size,
+                 metadata_buffer.data_n_bytes,
                  0);
 
         end_time = chrono::steady_clock::now();
@@ -95,13 +97,13 @@ void sf_replay (
         total_read_us += read_us_duration;
         max_read_us = max(max_read_us, (uint64_t)read_us_duration);
 
-        total_compress_us += compress_us_duration;
-        max_compress_us = max(max_compress_us, (uint64_t)compress_us_duration);
+//        total_compress_us += compress_us_duration;
+//        max_compress_us = max(max_compress_us, (uint64_t)compress_us_duration);
 
         total_send_us += send_us_duration;
         max_send_us = max(max_send_us, (uint64_t)send_us_duration);
 
-        total_compressed_size += compressed_size;
+        total_compressed_size += metadata_buffer.data_n_bytes;
         total_original_size += MODULE_N_BYTES + sizeof(StreamModuleFrame);
 
         if (stats_counter == STATS_MODULO) {

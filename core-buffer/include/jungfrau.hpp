@@ -52,7 +52,7 @@ struct ModuleFrame {
 #pragma pack(1)
 struct StreamModuleFrame {
     ModuleFrame metadata;
-    uint64_t frame_size;
+    uint64_t data_n_bytes;
     bool is_frame_present;
 };
 #pragma pack(pop)

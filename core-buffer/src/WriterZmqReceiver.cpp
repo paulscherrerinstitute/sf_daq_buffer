@@ -131,10 +131,10 @@ void WriterZmqReceiver::get_next_image(
         auto n_bytes_image = zmq_recv(
                 sockets_[i_module],
                 (image_buffer + image_buffer_offset),
-                frame_metadata.frame_size,
+                frame_metadata.data_n_bytes,
                 0);
 
-        if (n_bytes_image != frame_metadata.frame_size) {
+        if (n_bytes_image != frame_metadata.data_n_bytes) {
             throw runtime_error("Wrong number of data bytes.");
         }
 

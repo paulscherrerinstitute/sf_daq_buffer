@@ -51,7 +51,7 @@ TEST(WriterZmqReceiver, basic_test)
         frame_metadata.metadata.daq_rec = 4;
 
         frame_metadata.is_frame_present = 1;
-        frame_metadata.frame_size = compressed_frame_size;
+        frame_metadata.data_n_bytes = compressed_frame_size;
 
         zmq_send(sockets[i],
                  &frame_metadata,
