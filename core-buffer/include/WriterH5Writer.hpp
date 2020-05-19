@@ -15,7 +15,7 @@ struct ImageMetadata
     uint64_t frame_index;
     uint32_t daq_rec;
     uint8_t is_good_frame;
-    uint64_t compressed_image_size;
+    uint64_t data_n_bytes;
 };
 
 class WriterH5Writer {

@@ -56,7 +56,7 @@ void WriterZmqReceiver::get_next_image(
     image_metadata->pulse_id = pulse_id;
     image_metadata->frame_index = 0;
     image_metadata->daq_rec = 0;
-    image_metadata->compressed_image_size = 0;
+    image_metadata->data_n_bytes = 0;
     image_metadata->is_good_frame = 1;
     bool image_metadata_init = false;
 
@@ -141,5 +141,5 @@ void WriterZmqReceiver::get_next_image(
         image_buffer_offset += n_bytes_image;
     }
 
-    image_metadata->compressed_image_size = image_buffer_offset;
+    image_metadata->data_n_bytes = image_buffer_offset;
 }

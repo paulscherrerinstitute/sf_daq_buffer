@@ -15,7 +15,7 @@ TEST(WriterH5Writer, basic_interaction)
     auto metadata = make_shared<ImageMetadata>();
 
     // Needed by writer.
-    metadata->compressed_image_size = 500;
+    metadata->data_n_bytes = 500;
 
     WriterH5Writer writer("ignore.h5", n_frames, n_modules);
     writer.write(metadata.get(), data.get());
@@ -62,7 +62,7 @@ TEST(WriterH5Writer, test_compression)
     }
 
     auto metadata = make_shared<ImageMetadata>();
-    metadata->compressed_image_size = total_compressed_size;
+    metadata->data_n_bytes = total_compressed_size;
 
     metadata->is_good_frame = 1;
     metadata->frame_index = 3;
