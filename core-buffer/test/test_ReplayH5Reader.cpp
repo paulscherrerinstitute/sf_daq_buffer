@@ -52,6 +52,8 @@ TEST(ReplayH5Reader, basic_interaction)
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {
         w_frame_buffer[i] = r_frame_buffer[i];
     }
+
+    reader.close_file();
 }
 
 TEST(ReplayH5Reader, missing_frame)
@@ -103,4 +105,6 @@ TEST(ReplayH5Reader, missing_frame)
     for (size_t i=0; i<MODULE_N_PIXELS; i++) {
         r_frame_buffer[i] = 0;
     }
+
+    reader.close_file();
 }
