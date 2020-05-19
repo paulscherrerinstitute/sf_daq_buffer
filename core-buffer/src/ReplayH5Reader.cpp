@@ -1,7 +1,6 @@
 #include "ReplayH5Reader.hpp"
 
 #include "BufferUtils.hpp"
-#include "buffer_config.hpp"
 #include <iostream>
 #include <chrono>
 #include <cstring>
@@ -74,7 +73,7 @@ void ReplayH5Reader::prepare_buffer_for_pulse(const uint64_t pulse_id)
     hsize_t f_f_start[] = {start_index_in_file, 0, 0};
     f_f_space.selectHyperslab(H5S_SELECT_SET, f_f_count, f_f_start);
 
-    dset_frame_.read(frame_buffer, H5::PredType::NATIVE_UINT16,
+    dset_frame_.read(&(frame_buffer[0]), H5::PredType::NATIVE_UINT16,
                      b_f_space, f_f_space);
 }
 
