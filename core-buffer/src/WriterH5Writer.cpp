@@ -14,11 +14,9 @@ using namespace core_buffer;
 WriterH5Writer::WriterH5Writer(
         const string& output_file,
         const size_t n_frames,
-        const size_t n_modules,
-        const size_t image_cache_n_images) :
+        const size_t n_modules) :
         n_frames_(n_frames),
         n_modules_(n_modules),
-        image_cache_n_images_(image_cache_n_images),
         current_write_index_(0)
 {
 
@@ -108,10 +106,13 @@ void WriterH5Writer::close_file()
     file_.close();
 }
 
-void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
+void WriterH5Writer::write(
+        const ImageMetadataBuffer* metadata, const char* data)
+{
+    auto n_images_in_buffer = metadata->n_pulses_in_buffer;
 
     hsize_t b_i_dims[3] = {
-            image_cache_n_images_,
+            n_images_in_buffer,
             MODULE_Y_SIZE*n_modules_,
             MODULE_X_SIZE};
     H5::DataSpace b_i_space(3, b_i_dims);
@@ -120,10 +121,10 @@ void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
                            MODULE_Y_SIZE * n_modules_,
                            MODULE_X_SIZE};
     H5::DataSpace f_i_space(3, f_i_dims);
-    hsize_t i_count[] = {image_cache_n_images_,
+
+    hsize_t i_count[] = {n_images_in_buffer,
                          MODULE_Y_SIZE*n_modules_,
                          MODULE_X_SIZE};
-
     hsize_t i_start[] = {current_write_index_, 0, 0};
     f_i_space.selectHyperslab(H5S_SELECT_SET, i_count, i_start);
 
@@ -131,11 +132,12 @@ void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
             data, H5::PredType::NATIVE_UINT16,
             b_i_space, f_i_space);
 
-    hsize_t b_m_dims[1] = {1};
-    H5::DataSpace b_m_space (1, b_m_dims);
+    hsize_t b_m_dims[2] = {n_images_in_buffer, 1};
+    H5::DataSpace b_m_space (2, b_m_dims);
 
     hsize_t f_m_dims[] = {n_frames_, 1};
     H5::DataSpace f_m_space(2, f_m_dims);
+
     hsize_t meta_count[] = {1, 1};
     hsize_t meta_start[] = {current_write_index_, 0};
     f_m_space.selectHyperslab(H5S_SELECT_SET, meta_count, meta_start);

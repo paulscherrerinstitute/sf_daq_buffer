@@ -29,7 +29,6 @@ class WriterH5Writer {
 
     const size_t n_frames_;
     const size_t n_modules_;
-    const size_t image_cache_n_images_;
     size_t current_write_index_;
 
     H5::H5File file_;
@@ -44,10 +43,9 @@ class WriterH5Writer {
 public:
     WriterH5Writer(const std::string& output_file,
                    const size_t n_frames,
-                   const size_t n_modules,
-                   const size_t image_cache_n_images);
+                   const size_t n_modules);
     ~WriterH5Writer();
-    void write(const ImageMetadata* metadata, const char* data);
+    void write(const ImageMetadataBuffer* metadata, const char* data);
     void close_file();
 };
 
