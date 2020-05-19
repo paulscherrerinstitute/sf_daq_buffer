@@ -2,11 +2,11 @@
 #include <sstream>
 
 
-//extern "C"
-//{
-//    #include "H5DOpublic.h"
-//    #include <bitshuffle/bshuf_h5filter.h>
-//}
+extern "C"
+{
+    #include "H5DOpublic.h"
+    #include <bitshuffle/bshuf_h5filter.h>
+}
 
 using namespace std;
 using namespace core_buffer;
@@ -22,7 +22,7 @@ WriterH5Writer::WriterH5Writer(
         current_write_index_(0)
 {
 
-//    bshuf_register_h5filter();
+    bshuf_register_h5filter();
 
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
@@ -36,16 +36,16 @@ WriterH5Writer::WriterH5Writer(
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
-//    // block_size, compression type
-//    uint compression_prop[] =
-//            {MODULE_N_PIXELS, //block size
-//             BSHUF_H5_COMPRESS_LZ4}; // Compression type
-//
-//    H5Pset_filter(image_dataset_properties.getId(),
-//            BSHUF_H5FILTER,
-//            H5Z_FLAG_MANDATORY,
-//            2,
-//            &(compression_prop[0]));
+    // block_size, compression type
+    uint compression_prop[] =
+            {MODULE_N_PIXELS, //block size
+             BSHUF_H5_COMPRESS_LZ4}; // Compression type
+
+    H5Pset_filter(image_dataset_properties.getId(),
+            BSHUF_H5FILTER,
+            H5Z_FLAG_MANDATORY,
+            2,
+            &(compression_prop[0]));
 
     image_dataset_ = file_.createDataSet(
             "image",
