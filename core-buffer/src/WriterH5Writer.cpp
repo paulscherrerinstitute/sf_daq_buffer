@@ -24,7 +24,7 @@ WriterH5Writer::WriterH5Writer(
 
 //    bshuf_register_h5filter();
 
-    file_ = H5::H5File(BUFFER_BASE_DIR + output_file, H5F_ACC_TRUNC);
+    file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
     hsize_t image_dataset_dims[3] =
             {n_frames_, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
