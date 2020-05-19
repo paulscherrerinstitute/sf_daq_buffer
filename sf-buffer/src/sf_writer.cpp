@@ -97,7 +97,7 @@ int main (int argc, char *argv[])
             ref(queue), start_pulse_id, stop_pulse_id);
 
     size_t n_frames = stop_pulse_id - start_pulse_id + 1;
-    WriterH5Writer writer(output_file, n_frames, n_modules, 1);
+    WriterH5Writer writer(output_file, n_frames, n_modules);
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
