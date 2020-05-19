@@ -7,8 +7,6 @@
 
 namespace core_buffer {
 
-    const std::string BUFFER_BASE_DIR = "/gpfs/photonics/swissfel/buffer/";
-
     const size_t MODULE_X_SIZE = 1024;
     const size_t MODULE_Y_SIZE = 512;
     const size_t MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE;
