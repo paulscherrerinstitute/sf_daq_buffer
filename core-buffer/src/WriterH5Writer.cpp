@@ -138,7 +138,7 @@ void WriterH5Writer::write(
     hsize_t f_m_dims[] = {n_frames_, 1};
     H5::DataSpace f_m_space(2, f_m_dims);
 
-    hsize_t meta_count[] = {1, 1};
+    hsize_t meta_count[] = {n_images_in_buffer, 1};
     hsize_t meta_start[] = {current_write_index_, 0};
     f_m_space.selectHyperslab(H5S_SELECT_SET, meta_count, meta_start);
 
