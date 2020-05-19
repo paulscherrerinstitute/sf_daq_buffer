@@ -2,11 +2,11 @@
 #include <sstream>
 
 
-extern "C"
-{
-    #include "H5DOpublic.h"
-    #include <bitshuffle/bshuf_h5filter.h>
-}
+//extern "C"
+//{
+//    #include "H5DOpublic.h"
+//    #include <bitshuffle/bshuf_h5filter.h>
+//}
 
 using namespace std;
 using namespace core_buffer;
@@ -14,8 +14,11 @@ using namespace core_buffer;
 WriterH5Writer::WriterH5Writer(
         const string& output_file,
         const size_t n_frames,
-        const size_t n_modules) :
+        const size_t n_modules,
+        const size_t image_cache_n_images) :
         n_frames_(n_frames),
+        n_modules_(n_modules),
+        image_cache_n_images_(image_cache_n_images),
         current_write_index_(0)
 {
 
@@ -107,18 +110,26 @@ void WriterH5Writer::close_file()
 
 void WriterH5Writer::write(const ImageMetadata* metadata, const char* data) {
 
-    hsize_t image_offset[] = {current_write_index_, 0, 0};
+    hsize_t b_i_dims[3] = {
+            image_cache_n_images_,
+            MODULE_Y_SIZE*n_modules_,
+            MODULE_X_SIZE};
+    H5::DataSpace b_i_space(3, b_i_dims);
 
-    if(H5DOwrite_chunk(
-            image_dataset_.getId(),
-            H5P_DEFAULT,
-            BSHUF_H5FILTER,
-            image_offset,
-            metadata->data_n_bytes,
-            data))
-    {
-        throw runtime_error("Cannot write image dataset.");
-    }
+    hsize_t f_i_dims[3] = {n_frames_,
+                           MODULE_Y_SIZE * n_modules_,
+                           MODULE_X_SIZE};
+    H5::DataSpace f_i_space(3, f_i_dims);
+    hsize_t i_count[] = {image_cache_n_images_,
+                         MODULE_Y_SIZE,
+                         MODULE_X_SIZE};
+
+    hsize_t i_start[] = {current_write_index_, 0, 0};
+    f_i_space.selectHyperslab(H5S_SELECT_SET, i_count, i_start);
+
+    image_dataset_.write(
+            data, H5::PredType::NATIVE_UINT16,
+            b_i_space, f_i_space);
 
     hsize_t b_m_dims[1] = {1};
     H5::DataSpace b_m_space (1, b_m_dims);
