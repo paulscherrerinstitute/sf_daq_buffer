@@ -39,7 +39,7 @@ void ReplayH5Reader::prepare_buffer_for_pulse(const uint64_t pulse_id)
         hsize_t f_m_start[] = {0, 0};
         f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
 
-        dset_metadata_.read(&(metadata_buffer[0]), H5::PredType::NATIVE_UINT64,
+        dset_metadata_.read(&(metadata_buffer_[0]), H5::PredType::NATIVE_UINT64,
                             b_m_space, f_m_space);
 
         buffer_start_pulse_id_ = 0;
@@ -73,7 +73,7 @@ void ReplayH5Reader::prepare_buffer_for_pulse(const uint64_t pulse_id)
     hsize_t f_f_start[] = {start_index_in_file, 0, 0};
     f_f_space.selectHyperslab(H5S_SELECT_SET, f_f_count, f_f_start);
 
-    dset_frame_.read(&(frame_buffer[0]), H5::PredType::NATIVE_UINT16,
+    dset_frame_.read(&(frame_buffer_[0]), H5::PredType::NATIVE_UINT16,
                      b_f_space, f_f_space);
 }
 
@@ -104,17 +104,15 @@ bool ReplayH5Reader::get_frame(
 {
     prepare_buffer_for_pulse(pulse_id);
 
-
     auto metadata_buffer_index = BufferUtils::get_file_frame_index(pulse_id);
     memcpy(metadata,
-            &(metadata_buffer[metadata_buffer_index]),
+            &(metadata_buffer_[metadata_buffer_index]),
             sizeof(ModuleFrame));
 
     auto frame_buffer_index = pulse_id - buffer_start_pulse_id_;
     memcpy(frame_buffer,
-            &(frame_buffer[frame_buffer_index]),
+            &(frame_buffer_[frame_buffer_index * MODULE_N_BYTES]),
             MODULE_N_BYTES);
-
 
     if (metadata->pulse_id == 0) {
         // Signal that there is no frame at this pulse_id.
