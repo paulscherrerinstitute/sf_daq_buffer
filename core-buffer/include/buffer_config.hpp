@@ -32,6 +32,8 @@ namespace core_buffer {
 
     const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
 
+    const size_t REPLAY_READ_BUFFER_SIZE = 100;
+
     const size_t BUFFER_UDP_N_RECV_MSG = 64;
 
     // Size of UDP recv buffer
