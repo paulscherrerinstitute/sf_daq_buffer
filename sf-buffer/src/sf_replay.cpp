@@ -103,33 +103,33 @@ void sf_replay (
         total_send_us += send_us_duration;
         max_send_us = max(max_send_us, (uint64_t)send_us_duration);
 
-        total_compressed_size += metadata_buffer.data_n_bytes;
-        total_original_size += MODULE_N_BYTES + sizeof(StreamModuleFrame);
+//        total_compressed_size += metadata_buffer.data_n_bytes;
+//        total_original_size += MODULE_N_BYTES + sizeof(StreamModuleFrame);
 
         if (stats_counter == STATS_MODULO) {
             cout << "sf_replay:avg_read_us " << total_read_us/STATS_MODULO;
             cout << " sf_replay:max_read_us " << max_read_us;
 
-            cout << " sf_replay:avg_compress_us ";
-            cout << total_compress_us/STATS_MODULO;
-            cout << " sf_replay:max_compress_us " << max_compress_us;
+//            cout << " sf_replay:avg_compress_us ";
+//            cout << total_compress_us/STATS_MODULO;
+//            cout << " sf_replay:max_compress_us " << max_compress_us;
 
             cout << " sf_replay:avg_send_us " << total_send_us/STATS_MODULO;
             cout << " sf_replay:max_send_us " << max_send_us;
 
-            cout << " sf_replay:compress_ratio ";
-            cout << (float)total_compressed_size/total_original_size;
-            cout << endl;
+//            cout << " sf_replay:compress_ratio ";
+//            cout << (float)total_compressed_size/total_original_size;
+//            cout << endl;
 
             stats_counter = 0;
             total_read_us = 0;
             max_read_us = 0;
-            total_compress_us = 0;
-            max_compress_us = 0;
+//            total_compress_us = 0;
+//            max_compress_us = 0;
             total_send_us = 0;
             max_send_us = 0;
-            total_original_size = 0;
-            total_compressed_size = 0;
+//            total_original_size = 0;
+//            total_compressed_size = 0;
         }
     }
 }
