@@ -13,7 +13,8 @@ BufferedFastQueue::BufferedFastQueue(
             n_modules_(n_modules)
 {
     while ((current_slot_id_ = queue_.reserve()) == -1){
-        this_thread::sleep_for(chrono::milliseconds(5));
+        this_thread::sleep_for(
+                chrono::milliseconds(RB_READ_RETRY_INTERVAL_MS));
     }
 
     queue_meta_buffer_ = queue_.get_metadata_buffer(current_slot_id_);
@@ -50,7 +51,8 @@ void BufferedFastQueue::commit()
         queue_.commit();
 
         while ((current_slot_id_ = queue_.reserve()) == -1){
-            this_thread::sleep_for(chrono::milliseconds(5));
+            this_thread::sleep_for(
+                    chrono::milliseconds(RB_READ_RETRY_INTERVAL_MS));
         }
 
         queue_meta_buffer_ = queue_.get_metadata_buffer(current_slot_id_);
