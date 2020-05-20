@@ -17,6 +17,7 @@ void ReplayH5Reader::load_buffers(
 {
     auto pulse_filename = BufferUtils::get_filename(
             device_, channel_name_, pulse_id);
+    auto start_index_in_file = BufferUtils::get_file_frame_index(pulse_id);
 
     if (pulse_filename != current_filename_) {
         close_file();
@@ -26,59 +27,59 @@ void ReplayH5Reader::load_buffers(
 
         dset_metadata_ = current_file_.openDataSet(BUFFER_H5_METADATA_DATASET);
         dset_frame_ = current_file_.openDataSet(BUFFER_H5_FRAME_DATASET);
-
-        // We always read the metadata for the entire file.
-        hsize_t b_metadata_dims[2] =
-                {FILE_MOD, ModuleFrame_N_FIELDS};
-        H5::DataSpace b_m_space (2, b_metadata_dims);
-        hsize_t b_m_count[] =
-                {FILE_MOD, ModuleFrame_N_FIELDS};
-        hsize_t b_m_start[] = {0, 0};
-        b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
-
-        hsize_t f_metadata_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
-        H5::DataSpace f_m_space (2, f_metadata_dims);
-        hsize_t f_m_count[] =
-                {FILE_MOD, ModuleFrame_N_FIELDS};
-        hsize_t f_m_start[] = {0, 0};
-        f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, f_m_start);
-
-        dset_metadata_.read(&(metadata_buffer_[0]), H5::PredType::NATIVE_UINT64,
-                            b_m_space, f_m_space);
-
-        buffer_start_pulse_id_ = 0;
-        buffer_end_pulse_id_ = 0;
     }
 
-    // End pulse_id is not included in the buffer.
-    if ((pulse_id >= buffer_start_pulse_id_) &&
-        (pulse_id < buffer_end_pulse_id_)) {
-        return;
-    }
+    hsize_t b_m_dims[2] = {n_pulses, 1};
+    H5::DataSpace b_m_space (2, b_m_dims);
+    hsize_t b_m_count[] = {n_pulses, 1};
+    hsize_t b_m_start[] = {0, 0};
+    b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
 
-    buffer_start_pulse_id_ = pulse_id - (pulse_id % REPLAY_READ_BUFFER_SIZE);
-    buffer_end_pulse_id_ = buffer_start_pulse_id_ + REPLAY_READ_BUFFER_SIZE;
+    hsize_t f_m_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
+    H5::DataSpace f_m_space (2, f_m_dims);
+    hsize_t f_m_count[] = {n_pulses, 1};
 
-    auto start_index_in_file = BufferUtils::get_file_frame_index(
-            buffer_start_pulse_id_);
+    hsize_t pulse_id_start[] = {start_index_in_file, 0};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, pulse_id_start);
+    dset_metadata_.read(
+            &(metadata->pulse_id[0]), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
 
-    hsize_t b_image_dims[3] =
-            {REPLAY_READ_BUFFER_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
-    H5::DataSpace b_f_space (3, b_image_dims);
-    hsize_t b_i_count[] =
-            {REPLAY_READ_BUFFER_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
-    hsize_t b_i_start[] = {0, 0, 0};
-    b_f_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
+    hsize_t frame_index_start[] = {start_index_in_file, 1};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, frame_index_start);
+    dset_metadata_.read(
+            &(metadata->frame_index[0]), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
+
+    hsize_t daq_rec_start[] = {start_index_in_file, 2};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, daq_rec_start);
+    dset_metadata_.read(
+            &(metadata->daq_rec[0]), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
+
+    hsize_t n_packets_start[] = {start_index_in_file, 3};
+    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, n_packets_start);
+    dset_metadata_.read(
+            &(metadata->n_received_packets[0]), H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
+
+    hsize_t b_f_dims[3] =
+            {n_pulses, MODULE_Y_SIZE, MODULE_X_SIZE};
+    H5::DataSpace b_f_space (3, b_f_dims);
+    hsize_t b_f_count[] =
+            {n_pulses, MODULE_Y_SIZE, MODULE_X_SIZE};
+    hsize_t b_f_start[] = {0, 0, 0};
+    b_f_space.selectHyperslab(H5S_SELECT_SET, b_f_count, b_f_start);
 
     hsize_t f_frame_dims[3] = {FILE_MOD, MODULE_Y_SIZE, MODULE_X_SIZE};
     H5::DataSpace f_f_space (3, f_frame_dims);
     hsize_t f_f_count[] =
-            {REPLAY_READ_BUFFER_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
+            {n_pulses, MODULE_Y_SIZE, MODULE_X_SIZE};
     hsize_t f_f_start[] = {start_index_in_file, 0, 0};
     f_f_space.selectHyperslab(H5S_SELECT_SET, f_f_count, f_f_start);
 
-    dset_frame_.read(&(frame_buffer_[0]), H5::PredType::NATIVE_UINT16,
-                     b_f_space, f_f_space);
+    dset_frame_.read(
+            frame_buffer, H5::PredType::NATIVE_UINT16, b_f_space, f_f_space);
 }
 
 ReplayH5Reader::ReplayH5Reader(
