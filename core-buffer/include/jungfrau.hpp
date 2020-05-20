@@ -58,7 +58,8 @@ struct ReplayModuleFrameBuffer {
     uint64_t daq_rec[core_buffer::REPLAY_READ_BUFFER_SIZE];
     uint64_t n_received_packets[core_buffer::EPLAY_READ_BUFFER_SIZE];
     bool is_frame_present[core_buffer::REPLAY_READ_BUFFER_SIZE];
-    uint64_t module_id;
+    bool is_good_frame[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint16_t module_id;
     uint64_t data_n_bytes;
     uint16_t n_frames;
 
