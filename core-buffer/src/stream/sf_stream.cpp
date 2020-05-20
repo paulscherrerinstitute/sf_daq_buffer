@@ -101,7 +101,7 @@ int main (int argc, char *argv[])
                 frame_index = module_metadata.frame_index;
                 daq_rec     = module_metadata.daq_rec;
 
-                if ( module_metadata.n_received_packets != 128 ) is_good_frame = false; 
+                if ( module_metadata.n_received_packets != 128 ) is_good_frame = false;
             } else {
                 if (module_metadata.pulse_id != pulse_id) is_good_frame = false;
 
@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
         }
 
         //Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
-        
+
         header["frame"]         = (Json::Value::UInt64)frame_index;
         header["is_good_frame"] = is_good_frame;
         header["daq_rec"]       = (Json::Value::UInt64)daq_rec;

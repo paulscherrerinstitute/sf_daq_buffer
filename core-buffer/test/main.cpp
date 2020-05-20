@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include "test_UdpReceiver.cpp"
-#include "test_UdpRecvModule.cpp"
 #include "test_BufferBinaryWriter.cpp"
 #include "test_buffer_utils.cpp"
 #include "test_BufferH5Writer.cpp"

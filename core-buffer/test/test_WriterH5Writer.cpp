@@ -12,12 +12,13 @@ TEST(WriterH5Writer, basic_interaction)
     size_t n_frames = 5;
 
     auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES);
-    auto metadata = make_shared<ImageMetadata>();
+    auto metadata = make_shared<ImageMetadataBuffer>();
 
     // Needed by writer.
-    metadata->data_n_bytes = 500;
+    metadata->data_n_bytes[0] = 500;
+    metadata->n_pulses_in_buffer = 1;
 
-    WriterH5Writer writer("ignore.h5", n_frames, n_modules, 1);
+    WriterH5Writer writer("ignore.h5", n_frames, n_modules);
     writer.write(metadata.get(), data.get());
     writer.close_file();
 }
