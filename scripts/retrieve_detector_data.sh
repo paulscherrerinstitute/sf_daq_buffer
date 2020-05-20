@@ -30,9 +30,25 @@ coreAssociated_replay=(7 7 7 7 8 8 8 8 9 9 9 9 10 10 10 10 11 11 11 11 12 12 12 
 
 coreAssociated_writer="2,3,4,5,6"
 
-touch /tmp/detector_retrieve.log
+touch /tmp/detector_retrieve.log /tmp/detector_retrieve_replay.log
 
 cd /gpfs/photonics/swissfel/buffer/
+
+PREVIOUS_STILL_RUN=1
+while [ ${PREVIOUS_STILL_RUN} = 1 ]
+do
+    PREVIOUS_STILL_RUN=0
+    ps -fe | grep "/usr/bin/sf_replay " | grep -v grep | grep sf_ > /dev/null
+    PREVIOUS_STILL_RUN1=$?
+    ps -fe | grep "/usr/bin/sf_writer " | grep -v grep | grep sf_ > /dev/null 
+    PREVIOUS_STILL_RUN2=$?
+    if [ ${PREVIOUS_STILL_RUN1} != 1 -o ${PREVIOUS_STILL_RUN2} != 1 ]
+    then
+        PREVIOUS_STILL_RUN=1
+        echo "Previous retrieve is not yet finished ${PREVIOUS_STILL_RUN1} ${PREVIOUS_STILL_RUN2}"
+        sleep 30
+    fi
+done
 
 for M in {00..31}
 do
