@@ -52,9 +52,10 @@ TEST(ReplayH5Reader, basic_interaction)
 
     // -1 due to 0 based indexing.
     ASSERT_EQ(r_metadata.pulse_id[pulse_id-1], pulse_id);
+    ASSERT_EQ(r_metadata.frame_index[pulse_id-1], 2);
+    ASSERT_EQ(r_metadata.daq_rec[pulse_id-1], 3);
     ASSERT_EQ(r_metadata.is_frame_present[pulse_id-1], true);
     ASSERT_EQ(r_metadata.is_good_frame[pulse_id-1], true);
-
 
     // Data as well.
     auto offset = MODULE_N_PIXELS * (pulse_id-1);
