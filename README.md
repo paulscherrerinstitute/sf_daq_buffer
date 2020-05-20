@@ -103,6 +103,21 @@ ln -s "$(pwd)""/""sf_replay" /usr/bin/sf_replay
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
 
+## Warnings
+
+### Zeromq
+
+Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 
+message is not sent (the connection gets dropped before the message is in the buffer).
+Since we use PUSH/PULL to modulate the sf_replay speed, this is a key functionality we are using.
+
+Please install a later version:
+```bash
+cd /etc/yum.repos.d/
+wget https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/RHEL_7/network:messaging:zeromq:release-stable.repo
+yum install zeromq-devel
+```
+
 ## Terminology
 
 In order to unify the way we write code and talk about concept the following 
