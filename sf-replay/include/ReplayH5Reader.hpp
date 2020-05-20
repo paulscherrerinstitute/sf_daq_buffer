@@ -34,7 +34,7 @@ public:
     virtual ~ReplayH5Reader();
 
     void close_file();
-    bool get_buffer(
+    void get_buffer(
             const uint64_t pulse_id,
             ReplayModuleFrameBuffer* metadata,
             char* frame_buffer);

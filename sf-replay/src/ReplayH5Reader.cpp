@@ -108,7 +108,7 @@ void ReplayH5Reader::close_file()
     }
 }
 
-bool ReplayH5Reader::get_buffer(
+void ReplayH5Reader::get_buffer(
         const uint64_t pulse_id,
         ReplayModuleFrameBuffer* metadata,
         char* frame_buffer)
@@ -162,6 +162,4 @@ bool ReplayH5Reader::get_buffer(
     metadata->module_id = source_id_;
     metadata->data_n_bytes = n_pulses * MODULE_N_BYTES;
     metadata->n_frames = n_pulses;
-
-    return true;
 }
