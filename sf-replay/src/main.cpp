@@ -17,6 +17,7 @@ void sf_replay (
         void* socket,
         const string& device,
         const string& channel_name,
+        const uint16_t source_id,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
@@ -107,7 +108,9 @@ int main (int argc, char *argv[]) {
     if (zmq_bind(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
-    sf_replay(socket, device, channel_name, start_pulse_id, stop_pulse_id);
+    sf_replay(
+            socket, device, channel_name, source_id,
+            start_pulse_id, stop_pulse_id);
 
     zmq_close(socket);
     zmq_ctx_destroy(ctx);
