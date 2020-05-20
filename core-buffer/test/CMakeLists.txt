@@ -1,7 +1,7 @@
-add_executable(core-buffer_tests main.cpp)
+add_executable(core-buffer-tests main.cpp)
 
-target_link_libraries(core-buffer_tests
-        core-buffer
+target_link_libraries(core-buffer-tests
+        core-buffer-lib
         external
         hdf5
         hdf5_hl
@@ -9,10 +9,10 @@ target_link_libraries(core-buffer_tests
         zmq
         gtest)
 
-add_executable(perf-sf_writer perf/perf_WriterH5Writer.cpp)
-target_link_libraries(perf-sf_writer
-        core-buffer
-        hdf5
-        hdf5_hl
-        hdf5_cpp
-        gtest)
+#add_executable(perf-sf_writer perf/perf_WriterH5Writer.cpp)
+#target_link_libraries(perf-sf_writer
+#        core-buffer
+#        hdf5
+#        hdf5_hl
+#        hdf5_cpp
+#        gtest)

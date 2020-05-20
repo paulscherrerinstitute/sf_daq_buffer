@@ -1,15 +1,6 @@
 #include "gtest/gtest.h"
-#include "test_UdpReceiver.cpp"
-#include "test_BufferBinaryWriter.cpp"
 #include "test_buffer_utils.cpp"
-#include "test_BufferH5Writer.cpp"
-#include "test_ReplayH5Reader.cpp"
-#include "test_WriterH5Writer.cpp"
-#include "test_FastQueue.cpp"
-#include "test_LiveRecvModule.cpp"
-#include "test_BufferUdpReceiver.cpp"
 #include "test_bitshuffle.cpp"
-#include "test_WriterZmqReceiver.cpp"
 
 using namespace std;
 
