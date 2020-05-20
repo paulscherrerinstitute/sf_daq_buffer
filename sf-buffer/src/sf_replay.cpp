@@ -23,10 +23,6 @@ void sf_replay (
     StreamModuleFrame metadata_buffer;
     auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
 
-//    auto compressed_buffer_size = bshuf_compress_lz4_bound(
-//            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-//    auto compressed_buffer = make_unique<char[]>(compressed_buffer_size);
-
     ReplayH5Reader file_reader(device, channel_name);
 
     //TODO: Add statstics.
@@ -34,13 +30,8 @@ void sf_replay (
 
     uint64_t total_read_us = 0;
     uint64_t max_read_us = 0;
-    uint64_t total_compress_us = 0;
-    uint64_t max_compress_us = 0;
     uint64_t total_send_us = 0;
     uint64_t max_send_us = 0;
-
-    uint64_t total_original_size = 0;
-    uint64_t total_compressed_size = 0;
 
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
     for (
@@ -60,22 +51,6 @@ void sf_replay (
         auto end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
-
-//        start_time = chrono::steady_clock::now();
-//
-//        auto compressed_size = bshuf_compress_lz4(
-//                frame_buffer.get(), compressed_buffer.get(),
-//                MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-//
-//        if (compressed_size < 0) {
-//            throw runtime_error("Error while compressing buffer.");
-//        }
-//
-//        metadata_buffer.frame_data_n_bytes = compressed_size;
-//
-//        end_time = chrono::steady_clock::now();
-//        auto compress_us_duration = chrono::duration_cast<chrono::microseconds>(
-//                end_time-start_time).count();
 
         start_time = chrono::steady_clock::now();
 
@@ -97,39 +72,22 @@ void sf_replay (
         total_read_us += read_us_duration;
         max_read_us = max(max_read_us, (uint64_t)read_us_duration);
 
-//        total_compress_us += compress_us_duration;
-//        max_compress_us = max(max_compress_us, (uint64_t)compress_us_duration);
-
         total_send_us += send_us_duration;
         max_send_us = max(max_send_us, (uint64_t)send_us_duration);
-
-//        total_compressed_size += metadata_buffer.data_n_bytes;
-//        total_original_size += MODULE_N_BYTES + sizeof(StreamModuleFrame);
 
         if (stats_counter == STATS_MODULO) {
             cout << "sf_replay:avg_read_us " << total_read_us/STATS_MODULO;
             cout << " sf_replay:max_read_us " << max_read_us;
-
-//            cout << " sf_replay:avg_compress_us ";
-//            cout << total_compress_us/STATS_MODULO;
-//            cout << " sf_replay:max_compress_us " << max_compress_us;
-
             cout << " sf_replay:avg_send_us " << total_send_us/STATS_MODULO;
             cout << " sf_replay:max_send_us " << max_send_us;
 
-//            cout << " sf_replay:compress_ratio ";
-//            cout << (float)total_compressed_size/total_original_size;
             cout << endl;
 
             stats_counter = 0;
             total_read_us = 0;
             max_read_us = 0;
-//            total_compress_us = 0;
-//            max_compress_us = 0;
             total_send_us = 0;
             max_send_us = 0;
-//            total_original_size = 0;
-//            total_compressed_size = 0;
         }
     }
 }
