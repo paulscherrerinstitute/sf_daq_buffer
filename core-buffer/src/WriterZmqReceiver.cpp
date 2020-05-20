@@ -123,8 +123,7 @@ void WriterZmqReceiver::get_next_image(
 
         auto n_bytes_image = zmq_recv(
                 sockets_[i_module],
-//                (image_buffer + image_buffer_offset),
-                image_buffer,
+                (image_buffer + image_buffer_offset),
                 frame_metadata.data_n_bytes,
                 0);
 
