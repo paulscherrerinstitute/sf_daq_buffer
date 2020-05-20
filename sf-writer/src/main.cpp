@@ -9,7 +9,6 @@
 #include "WriterH5Writer.hpp"
 #include <FastQueue.hpp>
 #include <cstring>
-#include <BufferedFastQueue.hpp>
 #include "date.h"
 #include "bitshuffle/bitshuffle.h"
 #include "WriterZmqReceiver.hpp"
@@ -27,8 +26,6 @@ void receive_replay(
 {
     try {
         WriterZmqReceiver receiver(ctx, ipc_prefix, n_modules);
-        BufferedFastQueue buffered_queue(
-                queue, WRITER_DATA_CACHE_N_IMAGES, n_modules);
 
         uint64_t current_pulse_id=start_pulse_id;
 
