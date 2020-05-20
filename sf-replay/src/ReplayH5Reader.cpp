@@ -83,9 +83,13 @@ void ReplayH5Reader::load_buffers(
 
 ReplayH5Reader::ReplayH5Reader(
         const string device,
-        const string channel_name) :
+        const string channel_name,
+        const uint16_t source_id,
+        const uint64_t stop_pulse_id) :
             device_(device),
-            channel_name_(channel_name)
+            channel_name_(channel_name),
+            source_id_(source_id),
+            stop_pulse_id_(stop_pulse_id)
 {
 }
 
@@ -121,27 +125,42 @@ bool ReplayH5Reader::get_buffer(
 
     load_buffers(pulse_id, n_pulses, metadata, frame_buffer);
 
+    for (size_t i_frame=0; i_frame<n_pulses; i_frame++) {
+        auto curr_pulse_id = start_pulse_id + i_frame;
 
+        metadata->is_frame_present[i_frame] = true;
+        if (metadata->pulse_id[i_frame] == 0) {
+            // Writer expects all pulse_ids, even ones with no data.
+            metadata->pulse_id[i_frame] = curr_pulse_id;
+            metadata->is_frame_present[i_frame] = false;
+        }
 
-    if (metadata->pulse_id == 0) {
-        // Signal that there is no frame at this pulse_id.
-        metadata->pulse_id = pulse_id;
-        return false;
+        // TODO: This looks really ugly. Fix condition length.
+        metadata->is_good_frame[i_frame] = true;
+        if (!metadata->is_frame_present[i_frame] ||
+            metadata->n_received_packets[i_frame] !=
+                JUNGFRAU_N_PACKETS_PER_FRAME) {
+            metadata->is_good_frame[i_frame] = false;
+        }
 
-    }else if (metadata->pulse_id != pulse_id) {
-        stringstream err_msg;
+        if (metadata->pulse_id[i_frame] != curr_pulse_id) {
+            stringstream err_msg;
 
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[ReplayH5Reader::get_buffer]";
-        err_msg << " Corrupted file " << current_filename_;
-        err_msg << " index_in_file " << metadata_buffer_index;
-        err_msg << " expected pulse_id " << pulse_id;
-        err_msg << " but read " << metadata->pulse_id << endl;
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[ReplayH5Reader::get_buffer]";
+            err_msg << " Corrupted file " << current_filename_;
+            err_msg << " expected pulse_id " << curr_pulse_id;
+            err_msg << " but read " << metadata->pulse_id[i_frame] << endl;
 
-        throw runtime_error(err_msg.str());
+            throw runtime_error(err_msg.str());
+        }
     }
+
+    metadata->module_id = source_id_;
+    metadata->data_n_bytes = n_pulses * MODULE_N_BYTES;
+    metadata->n_frames = n_pulses;
 
     return true;
 }
