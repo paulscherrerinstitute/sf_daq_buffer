@@ -119,7 +119,7 @@ void sf_replay (
 
 //            cout << " sf_replay:compress_ratio ";
 //            cout << (float)total_compressed_size/total_original_size;
-//            cout << endl;
+            cout << endl;
 
             stats_counter = 0;
             total_read_us = 0;
