@@ -50,7 +50,7 @@ TEST(WriterZmqReceiver, basic_test)
 
     for (size_t i = 0; i < n_modules; i++) {
 
-        StreamModuleFrame frame_metadata;
+        ReplayModuleFrameBuffer frame_metadata;
         frame_metadata.metadata.pulse_id = pulse_id;
         frame_metadata.metadata.frame_index = pulse_id + 100;
         frame_metadata.metadata.n_received_packets = 128;
@@ -61,7 +61,7 @@ TEST(WriterZmqReceiver, basic_test)
 
         zmq_send(sockets[i],
                  &frame_metadata,
-                 sizeof(StreamModuleFrame),
+                 sizeof(ReplayModuleFrameBuffer),
                  ZMQ_SNDMORE);
 
         zmq_send(sockets[i],
