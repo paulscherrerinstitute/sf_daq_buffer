@@ -10,6 +10,8 @@
 #define JUNGFRAU_DATA_BYTES_PER_FRAME 1048576
 #define JF_BYTES_PER_FRAME (8246 * 128)
 
+#include "buffer_config.hpp"
+
 // 6 bytes + 48 bytes + 8192 bytes = 8246 bytes
 #pragma pack(push)
 #pragma pack(2)
@@ -50,10 +52,16 @@ struct ModuleFrame {
 
 #pragma pack(push)
 #pragma pack(1)
-struct StreamModuleFrame {
-    ModuleFrame metadata;
+struct ReplayModuleFrameBuffer {
+    uint64_t pulse_id[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint64_t frame_index[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint64_t daq_rec[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint64_t n_received_packets[core_buffer::EPLAY_READ_BUFFER_SIZE];
+    bool is_frame_present[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint64_t module_id;
     uint64_t data_n_bytes;
-    bool is_frame_present;
+    uint16_t n_frames;
+
 };
 #pragma pack(pop)
 
