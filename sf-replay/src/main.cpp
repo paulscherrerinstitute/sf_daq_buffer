@@ -20,33 +20,21 @@ void sf_replay (
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
-    StreamModuleFrame metadata_buffer;
-    auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
+    ReplayModuleFrameBuffer metadata_buffer;
+    auto frame_buffer = make_unique<uint16_t[]>(
+            MODULE_N_PIXELS * REPLAY_READ_BUFFER_SIZE);
 
-    ReplayH5Reader file_reader(device, channel_name);
+    ReplayH5Reader file_reader(device, channel_name, stop_pulse_id);
 
-    //TODO: Add statstics.
-    uint64_t stats_counter = 0;
-
-    uint64_t total_read_us = 0;
-    uint64_t max_read_us = 0;
-    uint64_t total_send_us = 0;
-    uint64_t max_send_us = 0;
-
+    uint64_t curr_pulse_id = start_pulse_id;
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
-    for (
-            uint64_t curr_pulse_id = start_pulse_id;
-            curr_pulse_id <= stop_pulse_id;
-            curr_pulse_id++) {
+    while (curr_pulse_id <= stop_pulse_id) {
 
         auto start_time = chrono::steady_clock::now();
 
-        metadata_buffer.is_frame_present = file_reader.get_frame(
-                curr_pulse_id,
-                &(metadata_buffer.metadata),
-                (char*)(frame_buffer.get()));
-
-        metadata_buffer.data_n_bytes = MODULE_N_BYTES;
+        file_reader.get_buffer(curr_pulse_id,
+                               &metadata_buffer,
+                               (char *) (frame_buffer.get()));
 
         auto end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -56,7 +44,7 @@ void sf_replay (
 
         zmq_send(socket,
                  &metadata_buffer,
-                 sizeof(StreamModuleFrame),
+                 sizeof(ReplayModuleFrameBuffer),
                  ZMQ_SNDMORE);
         zmq_send(socket,
                  (char*)(frame_buffer.get()),
@@ -64,31 +52,17 @@ void sf_replay (
                  0);
 
         end_time = chrono::steady_clock::now();
+
+        curr_pulse_id += metadata_buffer.n_frames;
+
         auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
+        auto avg_read_us = read_us_duration / REPLAY_READ_BUFFER_SIZE;
+        auto avg_send_us = send_us_duration / REPLAY_READ_BUFFER_SIZE;
 
-        // TODO: Make proper stastistics.
-        stats_counter++;
-        total_read_us += read_us_duration;
-        max_read_us = max(max_read_us, (uint64_t)read_us_duration);
-
-        total_send_us += send_us_duration;
-        max_send_us = max(max_send_us, (uint64_t)send_us_duration);
-
-        if (stats_counter == STATS_MODULO) {
-            cout << "sf_replay:avg_read_us " << total_read_us/STATS_MODULO;
-            cout << " sf_replay:max_read_us " << max_read_us;
-            cout << " sf_replay:avg_send_us " << total_send_us/STATS_MODULO;
-            cout << " sf_replay:max_send_us " << max_send_us;
-
-            cout << endl;
-
-            stats_counter = 0;
-            total_read_us = 0;
-            max_read_us = 0;
-            total_send_us = 0;
-            max_send_us = 0;
-        }
+        cout << "sf_replay:avg_read_us " << avg_read_us;
+        cout << " sf_replay:avg_send_us " << avg_send_us;
+        cout << endl;
     }
 }
 
