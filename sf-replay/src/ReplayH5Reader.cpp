@@ -9,7 +9,11 @@
 using namespace std;
 using namespace core_buffer;
 
-void ReplayH5Reader::prepare_buffer_for_pulse(const uint64_t pulse_id)
+void ReplayH5Reader::load_buffers(
+        const uint64_t pulse_id,
+        const size_t n_pulses,
+        ReplayModuleFrameBuffer* metadata,
+        char* frame_buffer)
 {
     auto pulse_filename = BufferUtils::get_filename(
             device_, channel_name_, pulse_id);
@@ -99,20 +103,25 @@ void ReplayH5Reader::close_file()
     }
 }
 
-bool ReplayH5Reader::get_frame(
-        const uint64_t pulse_id, ModuleFrame* metadata, char* frame_buffer)
+bool ReplayH5Reader::get_buffer(
+        const uint64_t pulse_id,
+        ReplayModuleFrameBuffer* metadata,
+        char* frame_buffer)
 {
-    prepare_buffer_for_pulse(pulse_id);
+    auto start_pulse_id = pulse_id;
+    auto n_pulses = REPLAY_READ_BUFFER_SIZE;
+    auto buffer_end_pulse_id = start_pulse_id + n_pulses - 1;
 
-    auto metadata_buffer_index = BufferUtils::get_file_frame_index(pulse_id);
-    memcpy(metadata,
-            &(metadata_buffer_[metadata_buffer_index]),
-            sizeof(ModuleFrame));
+    // The last read segment might not fill the complete buffer.
+    if (stop_pulse_id_ < buffer_end_pulse_id) {
+        // stop_pulse_id_ must be included in the stream.
+        buffer_end_pulse_id = stop_pulse_id_;
+        n_pulses = buffer_end_pulse_id - start_pulse_id + 1;
+    }
 
-    auto frame_buffer_index = pulse_id - buffer_start_pulse_id_;
-    memcpy(frame_buffer,
-            &(frame_buffer_[frame_buffer_index * MODULE_N_BYTES]),
-            MODULE_N_BYTES);
+    load_buffers(pulse_id, n_pulses, metadata, frame_buffer);
+
+
 
     if (metadata->pulse_id == 0) {
         // Signal that there is no frame at this pulse_id.
@@ -125,7 +134,7 @@ bool ReplayH5Reader::get_frame(
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[ReplayH5Reader::get_frame]";
+        err_msg << "[ReplayH5Reader::get_buffer]";
         err_msg << " Corrupted file " << current_filename_;
         err_msg << " index_in_file " << metadata_buffer_index;
         err_msg << " expected pulse_id " << pulse_id;
