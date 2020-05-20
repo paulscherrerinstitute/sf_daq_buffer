@@ -70,7 +70,7 @@ TEST(WriterZmqReceiver, basic_test)
                  0);
     }
 
-    receiver.get_next_image(pulse_id, &image_metadata, image_buffer.get());
+    receiver.get_next_batch(pulse_id, &image_metadata, image_buffer.get());
     EXPECT_EQ(pulse_id, image_metadata.pulse_id);
     EXPECT_EQ(image_metadata.is_good_frame, 1);
     EXPECT_EQ(image_metadata.daq_rec, 4);

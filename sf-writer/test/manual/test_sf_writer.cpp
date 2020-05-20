@@ -44,7 +44,7 @@ void receive_replay(
 
             cout << "Received " << image_metadata->pulse_id << endl;
 
-            receiver.get_next_image(
+            receiver.get_next_batch(
                     current_pulse_id, image_metadata, image_buffer);
 
             if (image_metadata->pulse_id != current_pulse_id) {
