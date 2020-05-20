@@ -112,7 +112,7 @@ int main (int argc, char *argv[])
 
         auto metadata = queue.get_metadata_buffer(slot_id);
 
-        cout << "Written image " << metadata->pulse_id;
+        cout << "Written image " << metadata->pulse_id << endl;
         current_pulse_id++;
 
         queue.release();
