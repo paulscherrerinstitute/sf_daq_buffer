@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <string>
-#include "jungfrau.hpp"
 
 namespace core_buffer {
 
@@ -32,7 +31,7 @@ namespace core_buffer {
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // +1 for packet headers.
     const int BUFFER_UDP_RCVBUF_BYTES =
-            (JF_BYTES_PER_FRAME * BUFFER_UDP_RCVBUF_N_SLOTS);
+            (128 * BUFFER_UDP_RCVBUF_N_SLOTS);
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
     // HWM for live stream from buffer.
