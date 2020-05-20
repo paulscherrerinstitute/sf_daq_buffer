@@ -25,7 +25,7 @@ void sf_replay (
     auto frame_buffer = make_unique<uint16_t[]>(
             MODULE_N_PIXELS * REPLAY_READ_BUFFER_SIZE);
 
-    ReplayH5Reader file_reader(device, channel_name, stop_pulse_id);
+    ReplayH5Reader file_reader(device, channel_name, source_id, stop_pulse_id);
 
     uint64_t curr_pulse_id = start_pulse_id;
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
