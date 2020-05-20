@@ -5,11 +5,10 @@ file(GLOB SOURCES
 
 add_library(core-buffer-lib STATIC ${SOURCES})
 target_include_directories(core-buffer-lib PUBLIC include/)
-target_include_directories(core-buffer-lib PUBLIC external/)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(core-buffer-lib PRIVATE DEBUG_OUTPUT)
-endif()
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+#    target_compile_definitions(core-buffer-lib PRIVATE DEBUG_OUTPUT)
+#endif()
 
 #add_executable(sf-replay src/replay/sf_replay.cpp)
 #set_target_properties(sf-replay PROPERTIES OUTPUT_NAME sf_replay)
