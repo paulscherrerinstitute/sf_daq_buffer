@@ -8,10 +8,12 @@ target_link_libraries(sf-writer-tests
         gtest
         )
 
-#add_executable(perf-sf_writer perf/perf_WriterH5Writer.cpp)
-#target_link_libraries(perf-sf_writer
-#        core-buffer
-#        hdf5
-#        hdf5_hl
-#        hdf5_cpp
-#        gtest)
+add_executable(sf-writer-recv manual/test_sf_writer.cpp)
+set_target_properties(sf-writer-recv PROPERTIES OUTPUT_NAME sf_writer)
+target_link_libraries(sf-writer-recv
+        sf-writer-lib
+        zmq
+        hdf5
+        hdf5_cpp
+        pthread
+        )
