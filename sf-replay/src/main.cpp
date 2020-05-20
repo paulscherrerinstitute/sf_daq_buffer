@@ -58,8 +58,8 @@ void sf_replay (
 
         auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
-        auto avg_read_us = read_us_duration / REPLAY_READ_BUFFER_SIZE;
-        auto avg_send_us = send_us_duration / REPLAY_READ_BUFFER_SIZE;
+        auto avg_read_us = read_us_duration / metadata_buffer.n_frames;
+        auto avg_send_us = send_us_duration / metadata_buffer.n_frames;
 
         cout << "sf_replay:avg_read_us " << avg_read_us;
         cout << " sf_replay:avg_send_us " << avg_send_us;
