@@ -35,21 +35,21 @@ void receive_replay(
         // "<= stop_pulse_id" because we include the last pulse_id.
         while(current_pulse_id<=stop_pulse_id) {
 
-            auto image_metadata = buffered_queue.get_metadata_buffer();
-            auto image_buffer = buffered_queue.get_data_buffer();
-
-            receiver.get_next_image(
-                    current_pulse_id, image_metadata, image_buffer);
-
-            if (image_metadata->pulse_id != current_pulse_id) {
-                throw runtime_error("Wrong pulse id from zmq receiver.");
+            int slot_id;
+            while((slot_id = queue.reserve()) == -1) {
+                this_thread::sleep_for(chrono::milliseconds(
+                        RB_READ_RETRY_INTERVAL_MS));
             }
 
-            buffered_queue.commit();
-            current_pulse_id++;
-        }
+            auto metadata = queue.get_metadata_buffer(slot_id);
+            auto buffer = queue.get_data_buffer(slot_id);
 
-        buffered_queue.finalize();
+            receiver.get_next_batch(
+                    current_pulse_id, metadata, buffer);
+
+            queue.commit();
+            current_pulse_id += metadata->n_images;
+        }
 
     } catch (const std::exception& e) {
         using namespace date;
@@ -99,20 +99,13 @@ int main (int argc, char *argv[])
     size_t n_frames = stop_pulse_id - start_pulse_id + 1;
     WriterH5Writer writer(output_file, n_frames, n_modules);
 
-    // TODO: Remove stats trash.
-    int stats_counter = 0;
-    size_t read_total_us = 0;
-    size_t write_total_us = 0;
-    size_t read_max_us = 0;
-    size_t write_max_us = 0;
-
-    auto start_time = chrono::steady_clock::now();
-
     auto current_pulse_id = start_pulse_id;
     // "<= stop_pulse_id" because we include the last pulse_id.
     while (current_pulse_id <= stop_pulse_id) {
 
-        int slot_id; ;
+        auto start_time = chrono::steady_clock::now();
+
+        int slot_id;
         while((slot_id = queue.read()) == -1) {
             this_thread::sleep_for(chrono::milliseconds(
                     RB_READ_RETRY_INTERVAL_MS));
@@ -121,12 +114,8 @@ int main (int argc, char *argv[])
         auto metadata = queue.get_metadata_buffer(slot_id);
         auto data = queue.get_data_buffer(slot_id);
 
-        auto read_end_time = chrono::steady_clock::now();
-        auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
-                read_end_time-start_time).count();
-
         // Verify that all pulse_ids are correct.
-        for (int i=0; i<metadata->n_pulses_in_buffer; i++) {
+        for (int i=0; i<metadata->n_images; i++) {
             if (metadata->pulse_id[i] != current_pulse_id) {
                 throw runtime_error("Wrong pulse id from receiver thread.");
             }
@@ -134,41 +123,26 @@ int main (int argc, char *argv[])
             current_pulse_id++;
         }
 
+        auto end_time = chrono::steady_clock::now();
+        auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
+                end_time-start_time).count();
+
         start_time = chrono::steady_clock::now();
 
         writer.write(metadata, data);
 
-        auto write_end_time = chrono::steady_clock::now();
+        end_time = chrono::steady_clock::now();
         auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
-                write_end_time-start_time).count();
+                end_time-start_time).count();
 
         queue.release();
 
-        // TODO: Some poor statistics.
-        stats_counter++;
+        auto avg_read_us = read_us_duration / metadata->n_images;;
+        auto avg_write_us = write_us_duration / metadata->n_images;;
 
-        read_total_us += read_us_duration;
-        read_max_us = max(read_max_us, (uint64_t)read_us_duration);
-
-        write_total_us += write_us_duration;
-        write_max_us = max(write_max_us, (uint64_t)write_us_duration);
-
-//        if (stats_counter == STATS_MODULO) {
-            cout << "sf_writer:read_us " << read_total_us / STATS_MODULO;
-            cout << " sf_writer:read_max_us " << read_max_us;
-            cout << " sf_writer:write_us " << write_total_us / STATS_MODULO;
-            cout << " sf_writer:write_max_us " << write_max_us;
-
-            cout << endl;
-
-            stats_counter = 0;
-            read_total_us = 0;
-            read_max_us = 0;
-            write_total_us = 0;
-            write_max_us = 0;
-//        }
-
-        start_time = chrono::steady_clock::now();
+        cout << "sf_writer:avg_read_us " << avg_read_us;
+        cout << " sf_writer:avg_write_us " << avg_write_us;
+        cout << endl;
     }
 
     writer.close_file();
