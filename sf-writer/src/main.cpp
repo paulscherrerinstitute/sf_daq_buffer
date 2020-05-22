@@ -94,7 +94,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
-    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id;
+    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id + "-";
     thread replay_receive_thread(receive_replay,
                                  ctx, ipc_base, n_modules,
                                  ref(queue), start_pulse_id, stop_pulse_id);

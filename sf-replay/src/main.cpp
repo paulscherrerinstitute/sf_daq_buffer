@@ -116,7 +116,7 @@ int main (int argc, char *argv[]) {
     const auto start_pulse_id = (uint64_t) atoll(argv[5]);
     const auto stop_pulse_id = (uint64_t) atoll(argv[6]);
 
-    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id;
+    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id + "-";
     stringstream ipc_stream;
     ipc_stream << ipc_base << (int)source_id;
     const auto ipc_address = ipc_stream.str();
