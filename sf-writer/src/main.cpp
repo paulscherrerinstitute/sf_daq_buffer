@@ -66,11 +66,12 @@ void receive_replay(
 
 int main (int argc, char *argv[])
 {
-    if (argc != 4) {
+    if (argc != 5) {
         cout << endl;
         cout << "Usage: sf_writer ";
-        cout << " [output_file] [start_pulse_id] [stop_pulse_id]";
+        cout << " [ipc_id] [output_file] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
+        cout << "\tipc_id: Unique identifier for ipc." << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
         cout << "\tstop_pulse_id: Stop pulse_id of retrieval." << endl;
@@ -79,9 +80,10 @@ int main (int argc, char *argv[])
         exit(-1);
     }
 
-    string output_file = string(argv[1]);
-    uint64_t start_pulse_id = (uint64_t) atoll(argv[2]);
-    uint64_t stop_pulse_id = (uint64_t) atoll(argv[3]);
+    const string ipc_id = string(argv[1]);
+    string output_file = string(argv[2]);
+    uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
+    uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
 
     size_t n_modules = 32;
 
@@ -92,9 +94,10 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, WRITER_ZMQ_IO_THREADS);
 
+    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id;
     thread replay_receive_thread(receive_replay,
-            ctx, REPLAY_STREAM_IPC_URL, n_modules,
-            ref(queue), start_pulse_id, stop_pulse_id);
+                                 ctx, ipc_base, n_modules,
+                                 ref(queue), start_pulse_id, stop_pulse_id);
 
     size_t n_frames = stop_pulse_id - start_pulse_id + 1;
     WriterH5Writer writer(output_file, n_frames, n_modules);

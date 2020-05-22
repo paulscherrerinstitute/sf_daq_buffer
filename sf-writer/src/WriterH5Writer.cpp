@@ -158,5 +158,5 @@ void WriterH5Writer::write(
             &(metadata->is_good_frame), H5::PredType::NATIVE_UINT8,
             b_m_space, f_m_space);
 
-    current_write_index_++;
+    current_write_index_ += n_images_in_buffer;
 }
