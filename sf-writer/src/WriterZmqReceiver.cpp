@@ -46,9 +46,9 @@ WriterZmqReceiver::~WriterZmqReceiver()
     }
 }
 
-void WriterZmqReceiver::get_next_image(
+void WriterZmqReceiver::get_next_batch(
         const uint64_t pulse_id,
-        ImageMetadata* image_metadata,
+        ImageMetadataBuffer* image_metadata,
         char* image_buffer)
 {
     // Init the image metadata.
@@ -66,11 +66,15 @@ void WriterZmqReceiver::get_next_image(
         auto n_bytes_metadata = zmq_recv(
                 sockets_[i_module],
                 &frame_metadata,
-                sizeof(StreamModuleFrame),
+                sizeof(ReplayModuleFrameBuffer),
                 0);
 
-        if (n_bytes_metadata != sizeof(StreamModuleFrame)) {
+        if (n_bytes_metadata != sizeof(ReplayModuleFrameBuffer)) {
             throw runtime_error("Wrong number of metadata bytes.");
+        }
+
+        for (size_t i=0; i<REPLAY_READ_BUFFER_SIZE; i++) {
+
         }
 
         // sf_replay should always send the right pulse_id.

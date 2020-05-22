@@ -4,6 +4,7 @@
 #include <string>
 #include "WriterH5Writer.hpp"
 #include <vector>
+#include <jungfrau.hpp>
 
 
 class WriterZmqReceiver {
@@ -11,7 +12,7 @@ class WriterZmqReceiver {
     const size_t n_modules_;
     std::vector<void*> sockets_;
 
-    StreamModuleFrame frame_metadata;
+    ReplayModuleFrameBuffer frame_metadata;
 
 public:
     WriterZmqReceiver(
@@ -21,9 +22,9 @@ public:
 
     virtual ~WriterZmqReceiver();
 
-    void get_next_image(
+    void get_next_batch(
             const uint64_t pulse_id,
-            ImageMetadata* image_metadata,
+            ImageMetadataBuffer* image_metadata,
             char* image_buffer);
 };
 
