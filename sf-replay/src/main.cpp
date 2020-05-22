@@ -94,9 +94,9 @@ void sf_replay (
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 6) {
+    if (argc != 7) {
         cout << endl;
-        cout << "Usage: sf_replay [device]";
+        cout << "Usage: sf_replay [ipc_id] [device]";
         cout << " [channel_name] [source_id] [start_pulse_id] [stop_pulse_id]";
         cout << endl;
         cout << "\tdevice: Name of detector." << endl;
@@ -109,14 +109,16 @@ int main (int argc, char *argv[]) {
         exit(-1);
     }
 
-    const string device = string(argv[1]);
-    const string channel_name = string(argv[2]);
-    const auto source_id = (uint16_t) atoi(argv[3]);
-    const auto start_pulse_id = (uint64_t) atoll(argv[4]);
-    const auto stop_pulse_id = (uint64_t) atoll(argv[5]);
+    const string ipc_id = string(argv[1]);
+    const string device = string(argv[2]);
+    const string channel_name = string(argv[3]);
+    const auto source_id = (uint16_t) atoi(argv[4]);
+    const auto start_pulse_id = (uint64_t) atoll(argv[5]);
+    const auto stop_pulse_id = (uint64_t) atoll(argv[6]);
 
+    auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id;
     stringstream ipc_stream;
-    ipc_stream << REPLAY_STREAM_IPC_URL << (int)source_id;
+    ipc_stream << ipc_base << (int)source_id;
     const auto ipc_address = ipc_stream.str();
 
     auto ctx = zmq_ctx_new();
