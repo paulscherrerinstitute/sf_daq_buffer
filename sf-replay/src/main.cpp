@@ -26,7 +26,7 @@ void sf_replay (
     uint64_t max_send_us = 0;
     uint64_t n_stats = 0;
 
-    ReplayH5Reader file_reader(device, channel_name, source_id, stop_pulse_id);
+    ReplayH5Reader file_reader(device, channel_name, source_id);
 
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
     for (uint64_t curr_pulse_id=start_pulse_id;
