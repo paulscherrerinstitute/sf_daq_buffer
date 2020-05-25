@@ -101,6 +101,6 @@ void ReplayH5Reader::get_buffer(
 
     auto buffer_index = pulse_id - buffer_start_pulse_id_;
 
-    metadata = m_buffer_ + (buffer_index * sizeof(ModuleFrame));
+    metadata = m_buffer_ + buffer_index;
     data = f_buffer_ + (buffer_index * MODULE_N_BYTES);
 }
