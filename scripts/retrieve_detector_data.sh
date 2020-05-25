@@ -12,6 +12,12 @@ DETECTOR=$1
 START_PULSE_ID=$2
 STOP_PULSE_ID=$3
 
+echo "Request to retrieve : $@ "
+echo "Started                 : "`date`
+date1=$(date +%s)
+
+PROCESS_PID=$$
+
 if [ $# == 4 ]
 then
     OUTFILE=$4
@@ -37,6 +43,7 @@ cd /gpfs/photonics/swissfel/buffer/
 PREVIOUS_STILL_RUN=1
 while [ ${PREVIOUS_STILL_RUN} = 1 ]
 do
+    sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
     PREVIOUS_STILL_RUN=0
     ps -fe | grep "/usr/bin/sf_replay " | grep -v grep | grep sf_ > /dev/null
     PREVIOUS_STILL_RUN1=$?
@@ -45,17 +52,29 @@ do
     if [ ${PREVIOUS_STILL_RUN1} != 1 -o ${PREVIOUS_STILL_RUN2} != 1 ]
     then
         PREVIOUS_STILL_RUN=1
-        echo "Previous retrieve is not yet finished ${PREVIOUS_STILL_RUN1} ${PREVIOUS_STILL_RUN2}"
-        sleep 30
+#        echo "Previous retrieve is not yet finished ${PREVIOUS_STILL_RUN1} ${PREVIOUS_STILL_RUN2}"
+#        sleep 30
     fi
 done
 
+date2=$(date +%s)
+echo -n "Waited Time   : "
+echo $((date2-date1)) | awk '{print int($1/60)":"int($1%60)}' 
+echo "Started actual retrieve : "`date`
+
 for M in {00..31}
 do
-    taskset -c ${coreAssociated_replay[10#${M}]} /usr/bin/sf_replay ${DETECTOR} M${M} ${M} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve_replay.log &
+    taskset -c ${coreAssociated_replay[10#${M}]} /usr/bin/sf_replay ${PROCESS_PID} ${DETECTOR} M${M} ${M} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve_replay.log &
 done
 
-taskset -c ${coreAssociated_writer} /usr/bin/sf_writer ${OUTFILE} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve.log &
+taskset -c ${coreAssociated_writer} /usr/bin/sf_writer ${PROCESS_PID} ${OUTFILE} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve.log &
 
 wait
-echo ${OUTFILE}
+
+rm -rf /tmp/sf-replay-${PROCESS_PID}-*
+
+date3=$(date +%s)
+echo "Finished                : "`date`
+echo -n "Retrieve Time : "
+echo $((date3-date2)) | awk '{print int($1/60)":"int($1%60)}'
+
