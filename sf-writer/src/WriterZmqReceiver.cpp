@@ -14,7 +14,7 @@ WriterZmqReceiver::WriterZmqReceiver(
         const uint64_t stop_pulse_id_) :
         n_modules_(n_modules),
         sockets_(n_modules),
-        end_pulse_id_(stop_pulse_id_)
+        stop_pulse_id_(stop_pulse_id_)
 {
 
     for (size_t i = 0; i < n_modules; i++) {
@@ -54,7 +54,7 @@ void WriterZmqReceiver::get_next_buffer(
         char* image_buffer)
 {
     auto n_images_in_buffer = WRITER_DATA_CACHE_N_IMAGES;
-    auto images_left = end_pulse_id_ - start_pulse_id + 1;
+    auto images_left = stop_pulse_id_ - start_pulse_id + 1;
     if (images_left < n_images_in_buffer) {
         n_images_in_buffer = images_left;
     }

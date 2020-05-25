@@ -11,7 +11,7 @@ class WriterZmqReceiver {
 
     const size_t n_modules_;
     std::vector<void*> sockets_;
-    const uint64_t end_pulse_id_;
+    const uint64_t stop_pulse_id_;
 
     ModuleFrame f_meta_;
 
