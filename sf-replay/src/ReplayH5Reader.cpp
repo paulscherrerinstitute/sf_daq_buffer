@@ -103,4 +103,8 @@ void ReplayH5Reader::get_buffer(
 
     metadata = m_buffer_ + buffer_index;
     data = f_buffer_ + (buffer_index * MODULE_N_BYTES);
+
+    if (metadata->pulse_id != 0 && metadata->pulse_id != pulse_id) {
+        throw runtime_error("Corrupted buffer file.");
+    }
 }
