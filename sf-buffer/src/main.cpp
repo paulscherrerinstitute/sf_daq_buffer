@@ -110,9 +110,9 @@ int main (int argc, char *argv[]) {
             send_max_us = send_us_duration;
         }
 
-        if (metadata.n_received_packets < JUNGFRAU_N_PACKETS_PER_FRAME) {
+        if (metadata.n_received_packets < JF_N_PACKETS_PER_FRAME) {
             n_missed_packets +=
-                    JUNGFRAU_N_PACKETS_PER_FRAME - metadata.n_received_packets;
+                    JF_N_PACKETS_PER_FRAME - metadata.n_received_packets;
             n_corrupted_frames++;
         }
 

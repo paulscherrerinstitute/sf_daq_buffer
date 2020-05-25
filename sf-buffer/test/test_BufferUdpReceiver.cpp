@@ -12,7 +12,7 @@ using namespace std;
 
 TEST(BufferUdpReceiver, simple_recv)
 {
-    auto n_packets = JUNGFRAU_N_PACKETS_PER_FRAME;
+    auto n_packets = JF_N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 5;
 
@@ -65,7 +65,7 @@ TEST(BufferUdpReceiver, simple_recv)
 
 TEST(BufferUdpReceiver, missing_middle_packet)
 {
-    auto n_packets = JUNGFRAU_N_PACKETS_PER_FRAME;
+    auto n_packets = JF_N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 
@@ -123,7 +123,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
 
 TEST(BufferUdpReceiver, missing_first_packet)
 {
-    auto n_packets = JUNGFRAU_N_PACKETS_PER_FRAME;
+    auto n_packets = JF_N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 
@@ -181,7 +181,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
 
 TEST(BufferUdpReceiver, missing_last_packet)
 {
-    auto n_packets = JUNGFRAU_N_PACKETS_PER_FRAME;
+    auto n_packets = JF_N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 

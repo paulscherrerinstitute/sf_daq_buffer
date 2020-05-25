@@ -106,7 +106,7 @@ TEST(UdpReceiver, false_recv)
 
 TEST(UdpReceiver, receive_many)
 {
-    auto n_msg_buffer = JUNGFRAU_N_PACKETS_PER_FRAME;
+    auto n_msg_buffer = JF_N_PACKETS_PER_FRAME;
     jungfrau_packet recv_buffer[n_msg_buffer];
     iovec recv_buff_ptr[n_msg_buffer];
     struct mmsghdr msgs[n_msg_buffer];
@@ -154,7 +154,7 @@ TEST(UdpReceiver, receive_many)
 
     this_thread::sleep_for(chrono::milliseconds(10));
 
-    auto n_msgs = udp_receiver.receive_many(msgs, JUNGFRAU_N_PACKETS_PER_FRAME);
+    auto n_msgs = udp_receiver.receive_many(msgs, JF_N_PACKETS_PER_FRAME);
     ASSERT_EQ(n_msgs, 2);
 
     for (size_t i=0;i<n_msgs;i++) {
@@ -162,7 +162,7 @@ TEST(UdpReceiver, receive_many)
         ASSERT_EQ(recv_buffer[i].bunchid, i);
     }
 
-    n_msgs = udp_receiver.receive_many(msgs, JUNGFRAU_N_PACKETS_PER_FRAME);
+    n_msgs = udp_receiver.receive_many(msgs, JF_N_PACKETS_PER_FRAME);
     ASSERT_EQ(n_msgs, -1);
 
     udp_receiver.disconnect();

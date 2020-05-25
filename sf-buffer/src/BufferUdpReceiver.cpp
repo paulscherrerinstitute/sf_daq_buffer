@@ -76,7 +76,7 @@ inline uint64_t BufferUdpReceiver::process_packets(
 
         // Last frame packet received. Frame finished.
         if (packet_buffer_[i_packet].packetnum ==
-            JUNGFRAU_N_PACKETS_PER_FRAME-1)
+            JF_N_PACKETS_PER_FRAME - 1)
         {
             // Buffer is loaded only if this is not the last message.
             if (i_packet+1 != packet_buffer_n_packets_) {
