@@ -1,6 +1,8 @@
+#include <gtest/gtest.h>
+#include <thread>
+
 #include "ReplayH5Reader.hpp"
 #include "BufferH5Writer.hpp"
-#include "gtest/gtest.h"
 
 using namespace std;
 using namespace core_buffer;
