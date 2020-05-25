@@ -25,7 +25,7 @@ void ReplayH5Reader::load_buffers(const uint64_t pulse_id)
     cache_start_index *= REPLAY_READ_BUFFER_SIZE;
 
     buffer_start_pulse_id_ = pulse_id - (file_index - cache_start_index);
-    buffer_end_pulse_id_ = buffer_start_pulse_id_ + REPLAY_READ_BUFFER_SIZE;
+    buffer_end_pulse_id_ = buffer_start_pulse_id_ + REPLAY_READ_BUFFER_SIZE - 1;
 
     hsize_t b_m_dims[2] = {REPLAY_READ_BUFFER_SIZE, ModuleFrame_N_FIELDS};
     H5::DataSpace b_m_space (2, b_m_dims);
