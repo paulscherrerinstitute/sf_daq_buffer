@@ -20,6 +20,9 @@ class ReplayH5Reader {
     H5::DataSet dset_metadata_;
     H5::DataSet dset_frame_;
 
+    ModuleFrame* m_buffer;
+    char* f_buffer;
+
     void load_buffers(const uint64_t pulse_id,
                       const size_t n_pulses,
                       ReplayModuleFrameBuffer* metadata,
@@ -36,8 +39,8 @@ public:
     void close_file();
     void get_buffer(
             const uint64_t pulse_id,
-            ReplayModuleFrameBuffer* metadata,
-            char* frame_buffer);
+            ModuleFrame*& metadata,
+            char*& frame_buffer);
 };
 
 
