@@ -9,11 +9,7 @@
 using namespace std;
 using namespace core_buffer;
 
-void ReplayH5Reader::load_buffers(
-        const uint64_t pulse_id,
-        const size_t n_pulses,
-        ReplayModuleFrameBuffer* metadata,
-        char* frame_buffer)
+void ReplayH5Reader::load_buffers(const uint64_t pulse_id)
 {
     auto pulse_filename = BufferUtils::get_filename(
             device_, channel_name_, pulse_id);
@@ -85,18 +81,21 @@ void ReplayH5Reader::load_buffers(
 ReplayH5Reader::ReplayH5Reader(
         const string device,
         const string channel_name,
-        const uint16_t source_id,
-        const uint64_t stop_pulse_id) :
+        const uint16_t source_id) :
             device_(device),
             channel_name_(channel_name),
-            source_id_(source_id),
-            stop_pulse_id_(stop_pulse_id)
+            source_id_(source_id)
 {
+    m_buffer = new ModuleFrame[REPLAY_READ_BUFFER_SIZE];
+    f_buffer = new char[MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE];
 }
 
 ReplayH5Reader::~ReplayH5Reader()
 {
     close_file();
+
+    delete[] m_buffer;
+    delete[] f_buffer;
 }
 
 void ReplayH5Reader::close_file()
@@ -110,56 +109,17 @@ void ReplayH5Reader::close_file()
 
 void ReplayH5Reader::get_buffer(
         const uint64_t pulse_id,
-        ReplayModuleFrameBuffer* metadata,
-        char* frame_buffer)
+        ModuleFrame*& metadata,
+        char*& data)
 {
-    auto start_pulse_id = pulse_id;
-    auto n_pulses = REPLAY_READ_BUFFER_SIZE;
-    auto buffer_end_pulse_id = start_pulse_id + n_pulses - 1;
-
-    // The last read segment might not fill the complete buffer.
-    if (stop_pulse_id_ < buffer_end_pulse_id) {
-        // stop_pulse_id_ must be included in the stream.
-        buffer_end_pulse_id = stop_pulse_id_;
-        n_pulses = buffer_end_pulse_id - start_pulse_id + 1;
+    // Buffer start and end pulse_ids are inclusive.
+    if ((pulse_id < buffer_start_pulse_id_) ||
+        (pulse_id > buffer_end_pulse_id_)) {
+        load_buffers(pulse_id);
     }
 
-    load_buffers(pulse_id, n_pulses, metadata, frame_buffer);
+    auto buffer_index = pulse_id - buffer_start_pulse_id_;
 
-    for (size_t i_frame=0; i_frame<n_pulses; i_frame++) {
-        auto curr_pulse_id = start_pulse_id + i_frame;
-
-        metadata->is_frame_present[i_frame] = true;
-        if (metadata->pulse_id[i_frame] == 0) {
-            // Writer expects all pulse_ids, even ones with no data.
-            metadata->pulse_id[i_frame] = curr_pulse_id;
-            metadata->is_frame_present[i_frame] = false;
-        }
-
-        // TODO: This looks really ugly. Fix condition length.
-        metadata->is_good_frame[i_frame] = true;
-        if (!metadata->is_frame_present[i_frame] ||
-            metadata->n_received_packets[i_frame] !=
-                JUNGFRAU_N_PACKETS_PER_FRAME) {
-            metadata->is_good_frame[i_frame] = false;
-        }
-
-        if (metadata->pulse_id[i_frame] != curr_pulse_id) {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[ReplayH5Reader::get_buffer]";
-            err_msg << " Corrupted file " << current_filename_;
-            err_msg << " expected pulse_id " << curr_pulse_id;
-            err_msg << " but read " << metadata->pulse_id[i_frame] << endl;
-
-            throw runtime_error(err_msg.str());
-        }
-    }
-
-    metadata->module_id = source_id_;
-    metadata->data_n_bytes = n_pulses * MODULE_N_BYTES;
-    metadata->n_frames = n_pulses;
+    metadata = m_buffer + (buffer_index * sizeof(ModuleFrame));
+    data = f_buffer + (buffer_index * MODULE_N_BYTES);
 }
