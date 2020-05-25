@@ -109,7 +109,7 @@ void WriterH5Writer::close_file()
 void WriterH5Writer::write(
         const ImageMetadataBuffer* metadata, const char* data)
 {
-    auto n_images_in_buffer = metadata->n_pulses_in_buffer;
+    auto n_images_in_buffer = metadata->n_images;
 
     hsize_t b_i_dims[3] = {
             n_images_in_buffer,
