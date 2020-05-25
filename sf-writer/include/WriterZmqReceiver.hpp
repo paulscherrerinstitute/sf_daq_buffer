@@ -11,6 +11,7 @@ class WriterZmqReceiver {
 
     const size_t n_modules_;
     std::vector<void*> sockets_;
+    const uint64_t stop_pulse_id_;
 
     ReplayModuleFrameBuffer frame_metadata;
 
@@ -18,7 +19,8 @@ public:
     WriterZmqReceiver(
             void *ctx,
             const std::string& ipc_prefix,
-            const size_t n_modules);
+            const size_t n_modules,
+            const uint64_t stop_pulse_id);
 
     virtual ~WriterZmqReceiver();
 
