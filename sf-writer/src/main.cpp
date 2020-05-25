@@ -41,7 +41,7 @@ void receive_replay(
             auto metadata = queue.get_metadata_buffer(slot_id);
             auto buffer = queue.get_data_buffer(slot_id);
 
-            receiver.get_next_batch(
+            receiver.get_next_buffer(
                     current_pulse_id, metadata, buffer);
 
             queue.commit();

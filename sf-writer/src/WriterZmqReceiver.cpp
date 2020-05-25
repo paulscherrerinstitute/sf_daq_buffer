@@ -46,7 +46,7 @@ WriterZmqReceiver::~WriterZmqReceiver()
     }
 }
 
-void WriterZmqReceiver::get_next_batch(
+void WriterZmqReceiver::get_next_buffer(
         const uint64_t pulse_id,
         ImageMetadataBuffer* image_metadata,
         char* image_buffer)

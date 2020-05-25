@@ -22,7 +22,7 @@ public:
 
     virtual ~WriterZmqReceiver();
 
-    void get_next_batch(
+    void get_next_buffer(
             const uint64_t pulse_id,
             ImageMetadataBuffer* image_metadata,
             char* image_buffer);
