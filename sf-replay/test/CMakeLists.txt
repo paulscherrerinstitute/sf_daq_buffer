@@ -8,4 +8,3 @@ target_link_libraries(sf-replay-tests
         hdf5_cpp
         gtest
         )
-
