@@ -16,7 +16,6 @@ void sf_replay (
         void* socket,
         const string& device,
         const string& channel_name,
-        const uint16_t source_id,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
@@ -26,7 +25,7 @@ void sf_replay (
     uint64_t max_send_us = 0;
     uint64_t n_stats = 0;
 
-    ReplayH5Reader file_reader(device, channel_name, source_id);
+    ReplayH5Reader file_reader(device, channel_name);
 
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
     for (uint64_t curr_pulse_id=start_pulse_id;
@@ -119,9 +118,7 @@ int main (int argc, char *argv[]) {
     if (zmq_bind(socket, ipc_address.c_str()) != 0)
         throw runtime_error(strerror (errno));
 
-    sf_replay(
-            socket, device, channel_name, source_id,
-            start_pulse_id, stop_pulse_id);
+    sf_replay(socket, device, channel_name, start_pulse_id, stop_pulse_id);
 
     zmq_close(socket);
     zmq_ctx_destroy(ctx);
