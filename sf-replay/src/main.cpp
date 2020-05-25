@@ -21,8 +21,9 @@ void sf_replay (
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
-    auto metadata_buffer = new ReplayModuleFrameBuffer();
-    auto frame_buffer = new char[MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE];
+    auto m_buffer = new ReplayModuleFrameBuffer();
+    auto m_buffer_size = sizeof(ReplayModuleFrameBuffer);
+    auto f_buffer = new char[MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE];
 
     ReplayH5Reader file_reader(device, channel_name, source_id, stop_pulse_id);
 
@@ -32,9 +33,7 @@ void sf_replay (
 
         auto start_time = chrono::steady_clock::now();
 
-        file_reader.get_buffer(curr_pulse_id,
-                               &metadata_buffer,
-                               (char *) (frame_buffer.get()));
+        file_reader.get_buffer(curr_pulse_id, m_buffer, f_buffer);
 
         auto end_time = chrono::steady_clock::now();
         auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -42,31 +41,25 @@ void sf_replay (
 
         start_time = chrono::steady_clock::now();
 
-        zmq_send(socket,
-                 &metadata_buffer,
-                 sizeof(ReplayModuleFrameBuffer),
-                 ZMQ_SNDMORE);
-        zmq_send(socket,
-                 (char*)(frame_buffer.get()),
-                 metadata_buffer.data_n_bytes,
-                 0);
+        zmq_send(socket, m_buffer, m_buffer_size, ZMQ_SNDMORE);
+        zmq_send(socket, f_buffer, m_buffer->data_n_bytes, 0);
 
         end_time = chrono::steady_clock::now();
 
-        curr_pulse_id += metadata_buffer.n_frames;
+        curr_pulse_id += m_buffer->n_frames;
 
         auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
-        auto avg_read_us = read_us_duration / metadata_buffer.n_frames;
-        auto avg_send_us = send_us_duration / metadata_buffer.n_frames;
+        auto avg_read_us = read_us_duration / m_buffer->n_frames;
+        auto avg_send_us = send_us_duration / m_buffer->n_frames;
 
         cout << "sf_replay:avg_read_us " << avg_read_us;
         cout << " sf_replay:avg_send_us " << avg_send_us;
         cout << endl;
     }
 
-    delete[] frame_buffer;
-    delete metadata_buffer;
+    delete[] f_buffer;
+    delete m_buffer;
 }
 
 int main (int argc, char *argv[]) {
