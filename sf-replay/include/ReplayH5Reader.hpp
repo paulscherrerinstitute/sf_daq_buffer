@@ -2,7 +2,7 @@
 #define SF_DAQ_BUFFER_REPLAYH5READER_HPP
 
 #include <string>
-#include "jungfrau.hpp"
+#include "formats.hpp"
 #include <H5Cpp.h>
 #include <memory>
 #include "buffer_config.hpp"

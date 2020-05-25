@@ -3,10 +3,10 @@
 #include <iostream>
 #include <thread>
 #include <cstring>
+#include <sstream>
 #include <zmq.h>
 
 #include "buffer_config.hpp"
-#include "jungfrau.hpp"
 
 using namespace std;
 using namespace core_buffer;

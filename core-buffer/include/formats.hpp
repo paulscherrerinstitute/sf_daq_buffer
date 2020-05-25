@@ -2,6 +2,7 @@
 #define SF_DAQ_BUFFER_FORMATS_HPP
 
 #include "buffer_config.hpp"
+#include "jungfrau.hpp"
 
 struct ImageMetadataBuffer
 {
@@ -21,5 +22,17 @@ struct ImageMetadata
     uint8_t is_good_frame;
     uint64_t data_n_bytes;
 };
+
+#pragma pack(push)
+#pragma pack(1)
+struct ReplayModuleFrameBuffer {
+    ModuleFrame frame[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    bool is_frame_present[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    bool is_good_frame[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint16_t module_id;
+    uint64_t data_n_bytes;
+    uint16_t n_frames;
+};
+#pragma pack(pop)
 
 #endif //SF_DAQ_BUFFER_FORMATS_HPP
