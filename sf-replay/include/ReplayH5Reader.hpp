@@ -13,7 +13,6 @@ class ReplayH5Reader {
     const std::string device_;
     const std::string channel_name_;
     const uint16_t source_id_;
-    const uint64_t stop_pulse_id_;
 
     H5::H5File current_file_;
     std::string current_filename_;
@@ -32,8 +31,7 @@ public:
     ReplayH5Reader(
             const std::string device,
             const std::string channel_name,
-            const uint16_t source_id,
-            const uint64_t stop_pulse_id);
+            const uint16_t source_id);
     virtual ~ReplayH5Reader();
 
     void close_file();
