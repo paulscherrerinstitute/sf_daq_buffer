@@ -21,11 +21,10 @@ class ReplayH5Reader {
 
     ModuleFrame* m_buffer;
     char* f_buffer;
+    uint64_t buffer_start_pulse_id_;
+    uint64_t buffer_end_pulse_id_;
 
-    void load_buffers(const uint64_t pulse_id,
-                      const size_t n_pulses,
-                      ReplayModuleFrameBuffer* metadata,
-                      char* frame_buffer);
+    void load_buffers(const uint64_t pulse_id);
 
 public:
     ReplayH5Reader(
