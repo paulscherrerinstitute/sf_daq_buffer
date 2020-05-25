@@ -13,7 +13,7 @@ class WriterZmqReceiver {
     std::vector<void*> sockets_;
     const uint64_t end_pulse_id_;
 
-    ReplayModuleFrameBuffer frame_metadata;
+    ModuleFrame f_meta_;
 
 public:
     WriterZmqReceiver(
@@ -26,7 +26,7 @@ public:
 
     void get_next_buffer(
             const uint64_t start_pulse_id,
-            ImageMetadataBuffer* image_metadata,
+            ImageMetadataBuffer* i_meta,
             char* image_buffer);
 };
 
