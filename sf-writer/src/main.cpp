@@ -25,7 +25,7 @@ void receive_replay(
         const uint64_t stop_pulse_id)
 {
     try {
-        WriterZmqReceiver receiver(ctx, ipc_prefix, n_modules);
+        WriterZmqReceiver receiver(ctx, ipc_prefix, n_modules, stop_pulse_id);
 
         uint64_t current_pulse_id=start_pulse_id;
 
