@@ -1,17 +1,16 @@
+#include "ReplayH5Reader.hpp"
+
 #include <iostream>
 #include <thread>
-#include "jungfrau.hpp"
-
-#include "zmq.h"
-#include "buffer_config.hpp"
-
 #include <cstring>
-#include "ReplayH5Reader.hpp"
-#include "date.h"
-#include "bitshuffle/bitshuffle.h"
+#include <zmq.h>
+
+#include "buffer_config.hpp"
+#include "jungfrau.hpp"
 
 using namespace std;
 using namespace core_buffer;
+using namespace chrono;
 
 void sf_replay (
         void* socket,
@@ -31,25 +30,25 @@ void sf_replay (
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
     while (curr_pulse_id <= stop_pulse_id) {
 
-        auto start_time = chrono::steady_clock::now();
+        auto start_time = steady_clock::now();
 
         file_reader.get_buffer(curr_pulse_id, m_buffer, f_buffer);
 
-        auto end_time = chrono::steady_clock::now();
-        auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
-                end_time-start_time).count();
+        auto end_time = steady_clock::now();
+        auto read_us_duration =
+                duration_cast<microseconds>(end_time-start_time).count();
 
-        start_time = chrono::steady_clock::now();
+        start_time = steady_clock::now();
 
         zmq_send(socket, m_buffer, m_buffer_size, ZMQ_SNDMORE);
         zmq_send(socket, f_buffer, m_buffer->data_n_bytes, 0);
 
-        end_time = chrono::steady_clock::now();
+        end_time = steady_clock::now();
 
         curr_pulse_id += m_buffer->n_frames;
 
-        auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
-                end_time-start_time).count();
+        auto send_us_duration =
+                duration_cast<microseconds>(end_time-start_time).count();
         auto avg_read_us = read_us_duration / m_buffer->n_frames;
         auto avg_send_us = send_us_duration / m_buffer->n_frames;
 
