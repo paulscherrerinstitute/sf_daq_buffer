@@ -23,7 +23,7 @@ public:
     virtual ~WriterZmqReceiver();
 
     void get_next_buffer(
-            const uint64_t pulse_id,
+            const uint64_t start_pulse_id,
             ImageMetadataBuffer* image_metadata,
             char* image_buffer);
 };

@@ -47,7 +47,7 @@ WriterZmqReceiver::~WriterZmqReceiver()
 }
 
 void WriterZmqReceiver::get_next_buffer(
-        const uint64_t pulse_id,
+        const uint64_t start_pulse_id,
         ImageMetadataBuffer* image_metadata,
         char* image_buffer)
 {
@@ -60,6 +60,8 @@ void WriterZmqReceiver::get_next_buffer(
     bool image_metadata_init = false;
 
     size_t image_buffer_offset = 0;
+
+    for (size_t pulse_id=start_pulse_id)
 
     for (size_t i_module = 0; i_module < n_modules_; i_module++) {
 
@@ -137,6 +139,4 @@ void WriterZmqReceiver::get_next_buffer(
 
         image_buffer_offset += n_bytes_image;
     }
-
-    image_metadata->data_n_bytes = image_buffer_offset;
 }
