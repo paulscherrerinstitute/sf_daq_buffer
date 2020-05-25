@@ -1,10 +1,6 @@
 #include "ReplayH5Reader.hpp"
 
 #include "BufferUtils.hpp"
-#include <iostream>
-#include <chrono>
-#include <cstring>
-#include "date.h"
 
 using namespace std;
 using namespace core_buffer;
@@ -67,11 +63,9 @@ void ReplayH5Reader::load_buffers(const uint64_t pulse_id)
 
 ReplayH5Reader::ReplayH5Reader(
         const string device,
-        const string channel_name,
-        const uint16_t source_id) :
+        const string channel_name) :
             device_(device),
-            channel_name_(channel_name),
-            source_id_(source_id)
+            channel_name_(channel_name)
 {
     m_buffer_ = new ModuleFrame[REPLAY_READ_BUFFER_SIZE];
     f_buffer_ = new char[MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE];

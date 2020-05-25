@@ -2,17 +2,15 @@
 #define SF_DAQ_BUFFER_REPLAYH5READER_HPP
 
 #include <string>
-#include "formats.hpp"
 #include <H5Cpp.h>
 #include <memory>
-#include "buffer_config.hpp"
 
+#include "formats.hpp"
 
 class ReplayH5Reader {
 
     const std::string device_;
     const std::string channel_name_;
-    const uint16_t source_id_;
 
     H5::H5File current_file_;
     std::string current_filename_;
@@ -29,8 +27,7 @@ class ReplayH5Reader {
 public:
     ReplayH5Reader(
             const std::string device,
-            const std::string channel_name,
-            const uint16_t source_id);
+            const std::string channel_name);
     virtual ~ReplayH5Reader();
 
     void close_file();
