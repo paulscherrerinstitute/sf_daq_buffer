@@ -42,7 +42,7 @@ void BufferedFastQueue::commit()
     queue_meta_buffer_->pulse_id[index] = image_metadata_.pulse_id;
     queue_meta_buffer_->frame_index[index] = image_metadata_.frame_index;
     queue_meta_buffer_->daq_rec[index] = image_metadata_.daq_rec;
-    queue_meta_buffer_->is_good_frame[index] = image_metadata_.is_good_frame;
+    queue_meta_buffer_->is_good_image[index] = image_metadata_.is_good_frame;
     queue_meta_buffer_->data_n_bytes[index] = image_metadata_.data_n_bytes;
 
     queue_meta_buffer_->n_pulses_in_buffer++;
