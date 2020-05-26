@@ -118,7 +118,7 @@ void BufferBinaryWriter::close_current_file()
 
         BufferUtils::update_latest_file(
                 latest_filename_, current_output_filename_);
-    }
 
-    current_output_filename_ = "";
+        current_output_filename_ = "";
+    }
 }
