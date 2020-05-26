@@ -13,4 +13,14 @@ struct ImageMetadataBuffer
     uint16_t n_images;
 };
 
+#pragma pack(push)
+#pragma pack(1)
+struct ReplayBuffer
+{
+    ModuleFrame metadata[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    uint64_t start_pulse_id;
+    uint16_t n_frames;
+};
+#pragma pack(pop)
+
 #endif //SF_DAQ_BUFFER_FORMATS_HPP
