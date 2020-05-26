@@ -29,6 +29,11 @@ public:
     ~JFH5Writer();
     void write(const ImageMetadataBuffer* metadata, const char* data);
     void close_file();
+
+    uint64_t* b_pulse_id_;
+    uint64_t* b_frame_index_;
+    uint32_t* b_daq_rec_;
+    uint8_t* b_is_good_frame_ ;
 };
 
 
