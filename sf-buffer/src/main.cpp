@@ -11,7 +11,7 @@
 #include <sys/resource.h>
 #include <syscall.h>
 #include <zconf.h>
-#include <BufferBinaryFormat.hpp>
+#include "formats.hpp"
 
 using namespace std;
 using namespace core_buffer;

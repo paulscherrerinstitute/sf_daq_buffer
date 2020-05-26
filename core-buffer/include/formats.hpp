@@ -13,13 +13,26 @@ struct ImageMetadataBuffer
     uint16_t n_images;
 };
 
+const char BUFFER_FORMAT_START_BYTE = 0xBE;
+
 #pragma pack(push)
 #pragma pack(1)
-struct ReplayBuffer
+struct BufferBinaryFormat {
+
+    BufferBinaryFormat() : FORMAT_MARKER(BUFFER_FORMAT_START_BYTE) {};
+
+    const char FORMAT_MARKER;
+    ModuleFrame metadata;
+    char data[core_buffer::MODULE_N_BYTES];
+};
+#pragma pack(pop)
+
+#pragma pack(push)
+#pragma pack(1)
+struct BufferBlock
 {
-    ModuleFrame metadata[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    BufferBinaryFormat frame[core_buffer::REPLAY_READ_BUFFER_SIZE];
     uint64_t start_pulse_id;
-    uint16_t n_frames;
 };
 #pragma pack(pop)
 
