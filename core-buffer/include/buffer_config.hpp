@@ -19,7 +19,7 @@ namespace core_buffer {
     // Must be power of 10 and >= than FILE_MOD.
     const size_t FOLDER_MOD = 100000;
     // Extension of our file format.
-    const std::string FILE_EXTENSION = ".h5";
+    const std::string FILE_EXTENSION = ".bin";
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
     // If the RB is empty, how much time to wait before trying to read it again.
