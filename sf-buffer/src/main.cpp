@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include <BufferH5Writer.hpp>
+#include <BufferBinaryWriter.hpp>
 #include "zmq.h"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
@@ -11,6 +11,7 @@
 #include <sys/resource.h>
 #include <syscall.h>
 #include <zconf.h>
+#include <BufferBinaryFormat.hpp>
 
 using namespace std;
 using namespace core_buffer;
@@ -59,7 +60,7 @@ int main (int argc, char *argv[]) {
     uint64_t n_corrupted_frames = 0;
     uint64_t last_pulse_id = 0;
 
-    BufferH5Writer writer(root_folder, device_name);
+    BufferBinaryWriter writer(root_folder, device_name);
     BufferUdpReceiver receiver(udp_port, source_id);
 
     pid_t tid;
@@ -67,8 +68,7 @@ int main (int argc, char *argv[]) {
     int ret = setpriority(PRIO_PROCESS, tid, 0);
     if (ret == -1) throw runtime_error("cannot set nice");
 
-    ModuleFrame metadata;
-    auto frame_buffer = new char[MODULE_N_BYTES * JUNGFRAU_N_MODULES];
+    BufferBinaryFormat* binary_buffer = new BufferBinaryFormat();
 
     size_t write_total_us = 0;
     size_t write_max_us = 0;
@@ -77,12 +77,12 @@ int main (int argc, char *argv[]) {
 
     while (true) {
 
-        auto pulse_id = receiver.get_frame_from_udp(metadata, frame_buffer);
+        auto pulse_id = receiver.get_frame_from_udp(
+                binary_buffer->metadata, binary_buffer->data);
 
         auto start_time = chrono::steady_clock::now();
 
-        writer.set_pulse_id(pulse_id);
-        writer.write(&metadata, frame_buffer);
+        writer.write(pulse_id, binary_buffer);
 
         auto write_end_time = chrono::steady_clock::now();
         auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -90,8 +90,9 @@ int main (int argc, char *argv[]) {
 
         start_time = chrono::steady_clock::now();
 
-        zmq_send(socket, &metadata, sizeof(ModuleFrame), ZMQ_SNDMORE);
-        zmq_send(socket, frame_buffer, MODULE_N_BYTES, 0);
+        zmq_send(socket, &(binary_buffer->metadata), sizeof(ModuleFrame),
+                ZMQ_SNDMORE);
+        zmq_send(socket, binary_buffer->data, MODULE_N_BYTES, 0);
 
         auto send_end_time = chrono::steady_clock::now();
         auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -110,9 +111,9 @@ int main (int argc, char *argv[]) {
             send_max_us = send_us_duration;
         }
 
-        if (metadata.n_received_packets < JF_N_PACKETS_PER_FRAME) {
-            n_missed_packets +=
-                    JF_N_PACKETS_PER_FRAME - metadata.n_received_packets;
+        if (binary_buffer->metadata.n_received_packets < JF_N_PACKETS_PER_FRAME) {
+            n_missed_packets += JF_N_PACKETS_PER_FRAME -
+                    binary_buffer->metadata.n_received_packets;
             n_corrupted_frames++;
         }
 
@@ -146,5 +147,5 @@ int main (int argc, char *argv[]) {
         }
     }
 
-    delete[] frame_buffer;
+    delete binary_buffer;
 }
