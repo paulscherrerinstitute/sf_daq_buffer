@@ -12,10 +12,7 @@ struct BufferBinaryFormat {
     BufferBinaryFormat() : FORMAT_MARKER(JF_FORMAT_START_BYTE) {};
 
     const char FORMAT_MARKER;
-    uint64_t pulse_id;
-    uint64_t frame_id;
-    uint32_t daq_rec;
-    uint16_t n_recv_packets;
+    ModuleFrame metadata;
     char data[JUNGFRAU_DATA_BYTES_PER_FRAME];
 };
 #pragma pack(pop)
