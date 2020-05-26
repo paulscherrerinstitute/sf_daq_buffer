@@ -12,10 +12,10 @@
 using namespace std;
 
 BufferBinaryWriter::BufferBinaryWriter(
-        const string& device_name,
-        const string& root_folder) :
-        device_name_(device_name),
+        const string& root_folder,
+        const string& device_name):
         root_folder_(root_folder),
+        device_name_(device_name),
         latest_filename_(root_folder + "/" + device_name + "/LATEST"),
         current_output_filename_(""),
         output_file_fd_(-1)
