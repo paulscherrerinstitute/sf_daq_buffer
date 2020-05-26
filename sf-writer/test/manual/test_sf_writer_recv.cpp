@@ -55,6 +55,8 @@ void receive_replay(
         // "<= stop_pulse_id" because we include the last pulse_id.
         while(pulse_id <= stop_pulse_id) {
 
+            auto start_time = chrono::steady_clock::now();
+
             for (size_t i_module = 0; i_module < n_modules; i_module++) {
 
                 auto n_bytes_metadata = zmq_recv(
@@ -74,8 +76,13 @@ void receive_replay(
                 if (n_bytes_image != MODULE_N_BYTES) {
                     throw runtime_error("Wrong number of data bytes.");
                 }
-
             }
+
+            auto end_time = chrono::steady_clock::now();
+            auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
+                    end_time-start_time).count();
+
+            cout << "sf_writer:read_us " << read_us_duration << endl;
         }
 
         queue.commit();
