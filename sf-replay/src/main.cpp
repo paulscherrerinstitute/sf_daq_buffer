@@ -14,15 +14,11 @@ using namespace chrono;
 void sf_replay (
         const string device,
         const string channel_name,
-        FastQueue<ModuleFrame>& queue,
+        FastQueue<ReplayBuffer>& queue,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id
         )
 {
-    uint64_t read_us = 0;
-    uint64_t max_read_us = 0;
-    uint64_t n_stats = 0;
-
     ReplayH5Reader file_reader(device, channel_name);
 
     // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
@@ -41,12 +37,7 @@ void sf_replay (
         auto metadata = queue.get_metadata_buffer(slot_id);
         auto buffer = queue.get_data_buffer(slot_id);
 
-        ModuleFrame* m_buffer;
-        char* f_buffer;
-        file_reader.get_buffer(curr_pulse_id, m_buffer, f_buffer);
-
-        memcpy(metadata, m_buffer, sizeof(ModuleFrame));
-        memcpy(buffer, f_buffer, MODULE_N_BYTES);
+        file_reader.get_buffer(curr_pulse_id, metadata, buffer);
 
         auto end_time = steady_clock::now();
         uint64_t read_us_duration =
@@ -55,20 +46,8 @@ void sf_replay (
         queue.commit();
 
         // TODO: Proper statistics
-        n_stats++;
-
-        read_us += read_us_duration;
-        max_read_us = max(max_read_us, read_us_duration);
-
-        if (n_stats == STATS_MODULO) {
-            cout << "sf_replay:avg_read_us " << read_us / STATS_MODULO;
-            cout << " sf_replay:max_read_us " << max_read_us;
-            cout << endl;
-
-            n_stats = 0;
-            read_us = 0;
-            max_read_us = 0;
-        }
+        cout << "sf_replay:avg_read_us ";
+        cout << read_us_duration / REPLAY_READ_BUFFER_SIZE << endl;
     }
 }
 
@@ -96,7 +75,9 @@ int main (int argc, char *argv[]) {
     const auto start_pulse_id = (uint64_t) atoll(argv[5]);
     const auto stop_pulse_id = (uint64_t) atoll(argv[6]);
 
-    FastQueue<ModuleFrame> queue(MODULE_N_BYTES, REPLAY_FASTQUEUE_N_SLOTS);
+    FastQueue<ReplayBuffer> queue(
+            MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE,
+            REPLAY_FASTQUEUE_N_SLOTS);
 
     thread file_read_thread(sf_replay,
                             device, channel_name, ref(queue),

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <jungfrau.hpp>
+#include <formats.hpp>
 
 class ReplayZmqSender {
 
@@ -15,7 +16,7 @@ public:
 
     void close();
 
-    void send(const ModuleFrame* metadata, const char* data);
+    void send(const ReplayBuffer* metadata, const char* data);
 };
 
 
