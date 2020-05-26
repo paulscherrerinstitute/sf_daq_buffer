@@ -1,5 +1,6 @@
 #include "JFH5Writer.hpp"
 #include <sstream>
+#include <cstring>
 
 
 //extern "C"
@@ -54,49 +55,55 @@ JFH5Writer::JFH5Writer(
     hsize_t metadata_dataset_dims[] = {n_frames_, 1};
     H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
-    // Chunk cannot be larger than n_frames.
-    auto metadata_chunk_size = WRITER_METADATA_CHUNK_N_IMAGES;
-    if (n_frames < metadata_chunk_size) {
-        metadata_chunk_size = n_frames;
-    }
-
-    hsize_t metadata_dataset_chunking[] = {metadata_chunk_size, 1};
-    H5::DSetCreatPropList metadata_dataset_properties;
-    metadata_dataset_properties.setChunk(2, metadata_dataset_chunking);
-
     pulse_id_dataset_ = file_.createDataSet(
             "pulse_id",
             H5::PredType::NATIVE_UINT64,
-            metadata_dataspace,
-            metadata_dataset_properties);
+            metadata_dataspace);
 
     frame_index_dataset_ = file_.createDataSet(
             "frame_index",
             H5::PredType::NATIVE_UINT64,
-            metadata_dataspace,
-            metadata_dataset_properties);
+            metadata_dataspace);
 
     daq_rec_dataset_ = file_.createDataSet(
             "daq_rec",
             H5::PredType::NATIVE_UINT32,
-            metadata_dataspace,
-            metadata_dataset_properties);
+            metadata_dataspace);
 
     is_good_frame_dataset_ = file_.createDataSet(
             "is_good_frame",
             H5::PredType::NATIVE_UINT8,
-            metadata_dataspace,
-            metadata_dataset_properties);
+            metadata_dataspace);
 
+    b_pulse_id_ = new uint64_t[n_frames_];
+    b_frame_index_= new uint64_t[n_frames_];
+    b_daq_rec_ = new uint32_t[n_frames_];
+    b_is_good_frame_ = new uint8_t[n_frames_];
 }
 
 JFH5Writer::~JFH5Writer()
 {
     close_file();
+
+    delete[] b_pulse_id_;
+    delete[] b_frame_index_;
+    delete[] b_daq_rec_;
+    delete[] b_is_good_frame_;
 }
 
 void JFH5Writer::close_file()
 {
+
+    pulse_id_dataset_.write(b_pulse_id_, H5::PredType::NATIVE_UINT64);
+
+    frame_index_dataset_.write(b_frame_index_,
+                               H5::PredType::NATIVE_UINT64);
+
+    daq_rec_dataset_.write(b_daq_rec_, H5::PredType::NATIVE_UINT32);
+
+    is_good_frame_dataset_.write(b_is_good_frame_,
+                                 H5::PredType::NATIVE_UINT8);
+
     image_dataset_.close();
     pulse_id_dataset_.close();
     frame_index_dataset_.close();
@@ -132,31 +139,41 @@ void JFH5Writer::write(
             data, H5::PredType::NATIVE_UINT16,
             b_i_space, f_i_space);
 
-    hsize_t b_m_dims[2] = {n_images_in_buffer, 1};
-    H5::DataSpace b_m_space (2, b_m_dims);
+    {
+        auto b_current_ptr = b_pulse_id_ + current_write_index_;
+        const uint64_t* metadata_pulse_id_ptr =
+                &(metadata->pulse_id[0]) + current_write_index_;
+        memcpy(b_current_ptr,
+               metadata_pulse_id_ptr,
+               sizeof(uint64_t) * n_images_in_buffer);
+    }
 
-    hsize_t f_m_dims[] = {n_frames_, 1};
-    H5::DataSpace f_m_space(2, f_m_dims);
+    {
+        auto b_current_ptr = b_frame_index_ + current_write_index_;
+        const uint64_t* metadata_pulse_id_ptr =
+                &(metadata->frame_index[0]) + current_write_index_;
+        memcpy(b_current_ptr,
+               metadata_pulse_id_ptr,
+               sizeof(uint64_t) * n_images_in_buffer);
+    }
 
-    hsize_t meta_count[] = {n_images_in_buffer, 1};
-    hsize_t meta_start[] = {current_write_index_, 0};
-    f_m_space.selectHyperslab(H5S_SELECT_SET, meta_count, meta_start);
+    {
+        auto b_current_ptr = b_daq_rec_ + current_write_index_;
+        const uint32_t* metadata_pulse_id_ptr =
+                &(metadata->daq_rec[0]) + current_write_index_;
+        memcpy(b_current_ptr,
+               metadata_pulse_id_ptr,
+               sizeof(uint32_t) * n_images_in_buffer);
+    }
 
-    pulse_id_dataset_.write(
-            &(metadata->pulse_id), H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
-
-    frame_index_dataset_.write(
-            &(metadata->frame_index), H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
-
-    daq_rec_dataset_.write(
-            &(metadata->daq_rec), H5::PredType::NATIVE_UINT32,
-            b_m_space, f_m_space);
-
-    is_good_frame_dataset_.write(
-            &(metadata->is_good_image), H5::PredType::NATIVE_UINT8,
-            b_m_space, f_m_space);
+    {
+        auto b_current_ptr = b_is_good_frame_ + current_write_index_;
+        const uint8_t* metadata_pulse_id_ptr =
+                &(metadata->is_good_image[0]) + current_write_index_;
+        memcpy(b_current_ptr,
+               metadata_pulse_id_ptr,
+               sizeof(uint8_t) * n_images_in_buffer);
+    }
 
     current_write_index_ += n_images_in_buffer;
 }
