@@ -54,6 +54,8 @@ namespace core_buffer {
     const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
     // How many frames to read at once from file.
     const size_t REPLAY_READ_BUFFER_SIZE = 100;
+    // How many slots to have in the internal queue between read and send.
+    const int REPLAY_FASTQUEUE_N_SLOTS = 2;
     // How many frames do we buffer in send.
     const size_t REPLAY_SNDHWM = 100;
 
