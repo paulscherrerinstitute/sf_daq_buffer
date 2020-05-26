@@ -14,7 +14,8 @@ target_link_libraries(sf-replay
         sf-replay-lib
         zmq
         hdf5
-        hdf5_cpp)
+        hdf5_cpp
+        pthread)
 
 enable_testing()
 add_subdirectory(test/)
