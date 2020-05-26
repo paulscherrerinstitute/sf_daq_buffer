@@ -1,5 +1,5 @@
 
-#include "WriterH5Writer.hpp"
+#include "JFH5Writer.hpp"
 #include "gtest/gtest.h"
 #include "bitshuffle/bitshuffle.h"
 
@@ -18,7 +18,7 @@ TEST(WriterH5Writer, basic_interaction)
     metadata->data_n_bytes[0] = 500;
     metadata->n_pulses_in_buffer = 1;
 
-    WriterH5Writer writer("ignore.h5", n_frames, n_modules);
+    JFH5Writer writer("ignore.h5", n_frames, n_modules);
     writer.write(metadata.get(), data.get());
     writer.close_file();
 }

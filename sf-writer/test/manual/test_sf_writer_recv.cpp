@@ -4,7 +4,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include "WriterH5Writer.hpp"
+#include "JFH5Writer.hpp"
 #include <FastQueue.hpp>
 #include <cstring>
 #include "date.h"

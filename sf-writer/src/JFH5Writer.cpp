@@ -1,4 +1,4 @@
-#include "WriterH5Writer.hpp"
+#include "JFH5Writer.hpp"
 #include <sstream>
 
 
@@ -11,7 +11,7 @@
 using namespace std;
 using namespace core_buffer;
 
-WriterH5Writer::WriterH5Writer(
+JFH5Writer::JFH5Writer(
         const string& output_file,
         const size_t n_frames,
         const size_t n_modules) :
@@ -90,12 +90,12 @@ WriterH5Writer::WriterH5Writer(
 
 }
 
-WriterH5Writer::~WriterH5Writer()
+JFH5Writer::~JFH5Writer()
 {
     close_file();
 }
 
-void WriterH5Writer::close_file()
+void JFH5Writer::close_file()
 {
     image_dataset_.close();
     pulse_id_dataset_.close();
@@ -106,7 +106,7 @@ void WriterH5Writer::close_file()
     file_.close();
 }
 
-void WriterH5Writer::write(
+void JFH5Writer::write(
         const ImageMetadataBuffer* metadata, const char* data)
 {
     auto n_images_in_buffer = metadata->n_images;

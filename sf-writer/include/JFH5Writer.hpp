@@ -7,7 +7,7 @@
 #include "buffer_config.hpp"
 #include "formats.hpp"
 
-class WriterH5Writer {
+class JFH5Writer {
 
     const size_t n_frames_;
     const size_t n_modules_;
@@ -23,10 +23,10 @@ class WriterH5Writer {
 
 
 public:
-    WriterH5Writer(const std::string& output_file,
-                   const size_t n_frames,
-                   const size_t n_modules);
-    ~WriterH5Writer();
+    JFH5Writer(const std::string& output_file,
+               const size_t n_frames,
+               const size_t n_modules);
+    ~JFH5Writer();
     void write(const ImageMetadataBuffer* metadata, const char* data);
     void close_file();
 };

@@ -2,7 +2,7 @@
 #define SF_DAQ_BUFFER_WRITERZMQRECEIVER_HPP
 
 #include <string>
-#include "WriterH5Writer.hpp"
+#include "JFH5Writer.hpp"
 #include <vector>
 #include <jungfrau.hpp>
 
