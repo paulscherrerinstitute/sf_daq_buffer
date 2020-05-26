@@ -18,6 +18,21 @@ void ReplayH5Reader::load_buffers(const uint64_t pulse_id)
 
         dset_metadata_ = current_file_.openDataSet(BUFFER_H5_METADATA_DATASET);
         dset_frame_ = current_file_.openDataSet(BUFFER_H5_FRAME_DATASET);
+
+        hsize_t b_m_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
+        H5::DataSpace b_m_space (2, b_m_dims);
+        hsize_t b_m_count[] = {FILE_MOD, ModuleFrame_N_FIELDS};
+        hsize_t b_m_start[] = {0, 0};
+        b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
+
+        hsize_t f_m_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
+        H5::DataSpace f_m_space (2, f_m_dims);
+        hsize_t f_m_count[] = {FILE_MOD, ModuleFrame_N_FIELDS};
+        hsize_t pulse_id_start[] = {0, 0};
+        f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, pulse_id_start);
+
+        dset_metadata_.read(
+                m_buffer_, H5::PredType::NATIVE_UINT64, b_m_space, f_m_space);
     }
 
     auto file_index = BufferUtils::get_file_frame_index(pulse_id);
@@ -26,21 +41,6 @@ void ReplayH5Reader::load_buffers(const uint64_t pulse_id)
 
     buffer_start_pulse_id_ = pulse_id - (file_index - cache_start_index);
     buffer_end_pulse_id_ = buffer_start_pulse_id_ + REPLAY_READ_BUFFER_SIZE - 1;
-
-    hsize_t b_m_dims[2] = {REPLAY_READ_BUFFER_SIZE, ModuleFrame_N_FIELDS};
-    H5::DataSpace b_m_space (2, b_m_dims);
-    hsize_t b_m_count[] = {REPLAY_READ_BUFFER_SIZE, ModuleFrame_N_FIELDS};
-    hsize_t b_m_start[] = {0, 0};
-    b_m_space.selectHyperslab(H5S_SELECT_SET, b_m_count, b_m_start);
-
-    hsize_t f_m_dims[2] = {FILE_MOD, ModuleFrame_N_FIELDS};
-    H5::DataSpace f_m_space (2, f_m_dims);
-    hsize_t f_m_count[] = {REPLAY_READ_BUFFER_SIZE, ModuleFrame_N_FIELDS};
-    hsize_t pulse_id_start[] = {cache_start_index, 0};
-    f_m_space.selectHyperslab(H5S_SELECT_SET, f_m_count, pulse_id_start);
-
-    dset_metadata_.read(
-            m_buffer_, H5::PredType::NATIVE_UINT64, b_m_space, f_m_space);
 
     hsize_t b_f_dims[3] =
             {REPLAY_READ_BUFFER_SIZE, MODULE_Y_SIZE, MODULE_X_SIZE};
@@ -67,7 +67,7 @@ ReplayH5Reader::ReplayH5Reader(
             device_(device),
             channel_name_(channel_name)
 {
-    m_buffer_ = new ModuleFrame[REPLAY_READ_BUFFER_SIZE];
+    m_buffer_ = new ModuleFrame[FILE_MOD];
     f_buffer_ = new char[MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE];
 }
 
@@ -99,9 +99,10 @@ void ReplayH5Reader::get_buffer(
         load_buffers(pulse_id);
     }
 
+    auto file_index = BufferUtils::get_file_frame_index(pulse_id);
     auto buffer_index = pulse_id - buffer_start_pulse_id_;
 
-    metadata = m_buffer_ + buffer_index;
+    metadata = m_buffer_ + file_index;
     data = f_buffer_ + (buffer_index * MODULE_N_BYTES);
 
     if (metadata->pulse_id != 0 && metadata->pulse_id != pulse_id) {
