@@ -76,6 +76,10 @@ JFH5Writer::~JFH5Writer()
 
 void JFH5Writer::close_file()
 {
+    if (file_.getId() == -1) {
+        return;
+    }
+
     image_dataset_.close();
 
     hsize_t b_m_dims[2] = {n_images_, 1};
