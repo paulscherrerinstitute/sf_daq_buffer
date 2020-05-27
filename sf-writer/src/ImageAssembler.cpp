@@ -1,3 +1,4 @@
+#include <cstring>
 #include "ImageAssembler.hpp"
 
 using namespace std;
@@ -27,7 +28,19 @@ void ImageAssembler::process(
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
+    size_t slot_offset = slot_id * image_buffer_slot_n_bytes_;
+    size_t module_image_offset = i_module * MODULE_N_BYTES;
 
+    for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
+        size_t image_offset = i_pulse * MODULE_N_BYTES * n_modules_;
+
+        memcpy(
+            image_buffer_ + slot_offset + image_offset + module_image_offset,
+            &(block_buffer->frame[i_pulse].data[0]),
+            MODULE_N_BYTES);
+
+
+    }
 }
 
 int ImageAssembler::get_full_slot()
