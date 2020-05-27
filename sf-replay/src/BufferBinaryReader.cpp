@@ -6,7 +6,10 @@
 #include <cstring>
 #include <fcntl.h>
 
+#include "BufferUtils.hpp"
+
 using namespace std;
+using namespace core_buffer;
 
 BufferBinaryReader::BufferBinaryReader(
         const std::string &device,
@@ -25,9 +28,53 @@ BufferBinaryReader::~BufferBinaryReader()
 }
 
 void BufferBinaryReader::get_block(
-        const uint64_t block_number, BufferBinaryBlock *buffer)
+        const uint64_t block_number, BufferBinaryBlock* buffer)
 {
+    uint64_t block_start_pulse_id = block_number * BUFFER_BLOCK_SIZE;
+    auto current_block_file = BufferUtils::get_filename(
+            device_, channel_name_, block_start_pulse_id);
 
+    if (current_block_file != current_input_file_)  {
+        open_file(current_block_file);
+    }
+
+    size_t file_start_index =
+            BufferUtils::get_file_frame_index(block_start_pulse_id);
+    size_t n_bytes_offset = file_start_index * sizeof(BufferBinaryFormat);
+
+    auto lseek_result = lseek(input_file_fd_, n_bytes_offset, SEEK_SET);
+    if (lseek_result < 0) {
+        stringstream err_msg;
+
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[BufferBinaryReader::get_block]";
+        err_msg << " Error while lseek on file ";
+        err_msg << current_input_file_;
+        err_msg << " for n_bytes_offset ";
+        err_msg << n_bytes_offset << ": ";
+        err_msg << strerror(errno) << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
+    auto n_bytes = ::read(input_file_fd_, buffer,
+            sizeof(BufferBinaryFormat) * BUFFER_BLOCK_SIZE);
+
+    if (n_bytes < sizeof(BufferBinaryFormat)) {
+        stringstream err_msg;
+
+        using namespace date;
+        using namespace chrono;
+        err_msg << "[" << system_clock::now() << "]";
+        err_msg << "[BufferBinaryReader::get_block]";
+        err_msg << " Error while reading from file ";
+        err_msg << current_input_file_ << ": ";
+        err_msg << strerror(errno) << endl;
+
+        throw runtime_error(err_msg.str());
+    }
 }
 
 void BufferBinaryReader::open_file(const std::string& filename)
