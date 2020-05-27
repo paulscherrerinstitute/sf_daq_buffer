@@ -56,28 +56,7 @@ JFH5Writer::JFH5Writer(const std::string& output_file,
             image_dataspace,
             image_dataset_properties);
 
-    hsize_t metadata_dataset_dims[] = {n_images_, 1};
-    H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
-    pulse_id_dataset_ = file_.createDataSet(
-            "pulse_id",
-            H5::PredType::NATIVE_UINT64,
-            metadata_dataspace);
-
-    frame_index_dataset_ = file_.createDataSet(
-            "frame_index",
-            H5::PredType::NATIVE_UINT64,
-            metadata_dataspace);
-
-    daq_rec_dataset_ = file_.createDataSet(
-            "daq_rec",
-            H5::PredType::NATIVE_UINT32,
-            metadata_dataspace);
-
-    is_good_frame_dataset_ = file_.createDataSet(
-            "is_good_frame",
-            H5::PredType::NATIVE_UINT8,
-            metadata_dataspace);
 
     b_pulse_id_ = new uint64_t[n_images_];
     b_frame_index_= new uint64_t[n_images_];
@@ -97,33 +76,49 @@ JFH5Writer::~JFH5Writer()
 
 void JFH5Writer::close_file()
 {
+    image_dataset_.close();
+
     hsize_t b_m_dims[2] = {n_images_, 1};
     H5::DataSpace b_m_space (2, b_m_dims);
 
     hsize_t f_m_dims[] = {n_images_, 1};
     H5::DataSpace f_m_space(2, f_m_dims);
 
-    pulse_id_dataset_.write(
+    auto pulse_id_dataset = file_.createDataSet(
+            "pulse_id",
+            H5::PredType::NATIVE_UINT64,
+            f_m_space);
+    pulse_id_dataset.write(
             b_pulse_id_, H5::PredType::NATIVE_UINT64,
             b_m_space, f_m_space);
+    pulse_id_dataset.close();
 
-    frame_index_dataset_.write(
+    auto frame_index_dataset = file_.createDataSet(
+            "frame_index",
+            H5::PredType::NATIVE_UINT64,
+            f_m_space);
+    frame_index_dataset.write(
             b_frame_index_, H5::PredType::NATIVE_UINT64,
             b_m_space, f_m_space);
+    frame_index_dataset.close();
 
-    daq_rec_dataset_.write(
+    auto daq_rec_dataset = file_.createDataSet(
+            "daq_rec",
+            H5::PredType::NATIVE_UINT32,
+            f_m_space);
+    daq_rec_dataset.write(
             b_daq_rec_, H5::PredType::NATIVE_UINT32,
             b_m_space, f_m_space);
+    daq_rec_dataset.close();
 
-    is_good_frame_dataset_.write(
+    auto is_good_frame_dataset = file_.createDataSet(
+            "is_good_frame",
+            H5::PredType::NATIVE_UINT8,
+            f_m_space);
+    is_good_frame_dataset.write(
             b_is_good_frame_, H5::PredType::NATIVE_UINT8,
             b_m_space, f_m_space);
-
-    image_dataset_.close();
-    pulse_id_dataset_.close();
-    frame_index_dataset_.close();
-    daq_rec_dataset_.close();
-    is_good_frame_dataset_.close();
+    is_good_frame_dataset.close();
 
     file_.close();
 }
