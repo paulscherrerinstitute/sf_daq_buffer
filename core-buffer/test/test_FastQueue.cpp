@@ -146,3 +146,5 @@ TEST(FaseQueue, array_parameter)
         ASSERT_EQ(module_metadata.module_id, i_module);
     }
 }
+
+// TODO: Test with payload of zero (metadata only).
