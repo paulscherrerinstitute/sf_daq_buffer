@@ -6,9 +6,10 @@
 #include <string>
 #include <H5Cpp.h>
 #include <memory>
-#include "jungfrau.hpp"
 #include <unordered_map>
-#include <buffer_config.hpp>
+
+#include "jungfrau.hpp"
+#include "buffer_config.hpp"
 
 class BufferH5Writer {
 

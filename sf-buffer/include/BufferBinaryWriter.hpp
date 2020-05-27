@@ -2,7 +2,8 @@
 #define BINARYWRITER_HPP
 
 #include <string>
-#include "BufferBinaryFormat.hpp"
+
+#include "formats.hpp"
 
 class BufferBinaryWriter {
 
