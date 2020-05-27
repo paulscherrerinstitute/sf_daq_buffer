@@ -1,6 +1,7 @@
 #include "JFH5Writer.hpp"
 #include <sstream>
 #include <cstring>
+#include <hdf5_hl.h>
 
 
 //extern "C"
@@ -32,8 +33,9 @@ JFH5Writer::JFH5Writer(const std::string& output_file,
 
     H5::DataSpace image_dataspace(3, image_dataset_dims);
 
+    auto chunk_size = min(n_images_, BUFFER_BLOCK_SIZE);
     hsize_t image_dataset_chunking[3] =
-            {1, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
+            {chunk_size, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
@@ -136,28 +138,37 @@ void JFH5Writer::write(
         throw runtime_error("Received unexpected block for stop_pulse_id.");
     }
 
-    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace b_i_space(3, b_i_dims);
-    hsize_t b_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t b_i_start[] = {n_images_offset, 0, 0};
-    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
+//    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    H5::DataSpace b_i_space(3, b_i_dims);
+//    hsize_t b_i_count[] = {n_images_to_copy,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    hsize_t b_i_start[] = {n_images_offset, 0, 0};
+//    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
+//
+//    hsize_t f_i_dims[3] = {n_images_,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    H5::DataSpace f_i_space(3, f_i_dims);
+//    hsize_t f_i_count[] = {n_images_to_copy,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    hsize_t f_i_start[] = {current_write_index_, 0, 0};
+//    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
+//
+//    image_dataset_.write(
+//            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
 
-    hsize_t f_i_dims[3] = {n_images_,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace f_i_space(3, f_i_dims);
-    hsize_t f_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t f_i_start[] = {current_write_index_, 0, 0};
-    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    image_dataset_.write(
-            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
+    hsize_t offset[] = {current_write_index_, 0, 0};
+    H5DOwrite_chunk(
+            image_dataset_.getId(),
+            H5P_DEFAULT,
+            0,
+            offset,
+            n_images_to_copy * MODULE_N_BYTES * n_modules_,
+            data);
 
     // pulse_id
     {
