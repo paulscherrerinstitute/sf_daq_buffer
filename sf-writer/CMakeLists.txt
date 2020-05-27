@@ -14,6 +14,7 @@ target_link_libraries(sf-writer
         sf-replay-lib
         zmq
         hdf5
+        hdf5_hl
         hdf5_cpp
         pthread
         )
