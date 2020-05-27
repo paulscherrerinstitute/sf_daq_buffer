@@ -1,0 +1,10 @@
+#ifndef SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
+#define SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
+
+
+class ImageAssembler {
+
+};
+
+
+#endif //SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
