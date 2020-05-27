@@ -118,6 +118,8 @@ void JFH5Writer::close_file()
 void JFH5Writer::write(
         const ImageMetadataBlock* metadata, const char* data)
 {
+    // TODO: Implement proper block offsetting.
+    size_t n_images_offset = 0;
     size_t n_images_to_copy = min(n_images_ - current_write_index_,
                                   BUFFER_BLOCK_SIZE);
 
