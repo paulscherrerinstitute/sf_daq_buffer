@@ -24,16 +24,6 @@ void ImageAssembler::process(
 
 }
 
-void ImageAssembler::get_free_slot()
-{
-
-}
-
-void ImageAssembler::get_full_slot()
-{
-
-}
-
 void ImageAssembler::free_slot(const int slot_id)
 {
 
