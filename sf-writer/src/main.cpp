@@ -21,39 +21,36 @@ using namespace chrono;
 void read_buffer(
         const string device,
         const string channel_name,
-        const vector<uint64_t>& blocks)
+        const vector<uint64_t>& buffer_blocks)
 {
     BufferBinaryReader block_reader(device, channel_name);
+    auto block_buffer = new BufferBinaryBlock();
 
-
-
-    // "<= stop_block" because we include the stop_block in the transfer.
-    for (uint64_t curr_block=start_block;
-         curr_block <= stop_block;
-         curr_block++) {
-
-        int slot_id;
-        while((slot_id = queue.reserve()) == -1) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    RB_READ_RETRY_INTERVAL_MS));
-        }
-
+    for (uint64_t block_number:buffer_blocks) {
         auto start_time = steady_clock::now();
 
-        auto block_buffer = queue.get_metadata_buffer(slot_id);
-
-        block_reader.get_block(curr_block, block_buffer);
+        block_reader.get_block(block_number, block_buffer);
 
         auto end_time = steady_clock::now();
         uint64_t read_us_duration = duration_cast<microseconds>(
                 end_time-start_time).count();
 
-        queue.commit();
+        start_time = steady_clock::now();
+
+        // TODO: Send to composition.
+
+        end_time = steady_clock::now();
+        uint64_t compose_us_duration = duration_cast<microseconds>(
+                end_time-start_time).count();
 
         // TODO: Proper statistics
         cout << "sf_replay:avg_read_us ";
         cout << read_us_duration / BUFFER_BLOCK_SIZE << endl;
+        cout << "sf_replay:avg_compose_us ";
+        cout << compose_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
+
+    delete block_buffer;
 }
 
 int main (int argc, char *argv[])
@@ -92,9 +89,7 @@ int main (int argc, char *argv[])
 
     std::vector<std::thread> reading_threads(n_modules);
     for (size_t i_module=0; i_module<n_modules; i_module++) {
-
         string channel_name = "M" + to_string(i_module);
-
         reading_threads.emplace_back(
                 read_buffer, device, channel_name, ref(buffer_blocks));
     }
@@ -106,8 +101,6 @@ int main (int argc, char *argv[])
     // "<= stop_pulse_id" because we include the last pulse_id.
     while (current_pulse_id <= stop_pulse_id) {
 
-        auto start_time = chrono::steady_clock::now();
-
         int slot_id;
         while((slot_id = queue.read()) == -1) {
             this_thread::sleep_for(chrono::milliseconds(
@@ -117,35 +110,18 @@ int main (int argc, char *argv[])
         auto metadata = queue.get_metadata_buffer(slot_id);
         auto data = queue.get_data_buffer(slot_id);
 
-        // Verify that all pulse_ids are correct.
-        for (int i=0; i<metadata->n_images; i++) {
-            if (metadata->pulse_id[i] != current_pulse_id) {
-                throw runtime_error("Wrong pulse id from receiver thread.");
-            }
-
-            current_pulse_id++;
-        }
-
-        auto end_time = chrono::steady_clock::now();
-        auto read_us_duration = chrono::duration_cast<chrono::microseconds>(
-                end_time-start_time).count();
-
-        start_time = chrono::steady_clock::now();
+        auto start_time = steady_clock::now();
 
         writer.write(metadata, data);
 
-        end_time = chrono::steady_clock::now();
+        auto end_time = steady_clock::now();
         auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
                 end_time-start_time).count();
 
         queue.release();
 
-        auto avg_read_us = read_us_duration / metadata->n_images;;
-        auto avg_write_us = write_us_duration / metadata->n_images;;
-
-        cout << "sf_writer:avg_read_us " << avg_read_us;
-        cout << " sf_writer:avg_write_us " << avg_write_us;
-        cout << endl;
+        cout << "sf_writer:avg_write_us ";
+        cout << write_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 
     writer.close_file();
