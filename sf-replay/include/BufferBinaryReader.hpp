@@ -21,7 +21,7 @@ public:
 
     virtual ~BufferBinaryReader();
 
-    void get_block(const uint64_t block_number, BufferBinaryBlock *buffer);
+    void get_block(const uint64_t block_id, BufferBinaryBlock *buffer);
 };
 
 

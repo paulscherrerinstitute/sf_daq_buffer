@@ -26,7 +26,7 @@ void read_buffer(
     BufferBinaryReader block_reader(device, channel_name);
     auto block_buffer = new BufferBinaryBlock();
 
-    for (uint64_t block_number:buffer_blocks) {
+    for (uint64_t block_id:buffer_blocks) {
 
         int slot_id;
         while((slot_id = image_assembler.get_free_slot()) == -1) {
@@ -36,7 +36,7 @@ void read_buffer(
 
         auto start_time = steady_clock::now();
 
-        block_reader.get_block(block_number, block_buffer);
+        block_reader.get_block(block_id, block_buffer);
 
         auto end_time = steady_clock::now();
         uint64_t read_us_duration = duration_cast<microseconds>(
@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
 
     JFH5Writer writer(output_file, start_pulse_id, stop_pulse_id, n_modules);
 
-    for (uint64_t block_number:buffer_blocks) {
+    for (uint64_t block_id:buffer_blocks) {
 
         int slot_id;
         while((slot_id = image_assembler.get_full_slot()) == -1) {

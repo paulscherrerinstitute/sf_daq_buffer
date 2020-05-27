@@ -28,9 +28,9 @@ BufferBinaryReader::~BufferBinaryReader()
 }
 
 void BufferBinaryReader::get_block(
-        const uint64_t block_number, BufferBinaryBlock* buffer)
+        const uint64_t block_id, BufferBinaryBlock* buffer)
 {
-    uint64_t block_start_pulse_id = block_number * BUFFER_BLOCK_SIZE;
+    uint64_t block_start_pulse_id = block_id * BUFFER_BLOCK_SIZE;
     auto current_block_file = BufferUtils::get_filename(
             device_, channel_name_, block_start_pulse_id);
 
