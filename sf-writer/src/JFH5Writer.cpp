@@ -14,9 +14,9 @@ using namespace core_buffer;
 
 JFH5Writer::JFH5Writer(
         const string& output_file,
-        const size_t n_frames,
+        const size_t n_images,
         const size_t n_modules) :
-        n_frames_(n_frames),
+        n_images_(n_images),
         n_modules_(n_modules),
         current_write_index_(0)
 {
@@ -26,7 +26,7 @@ JFH5Writer::JFH5Writer(
     file_ = H5::H5File(output_file, H5F_ACC_TRUNC);
 
     hsize_t image_dataset_dims[3] =
-            {n_frames_, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
+            {n_images_, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
 
     H5::DataSpace image_dataspace(3, image_dataset_dims);
 
@@ -52,7 +52,7 @@ JFH5Writer::JFH5Writer(
             image_dataspace,
             image_dataset_properties);
 
-    hsize_t metadata_dataset_dims[] = {n_frames_, 1};
+    hsize_t metadata_dataset_dims[] = {n_images_, 1};
     H5::DataSpace metadata_dataspace(2, metadata_dataset_dims);
 
     pulse_id_dataset_ = file_.createDataSet(
@@ -75,10 +75,10 @@ JFH5Writer::JFH5Writer(
             H5::PredType::NATIVE_UINT8,
             metadata_dataspace);
 
-    b_pulse_id_ = new uint64_t[n_frames_];
-    b_frame_index_= new uint64_t[n_frames_];
-    b_daq_rec_ = new uint32_t[n_frames_];
-    b_is_good_frame_ = new uint8_t[n_frames_];
+    b_pulse_id_ = new uint64_t[n_images_];
+    b_frame_index_= new uint64_t[n_images_];
+    b_daq_rec_ = new uint32_t[n_images_];
+    b_is_good_frame_ = new uint8_t[n_images_];
 }
 
 JFH5Writer::~JFH5Writer()
@@ -116,34 +116,33 @@ void JFH5Writer::close_file()
 void JFH5Writer::write(
         const ImageMetadataBuffer* metadata, const char* data)
 {
-    size_t n_images_to_copy = min(n_frames_ - current_write_index_,
+    size_t n_images_to_copy = min(n_images_ - current_write_index_,
                                   BUFFER_BLOCK_SIZE);
 
     if (n_images_to_copy < 1) {
         return;
     }
 
-    hsize_t b_i_dims[3] = {
-            n_images_to_copy,
-            MODULE_Y_SIZE*n_modules_,
-            MODULE_X_SIZE};
+    hsize_t b_i_dims[3] = {n_images_to_copy,
+                           MODULE_Y_SIZE * n_modules_,
+                           MODULE_X_SIZE};
     H5::DataSpace b_i_space(3, b_i_dims);
 
-    hsize_t f_i_dims[3] = {n_frames_,
+    hsize_t f_i_dims[3] = {n_images_,
                            MODULE_Y_SIZE * n_modules_,
                            MODULE_X_SIZE};
     H5::DataSpace f_i_space(3, f_i_dims);
 
     hsize_t i_count[] = {n_images_to_copy,
-                         MODULE_Y_SIZE*n_modules_,
+                         MODULE_Y_SIZE * n_modules_,
                          MODULE_X_SIZE};
     hsize_t i_start[] = {current_write_index_, 0, 0};
     f_i_space.selectHyperslab(H5S_SELECT_SET, i_count, i_start);
 
     image_dataset_.write(
-            data, H5::PredType::NATIVE_UINT16,
-            b_i_space, f_i_space);
+            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
 
+    // pulse_id
     {
         auto b_current_ptr = b_pulse_id_ + current_write_index_;
         const uint64_t* metadata_pulse_id_ptr =
@@ -153,6 +152,7 @@ void JFH5Writer::write(
                sizeof(uint64_t) * n_images_to_copy);
     }
 
+    // frame_index
     {
         auto b_current_ptr = b_frame_index_ + current_write_index_;
         const uint64_t* metadata_pulse_id_ptr =
@@ -162,6 +162,7 @@ void JFH5Writer::write(
                sizeof(uint64_t) * n_images_to_copy);
     }
 
+    // daq_rec
     {
         auto b_current_ptr = b_daq_rec_ + current_write_index_;
         const uint32_t* metadata_pulse_id_ptr =
@@ -171,6 +172,7 @@ void JFH5Writer::write(
                sizeof(uint32_t) * n_images_to_copy);
     }
 
+    // is_good_frame
     {
         auto b_current_ptr = b_is_good_frame_ + current_write_index_;
         const uint8_t* metadata_pulse_id_ptr =
