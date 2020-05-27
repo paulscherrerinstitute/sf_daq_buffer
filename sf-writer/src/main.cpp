@@ -31,7 +31,7 @@ void read_buffer(
         int slot_id;
         while((slot_id = image_assembler.get_free_slot()) == -1) {
             this_thread::sleep_for(chrono::milliseconds(
-                    RB_READ_RETRY_INTERVAL_MS));
+                    WRITER_IMAGE_ASSEMBLER_RETRY_MS));
         }
 
         auto start_time = steady_clock::now();
@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
         int slot_id;
         while((slot_id = image_assembler.get_full_slot()) == -1) {
             this_thread::sleep_for(chrono::milliseconds(
-                    RB_READ_RETRY_INTERVAL_MS));
+                    WRITER_IMAGE_ASSEMBLER_RETRY_MS));
         }
 
         auto metadata = image_assembler.get_metadata_buffer(slot_id);

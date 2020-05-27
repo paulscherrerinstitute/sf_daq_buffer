@@ -63,8 +63,8 @@ namespace core_buffer {
     const int WRITER_RCVHWM = 100;
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
-    // Size of buffer between the receiving and writing part.
-    const int WRITER_FASTQUEUE_N_SLOTS = 5;
+    // MS to retry reading from the image assembler.
+    const size_t WRITER_IMAGE_ASSEMBLER_RETRY_MS = 5;
     // How large are metadata chunks in the HDF5.
     const size_t WRITER_METADATA_CHUNK_N_IMAGES = 100;
     // How large should the data cache be in N images.
