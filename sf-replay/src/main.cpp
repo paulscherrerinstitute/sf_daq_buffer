@@ -89,10 +89,13 @@ int main (int argc, char *argv[]) {
 
     ReplayZmqSender sender(ipc_id, source_id);
 
-    // "<= stop_pulse_id" because we include the stop_pulse_id in the file.
-    for (uint64_t curr_pulse_id=start_pulse_id;
-         curr_pulse_id <= stop_pulse_id;
-         curr_pulse_id++) {
+    uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
+    uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
+
+    // "<= stop_block" because we include the stop_block in the transfer.
+    for (uint64_t curr_block=start_block;
+         curr_block <= stop_block;
+         curr_block++) {
 
         int slot_id;
         while((slot_id = queue.read()) == -1) {
