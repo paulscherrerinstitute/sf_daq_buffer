@@ -77,8 +77,8 @@ int main (int argc, char *argv[])
 
     string output_file = string(argv[1]);
     const string device = string(argv[2]);
-    uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
-    uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
+    uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
+    uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
     size_t n_modules = 32;
 
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
@@ -97,7 +97,14 @@ int main (int argc, char *argv[])
 
     std::vector<std::thread> reading_threads(n_modules);
     for (size_t i_module=0; i_module<n_modules; i_module++) {
-        string channel_name = "M" + to_string(i_module);
+
+        // TODO: Very ugly. Fix.
+        string channel_name = "M";
+        if (i_module < 10) {
+            channel_name += "0";
+        }
+        channel_name += to_string(i_module);
+
         reading_threads.emplace_back(
                 read_buffer,
                 device,
