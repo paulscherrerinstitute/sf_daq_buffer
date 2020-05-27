@@ -88,7 +88,7 @@ int main (int argc, char *argv[])
     ImageAssembler image_assembler(n_modules);
 
     // Generate list of buffer blocks that need to be loaded.
-    std::vector<uint64_t> buffer_blocks(n_blocks);
+    std::vector<uint64_t> buffer_blocks;
     for (uint64_t curr_block=start_block;
          curr_block<=stop_block;
          curr_block++) {
