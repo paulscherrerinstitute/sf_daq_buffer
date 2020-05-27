@@ -31,7 +31,7 @@ struct BufferBinaryFormat {
 #pragma pack(1)
 struct BufferBlock
 {
-    BufferBinaryFormat frame[core_buffer::REPLAY_READ_BUFFER_SIZE];
+    BufferBinaryFormat frame[core_buffer::BUFFER_BLOCK_SIZE];
     uint64_t start_pulse_id;
 };
 #pragma pack(pop)

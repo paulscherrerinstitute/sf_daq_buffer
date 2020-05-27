@@ -47,7 +47,7 @@ void sf_replay (
 
         // TODO: Proper statistics
         cout << "sf_replay:avg_read_us ";
-        cout << read_us_duration / REPLAY_READ_BUFFER_SIZE << endl;
+        cout << read_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 }
 
@@ -76,7 +76,7 @@ int main (int argc, char *argv[]) {
     const auto stop_pulse_id = (uint64_t) atoll(argv[6]);
 
     FastQueue<ReplayBuffer> queue(
-            MODULE_N_BYTES * REPLAY_READ_BUFFER_SIZE,
+            MODULE_N_BYTES * BUFFER_BLOCK_SIZE,
             REPLAY_FASTQUEUE_N_SLOTS);
 
     thread file_read_thread(sf_replay,
