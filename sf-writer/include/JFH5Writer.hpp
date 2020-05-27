@@ -9,7 +9,7 @@
 
 class JFH5Writer {
 
-    const size_t start_pulse_id_;
+    const uint64_t start_pulse_id_;
     const uint64_t stop_pulse_id_;
     const size_t n_modules_;
     const size_t n_images_;

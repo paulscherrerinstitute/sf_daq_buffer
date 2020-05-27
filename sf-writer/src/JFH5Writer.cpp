@@ -118,13 +118,22 @@ void JFH5Writer::close_file()
 void JFH5Writer::write(
         const ImageMetadataBlock* metadata, const char* data)
 {
-    // TODO: Implement proper block offsetting.
     size_t n_images_offset = 0;
-    size_t n_images_to_copy = min(n_images_ - current_write_index_,
-                                  BUFFER_BLOCK_SIZE);
+    if (start_pulse_id_ > metadata->block_first_pulse_id) {
+        n_images_offset = start_pulse_id_ - metadata->block_first_pulse_id;
+    }
+
+    if (n_images_offset > BUFFER_BLOCK_SIZE) {
+        throw runtime_error("Received unexpected block for start_pulse_id.");
+    }
+
+    size_t n_images_to_copy = BUFFER_BLOCK_SIZE - n_images_offset;
+    if (stop_pulse_id_ < metadata->block_last_pulse_id) {
+        n_images_to_copy -= metadata->block_last_pulse_id - stop_pulse_id_;
+    }
 
     if (n_images_to_copy < 1) {
-        return;
+        throw runtime_error("Received unexpected block for stop_pulse_id.");
     }
 
     hsize_t b_i_dims[3] = {n_images_to_copy,

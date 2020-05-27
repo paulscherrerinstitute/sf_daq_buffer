@@ -10,7 +10,8 @@ struct ImageMetadataBlock
     uint64_t frame_index[core_buffer::BUFFER_BLOCK_SIZE];
     uint32_t daq_rec[core_buffer::BUFFER_BLOCK_SIZE];
     uint8_t is_good_image[core_buffer::BUFFER_BLOCK_SIZE];
-    uint64_t start_pulse_id;
+    uint64_t block_first_pulse_id;
+    uint64_t block_last_pulse_id;
 };
 
 const char BUFFER_FORMAT_START_BYTE = 0xBE;
