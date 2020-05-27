@@ -156,7 +156,7 @@ void JFH5Writer::write(
     hsize_t b_i_count[] = {n_images_to_copy,
                            MODULE_Y_SIZE * n_modules_,
                            MODULE_X_SIZE};
-    hsize_t b_i_start[] = {current_write_index_, 0, 0};
+    hsize_t b_i_start[] = {n_images_offset, 0, 0};
     b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
 
     hsize_t f_i_dims[3] = {n_images_,
@@ -172,14 +172,6 @@ void JFH5Writer::write(
     image_dataset_.write(
             data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
 
-//    hsize_t offset[] = {current_write_index_, 0, 0};
-//    H5DOwrite_chunk(
-//            image_dataset_.getId(),
-//            H5P_DEFAULT,
-//            0,
-//            offset,
-//            n_images_to_copy * MODULE_N_BYTES * n_modules_,
-//            data);
 
     // pulse_id
     {
