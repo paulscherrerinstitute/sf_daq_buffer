@@ -11,6 +11,7 @@ add_executable(sf-writer src/main.cpp)
 set_target_properties(sf-writer PROPERTIES OUTPUT_NAME sf_writer)
 target_link_libraries(sf-writer
         sf-writer-lib
+        sf-replay-lib
         zmq
         hdf5
         hdf5_cpp
