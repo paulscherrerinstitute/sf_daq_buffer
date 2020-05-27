@@ -104,6 +104,6 @@ void FastQueue<T>::release()
 }
 
 template class FastQueue<ImageMetadataBlock>;
-template class FastQueue<ReplayBuffer>;
+template class FastQueue<BufferBinaryBlock>;
 template class FastQueue<ModuleFrame>;
 template class FastQueue<ModuleFrameBuffer>;
