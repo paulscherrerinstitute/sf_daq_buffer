@@ -1,6 +1,8 @@
 #ifndef SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
 #define SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
 
+#include <atomic>
+
 #include "formats.hpp"
 
 const size_t IA_N_SLOTS = 2;
@@ -11,6 +13,7 @@ class ImageAssembler {
 
     char* image_buffer_;
     ImageMetadataBlock* metadata_buffer_;
+    std::atomic_int* buffer_status_;
 
 public:
     ImageAssembler(const size_t n_modules);
