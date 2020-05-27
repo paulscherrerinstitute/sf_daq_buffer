@@ -15,6 +15,8 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     for (size_t i=0; i<IA_N_SLOTS; i++) {
         free_slot(i);
     }
+
+    read_slot_id_ = 0;
 }
 
 ImageAssembler::~ImageAssembler()
@@ -65,17 +67,29 @@ void ImageAssembler::process(
         }
     }
 
-    buffer_status_[slot_id]--;
+    auto previous_status = buffer_status_[slot_id].fetch_sub(1);
+
+    // 1 because fetch is done before subtraction.
+    if (previous_status ==  1) {
+        write_slot_id_++;
+        read_slot_id_ %= IA_N_SLOTS;
+    }
 }
 
 int ImageAssembler::get_full_slot()
 {
+    if (buffer_status_[read_slot_id_] == 0) {
+        return read_slot_id_;
+    }
 
+    return -1;
 }
 
 void ImageAssembler::free_slot(const int slot_id)
 {
     buffer_status_[slot_id] = n_modules_;
+
+    read_slot_id_ = (int)((read_slot_id_+1) % IA_N_SLOTS);
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)
