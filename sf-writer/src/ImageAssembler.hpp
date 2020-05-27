@@ -1,10 +1,18 @@
 #ifndef SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
 #define SF_DAQ_BUFFER_IMAGEASSEMBLER_HPP
 
+#include "formats.hpp"
+
+const size_t IA_N_SLOTS = 2;
 
 class ImageAssembler {
+    const size_t n_modules_;
+
+    char* image_buffer_;
+    ImageMetadataBlock* metadata_buffer_;
+
 public:
-    ImageAssembler();
+    ImageAssembler(const size_t n_modules);
     ImageMetadataBlock* get_metadata_buffer(const int slot_id);
     virtual ~ImageAssembler();
 

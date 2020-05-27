@@ -1,13 +1,19 @@
 #include "ImageAssembler.hpp"
 
-ImageAssembler::ImageAssembler()
-{
+using namespace std;
+using namespace core_buffer;
 
+ImageAssembler::ImageAssembler(const size_t n_modules) :
+    n_modules_(n_modules)
+{
+    image_buffer_ = new char[IA_N_SLOTS * MODULE_N_BYTES * n_modules_];
+    metadata_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
 }
 
 ImageAssembler::~ImageAssembler()
 {
-
+    delete[] image_buffer_;
+    delete[] metadata_buffer_;
 }
 
 void ImageAssembler::process(
