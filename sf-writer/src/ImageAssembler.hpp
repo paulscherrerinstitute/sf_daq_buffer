@@ -7,6 +7,7 @@ const size_t IA_N_SLOTS = 2;
 
 class ImageAssembler {
     const size_t n_modules_;
+    const size_t image_buffer_slot_n_bytes_;
 
     char* image_buffer_;
     ImageMetadataBlock* metadata_buffer_;

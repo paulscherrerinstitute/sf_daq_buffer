@@ -4,9 +4,10 @@ using namespace std;
 using namespace core_buffer;
 
 ImageAssembler::ImageAssembler(const size_t n_modules) :
-    n_modules_(n_modules)
+    n_modules_(n_modules),
+    image_buffer_slot_n_bytes_(BUFFER_BLOCK_SIZE * MODULE_N_BYTES * n_modules_)
 {
-    image_buffer_ = new char[IA_N_SLOTS * MODULE_N_BYTES * n_modules_];
+    image_buffer_ = new char[IA_N_SLOTS * image_buffer_slot_n_bytes_];
     metadata_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
 }
 
@@ -46,5 +47,5 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)
 
 char* ImageAssembler::get_data_buffer(const int slot_id)
 {
-    return image_buffer_ + (slot_id * MODULE_N_BYTES * n_modules_);
+    return image_buffer_ + (slot_id * image_buffer_slot_n_bytes_);
 }
