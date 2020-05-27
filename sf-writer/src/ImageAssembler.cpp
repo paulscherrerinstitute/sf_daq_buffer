@@ -13,7 +13,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     buffer_status_ = new atomic_int[IA_N_SLOTS];
 
     for (size_t i=0; i<IA_N_SLOTS; i++) {
-        buffer_status_[i] = 0;
+        free_slot(i);
     }
 }
 
@@ -64,6 +64,8 @@ void ImageAssembler::process(
 //                    block_buffer->frame[i_pulse].is_good_image.pulse_id;
         }
     }
+
+    buffer_status_[slot_id]--;
 }
 
 int ImageAssembler::get_full_slot()
