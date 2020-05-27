@@ -16,7 +16,7 @@ public:
 
     void close();
 
-    void send(const BufferBinaryBlock* metadata, const char* data);
+    void send(const BufferBinaryBlock* block_data);
 };
 
 
