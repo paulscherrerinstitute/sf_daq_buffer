@@ -162,40 +162,32 @@ void JFH5Writer::write(
     // pulse_id
     {
         auto b_current_ptr = b_pulse_id_ + current_write_index_;
-        const uint64_t* metadata_pulse_id_ptr =
-                &(metadata->pulse_id[0]) + current_write_index_;
         memcpy(b_current_ptr,
-               metadata_pulse_id_ptr,
+               &(metadata->pulse_id[n_images_offset]),
                sizeof(uint64_t) * n_images_to_copy);
     }
 
     // frame_index
     {
         auto b_current_ptr = b_frame_index_ + current_write_index_;
-        const uint64_t* metadata_pulse_id_ptr =
-                &(metadata->frame_index[0]) + current_write_index_;
         memcpy(b_current_ptr,
-               metadata_pulse_id_ptr,
+               &(metadata->frame_index[n_images_offset]),
                sizeof(uint64_t) * n_images_to_copy);
     }
 
     // daq_rec
     {
         auto b_current_ptr = b_daq_rec_ + current_write_index_;
-        const uint32_t* metadata_pulse_id_ptr =
-                &(metadata->daq_rec[0]) + current_write_index_;
         memcpy(b_current_ptr,
-               metadata_pulse_id_ptr,
+               &(metadata->daq_rec[n_images_offset]),
                sizeof(uint32_t) * n_images_to_copy);
     }
 
     // is_good_frame
     {
         auto b_current_ptr = b_is_good_frame_ + current_write_index_;
-        const uint8_t* metadata_pulse_id_ptr =
-                &(metadata->is_good_image[0]) + current_write_index_;
         memcpy(b_current_ptr,
-               metadata_pulse_id_ptr,
+               &(metadata->is_good_image[n_images_offset]),
                sizeof(uint8_t) * n_images_to_copy);
     }
 
