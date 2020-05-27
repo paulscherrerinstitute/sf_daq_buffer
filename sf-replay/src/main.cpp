@@ -1,8 +1,7 @@
 #include <iostream>
 #include <thread>
-#include <FastQueue.hpp>
-#include <cstring>
 
+#include "FastQueue.hpp"
 #include "buffer_config.hpp"
 #include "BufferBinaryReader.hpp"
 #include "ReplayZmqSender.hpp"
@@ -37,9 +36,9 @@ void sf_replay (
 
         auto start_time = steady_clock::now();
 
-        auto metadata = queue.get_metadata_buffer(slot_id);
+        auto block_buffer = queue.get_metadata_buffer(slot_id);
 
-        block_reader.get_block(curr_block, metadata);
+        block_reader.get_block(curr_block, block_buffer);
 
         auto end_time = steady_clock::now();
         uint64_t read_us_duration = duration_cast<microseconds>(
