@@ -4,7 +4,7 @@
 #include "FastQueue.hpp"
 #include "buffer_config.hpp"
 #include "BufferBinaryReader.hpp"
-#include "ReplayZmqSender.hpp"
+#include "BlockZmqSender.hpp"
 
 using namespace std;
 using namespace core_buffer;
@@ -87,7 +87,7 @@ int main (int argc, char *argv[]) {
     uint64_t max_send_us = 0;
     uint64_t n_stats = 0;
 
-    ReplayZmqSender sender(ipc_id, source_id);
+    BlockZmqSender sender(ipc_id, source_id);
 
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;

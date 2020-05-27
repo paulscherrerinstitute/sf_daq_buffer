@@ -1,4 +1,4 @@
-#include "ReplayZmqSender.hpp"
+#include "BlockZmqSender.hpp"
 
 #include <sstream>
 #include <zmq.h>
@@ -9,7 +9,7 @@ using namespace std;
 using namespace core_buffer;
 
 
-ReplayZmqSender::ReplayZmqSender(const string& ipc_id, const int source_id)
+BlockZmqSender::BlockZmqSender(const string& ipc_id, const int source_id)
 {
     auto ipc_base = REPLAY_STREAM_IPC_URL + ipc_id + "-";
     stringstream ipc_stream;
@@ -31,17 +31,17 @@ ReplayZmqSender::ReplayZmqSender(const string& ipc_id, const int source_id)
         throw runtime_error(zmq_strerror (errno));
 }
 
-ReplayZmqSender::~ReplayZmqSender()
+BlockZmqSender::~BlockZmqSender()
 {
     close();
 }
 
-void ReplayZmqSender::close() {
+void BlockZmqSender::close() {
     zmq_close(socket_);
     zmq_ctx_destroy(ctx_);
 }
 
-void ReplayZmqSender::send(const BufferBinaryBlock* block_data)
+void BlockZmqSender::send(const BufferBinaryBlock* block_data)
 {
     zmq_send(socket_, block_data, sizeof(BufferBinaryBlock), ZMQ_SNDMORE);
 }
