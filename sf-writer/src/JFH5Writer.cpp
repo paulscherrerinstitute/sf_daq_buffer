@@ -97,16 +97,27 @@ JFH5Writer::~JFH5Writer()
 
 void JFH5Writer::close_file()
 {
+    hsize_t b_m_dims[2] = {n_images_, 1};
+    H5::DataSpace b_m_space (2, b_m_dims);
 
-    pulse_id_dataset_.write(b_pulse_id_, H5::PredType::NATIVE_UINT64);
+    hsize_t f_m_dims[] = {n_images_, 1};
+    H5::DataSpace f_m_space(2, f_m_dims);
 
-    frame_index_dataset_.write(b_frame_index_,
-                               H5::PredType::NATIVE_UINT64);
+    pulse_id_dataset_.write(
+            b_pulse_id_, H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
 
-    daq_rec_dataset_.write(b_daq_rec_, H5::PredType::NATIVE_UINT32);
+    frame_index_dataset_.write(
+            b_frame_index_, H5::PredType::NATIVE_UINT64,
+            b_m_space, f_m_space);
 
-    is_good_frame_dataset_.write(b_is_good_frame_,
-                                 H5::PredType::NATIVE_UINT8);
+    daq_rec_dataset_.write(
+            b_daq_rec_, H5::PredType::NATIVE_UINT32,
+            b_m_space, f_m_space);
+
+    is_good_frame_dataset_.write(
+            b_is_good_frame_, H5::PredType::NATIVE_UINT8,
+            b_m_space, f_m_space);
 
     image_dataset_.close();
     pulse_id_dataset_.close();
