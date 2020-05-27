@@ -10,7 +10,7 @@
 #include "bitshuffle/bitshuffle.h"
 #include "JFH5Writer.hpp"
 #include "ImageAssembler.hpp"
-#include "../../sf-replay/include/BufferBinaryReader.hpp"
+#include "BufferBinaryReader.hpp"
 
 using namespace std;
 using namespace core_buffer;
