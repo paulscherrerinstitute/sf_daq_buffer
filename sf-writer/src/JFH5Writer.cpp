@@ -12,12 +12,14 @@
 using namespace std;
 using namespace core_buffer;
 
-JFH5Writer::JFH5Writer(
-        const string& output_file,
-        const size_t n_images,
-        const size_t n_modules) :
-        n_images_(n_images),
+JFH5Writer::JFH5Writer(const std::string& output_file,
+                       const uint64_t start_pulse_id,
+                       const uint64_t stop_pulse_id,
+                       const size_t n_modules) :
+        start_pulse_id_(start_pulse_id),
+        stop_pulse_id_(stop_pulse_id),
         n_modules_(n_modules),
+        n_images_(stop_pulse_id - start_pulse_id + 1),
         current_write_index_(0)
 {
 
