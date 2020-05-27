@@ -17,6 +17,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     }
 
     read_slot_id_ = 0;
+    write_slot_id_ = 0;
 }
 
 ImageAssembler::~ImageAssembler()
@@ -27,7 +28,11 @@ ImageAssembler::~ImageAssembler()
 
 int ImageAssembler::get_free_slot()
 {
+    if (buffer_status_[write_slot_id_] > 0) {
+        return write_slot_id_;
+    }
 
+    return -1;
 }
 
 void ImageAssembler::process(
@@ -71,8 +76,8 @@ void ImageAssembler::process(
 
     // 1 because fetch is done before subtraction.
     if (previous_status ==  1) {
-        write_slot_id_++;
-        read_slot_id_ %= IA_N_SLOTS;
+        auto next_write_slot_id = (int)((write_slot_id_+1) % IA_N_SLOTS);
+        write_slot_id_ = next_write_slot_id;
     }
 }
 

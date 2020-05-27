@@ -16,6 +16,7 @@ class ImageAssembler {
     std::atomic_int* buffer_status_;
 
     int read_slot_id_;
+    std::atomic_int write_slot_id_;
 
 public:
     ImageAssembler(const size_t n_modules);
