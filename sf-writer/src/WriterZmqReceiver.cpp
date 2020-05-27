@@ -59,7 +59,7 @@ void WriterZmqReceiver::get_next_buffer(
         n_images_in_buffer = images_left;
     }
 
-    i_meta->n_images = (uint16_t)n_images_in_buffer;
+//    i_meta->n_images = (uint16_t)n_images_in_buffer;
 
     for (uint64_t i_pulse=0; i_pulse<n_images_in_buffer; i_pulse++) {
 

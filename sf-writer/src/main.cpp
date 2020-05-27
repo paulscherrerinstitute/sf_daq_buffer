@@ -9,8 +9,8 @@
 #include "buffer_config.hpp"
 #include "bitshuffle/bitshuffle.h"
 #include "JFH5Writer.hpp"
-#include "BufferBinaryReader.hpp"
 #include "ImageAssembler.hpp"
+#include "../../sf-replay/include/BufferBinaryReader.hpp"
 
 using namespace std;
 using namespace core_buffer;
@@ -85,7 +85,7 @@ int main (int argc, char *argv[])
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
     auto n_blocks = stop_block - start_block + 1;
 
-    ImageAssembler image_assembler;
+    ImageAssembler image_assembler(n_modules);
 
     // Generate list of buffer blocks that need to be loaded.
     std::vector<uint64_t> buffer_blocks(n_blocks);
