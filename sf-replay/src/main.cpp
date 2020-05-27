@@ -14,7 +14,7 @@ using namespace chrono;
 void sf_replay (
         const string device,
         const string channel_name,
-        FastQueue<ReplayBuffer>& queue,
+        FastQueue<BufferBinaryBlock>& queue,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id
         )
@@ -75,7 +75,7 @@ int main (int argc, char *argv[]) {
     const auto start_pulse_id = (uint64_t) atoll(argv[5]);
     const auto stop_pulse_id = (uint64_t) atoll(argv[6]);
 
-    FastQueue<ReplayBuffer> queue(
+    FastQueue<BufferBinaryBlock> queue(
             MODULE_N_BYTES * BUFFER_BLOCK_SIZE,
             REPLAY_FASTQUEUE_N_SLOTS);
 

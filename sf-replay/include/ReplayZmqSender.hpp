@@ -16,7 +16,7 @@ public:
 
     void close();
 
-    void send(const ReplayBuffer* metadata, const char* data);
+    void send(const BufferBinaryBlock* metadata, const char* data);
 };
 
 

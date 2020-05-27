@@ -41,8 +41,10 @@ void ReplayZmqSender::close() {
     zmq_ctx_destroy(ctx_);
 }
 
-void ReplayZmqSender::send(const ReplayBuffer* metadata, const char* data)
+void ReplayZmqSender::send(
+        const BufferBinaryBlock* metadata,
+        const char* data)
 {
-    zmq_send(socket_, metadata, sizeof(ReplayBuffer), ZMQ_SNDMORE);
+    zmq_send(socket_, metadata, sizeof(BufferBinaryBlock), ZMQ_SNDMORE);
     zmq_send(socket_, data, MODULE_N_BYTES * BUFFER_BLOCK_SIZE, 0);
 }
