@@ -4,7 +4,7 @@
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 
-struct ImageMetadataBuffer
+struct ImageMetadataBlock
 {
     uint64_t pulse_id[core_buffer::BUFFER_BLOCK_SIZE];
     uint64_t frame_index[core_buffer::BUFFER_BLOCK_SIZE];
@@ -29,7 +29,7 @@ struct BufferBinaryFormat {
 
 #pragma pack(push)
 #pragma pack(1)
-struct BufferBlock
+struct BufferBinaryBlock
 {
     BufferBinaryFormat frame[core_buffer::BUFFER_BLOCK_SIZE];
     uint64_t start_pulse_id;

@@ -103,7 +103,7 @@ void FastQueue<T>::release()
     read_slot_id_ %= n_slots_;
 }
 
-template class FastQueue<ImageMetadataBuffer>;
+template class FastQueue<ImageMetadataBlock>;
 template class FastQueue<ReplayBuffer>;
 template class FastQueue<ModuleFrame>;
 template class FastQueue<ModuleFrameBuffer>;

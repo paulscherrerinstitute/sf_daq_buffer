@@ -50,7 +50,7 @@ WriterZmqReceiver::~WriterZmqReceiver()
 
 void WriterZmqReceiver::get_next_buffer(
         const uint64_t start_pulse_id,
-        ImageMetadataBuffer* i_meta,
+        ImageMetadataBlock* i_meta,
         char* image_buffer)
 {
     auto n_images_in_buffer = WRITER_DATA_CACHE_N_IMAGES;

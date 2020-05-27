@@ -27,7 +27,7 @@ public:
                const size_t n_images,
                const size_t n_modules);
     ~JFH5Writer();
-    void write(const ImageMetadataBuffer* metadata, const char* data);
+    void write(const ImageMetadataBlock* metadata, const char* data);
     void close_file();
 
     uint64_t* b_pulse_id_;

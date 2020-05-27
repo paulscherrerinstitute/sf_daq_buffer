@@ -12,7 +12,7 @@ TEST(WriterH5Writer, basic_interaction)
     size_t n_frames = 5;
 
     auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES);
-    auto metadata = make_shared<ImageMetadataBuffer>();
+    auto metadata = make_shared<ImageMetadataBlock>();
 
     // Needed by writer.
     metadata->data_n_bytes[0] = 500;

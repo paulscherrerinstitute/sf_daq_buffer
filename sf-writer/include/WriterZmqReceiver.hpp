@@ -26,7 +26,7 @@ public:
 
     void get_next_buffer(
             const uint64_t start_pulse_id,
-            ImageMetadataBuffer* i_meta,
+            ImageMetadataBlock* i_meta,
             char* image_buffer);
 };
 

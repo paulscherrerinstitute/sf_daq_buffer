@@ -114,7 +114,7 @@ void JFH5Writer::close_file()
 }
 
 void JFH5Writer::write(
-        const ImageMetadataBuffer* metadata, const char* data)
+        const ImageMetadataBlock* metadata, const char* data)
 {
     size_t n_images_to_copy = min(n_images_ - current_write_index_,
                                   BUFFER_BLOCK_SIZE);

@@ -20,7 +20,7 @@ void receive_replay(
         void* ctx,
         const string ipc_prefix,
         const size_t n_modules,
-        FastQueue<ImageMetadataBuffer>& queue,
+        FastQueue<ImageMetadataBlock>& queue,
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id)
 {
@@ -84,7 +84,7 @@ int main (int argc, char *argv[])
 
     size_t n_modules = 32;
 
-    FastQueue<ImageMetadataBuffer> queue(
+    FastQueue<ImageMetadataBlock> queue(
             MODULE_N_BYTES * n_modules * WRITER_DATA_CACHE_N_IMAGES,
             WRITER_FASTQUEUE_N_SLOTS);
 
