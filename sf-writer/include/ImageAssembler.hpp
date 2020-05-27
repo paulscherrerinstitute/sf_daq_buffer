@@ -15,20 +15,18 @@ class ImageAssembler {
     ImageMetadataBlock* metadata_buffer_;
     std::atomic_int* buffer_status_;
 
-    int read_slot_id_;
-    std::atomic_int write_slot_id_;
-
 public:
     ImageAssembler(const size_t n_modules);
 
     virtual ~ImageAssembler();
 
-    int get_free_slot();
-    void process(const int slot_id,
+    bool is_slot_free(const int slot_id);
+    bool is_slot_full(const int slot_id);
+
+    void process(int slot_id,
                  const int i_module,
                  const BufferBinaryBlock* block_buffer);
 
-    int get_full_slot();
     void free_slot(const int slot_id);
 
     ImageMetadataBlock* get_metadata_buffer(const int slot_id);

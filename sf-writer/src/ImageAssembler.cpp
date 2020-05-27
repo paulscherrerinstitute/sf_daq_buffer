@@ -15,9 +15,6 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     for (size_t i=0; i<IA_N_SLOTS; i++) {
         free_slot(i);
     }
-
-    read_slot_id_ = 0;
-    write_slot_id_ = 0;
 }
 
 ImageAssembler::~ImageAssembler()
@@ -26,20 +23,23 @@ ImageAssembler::~ImageAssembler()
     delete[] metadata_buffer_;
 }
 
-int ImageAssembler::get_free_slot()
+bool ImageAssembler::is_slot_free(const int slot_id)
 {
-    if (buffer_status_[write_slot_id_] > 0) {
-        return write_slot_id_;
-    }
+    return buffer_status_[slot_id % IA_N_SLOTS] > 0;
+}
 
-    return -1;
+bool ImageAssembler::is_slot_full(const int slot_id)
+{
+    return buffer_status_[slot_id % IA_N_SLOTS] == 0;
 }
 
 void ImageAssembler::process(
-        const int slot_id,
+        int slot_id,
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
+    slot_id %= IA_N_SLOTS;
+
     // TODO: Temp workaround. Make proper initialization.
     if (i_module == 0) {
         metadata_buffer_[slot_id].block_first_pulse_id =
@@ -72,37 +72,21 @@ void ImageAssembler::process(
         }
     }
 
-    auto previous_status = buffer_status_[slot_id].fetch_sub(1);
-
-    // 1 because fetch is done before subtraction.
-    if (previous_status ==  1) {
-        auto next_write_slot_id = (int)((write_slot_id_+1) % IA_N_SLOTS);
-        write_slot_id_ = next_write_slot_id;
-    }
-}
-
-int ImageAssembler::get_full_slot()
-{
-    if (buffer_status_[read_slot_id_] == 0) {
-        return read_slot_id_;
-    }
-
-    return -1;
+    buffer_status_[slot_id]--;
 }
 
 void ImageAssembler::free_slot(const int slot_id)
 {
-    buffer_status_[slot_id] = n_modules_;
-
-    read_slot_id_ = (int)((read_slot_id_+1) % IA_N_SLOTS);
+    buffer_status_[slot_id % IA_N_SLOTS] = n_modules_;
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)
 {
-    return &(metadata_buffer_[slot_id]);
+    return &(metadata_buffer_[slot_id % IA_N_SLOTS]);
 }
 
 char* ImageAssembler::get_data_buffer(const int slot_id)
 {
-    return image_buffer_ + (slot_id * image_buffer_slot_n_bytes_);
+    return image_buffer_ +
+           ((slot_id % IA_N_SLOTS) * image_buffer_slot_n_bytes_);
 }

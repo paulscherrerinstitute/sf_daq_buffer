@@ -26,10 +26,10 @@ void read_buffer(
     BufferBinaryReader block_reader(device, channel_name);
     auto block_buffer = new BufferBinaryBlock();
 
+    int slot_id = 0;
     for (uint64_t block_id:buffer_blocks) {
 
-        int slot_id;
-        while((slot_id = image_assembler.get_free_slot()) == -1) {
+        while(!image_assembler.is_slot_free(slot_id)) {
             this_thread::sleep_for(chrono::milliseconds(
                     WRITER_IMAGE_ASSEMBLER_RETRY_MS));
         }
@@ -45,6 +45,7 @@ void read_buffer(
         start_time = steady_clock::now();
 
         image_assembler.process(slot_id, i_module, block_buffer);
+        slot_id++;
 
         end_time = steady_clock::now();
         uint64_t compose_us_duration = duration_cast<microseconds>(
@@ -116,10 +117,10 @@ int main (int argc, char *argv[])
 
     JFH5Writer writer(output_file, start_pulse_id, stop_pulse_id, n_modules);
 
+    int slot_id = 0;
     for (uint64_t block_id:buffer_blocks) {
 
-        int slot_id;
-        while((slot_id = image_assembler.get_full_slot()) == -1) {
+        while(!image_assembler.is_slot_full(slot_id)) {
             this_thread::sleep_for(chrono::milliseconds(
                     WRITER_IMAGE_ASSEMBLER_RETRY_MS));
         }
@@ -136,6 +137,7 @@ int main (int argc, char *argv[])
                 end_time-start_time).count();
 
         image_assembler.free_slot(slot_id);
+        slot_id++;
 
         cout << "sf_writer:avg_write_us ";
         cout << write_us_duration / BUFFER_BLOCK_SIZE << endl;
