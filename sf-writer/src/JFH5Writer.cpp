@@ -116,10 +116,15 @@ void JFH5Writer::close_file()
 void JFH5Writer::write(
         const ImageMetadataBuffer* metadata, const char* data)
 {
-    auto n_images_in_buffer = metadata->n_images;
+    size_t n_images_to_copy = min(n_frames_ - current_write_index_,
+                                  BUFFER_BLOCK_SIZE);
+
+    if (n_images_to_copy < 1) {
+        return;
+    }
 
     hsize_t b_i_dims[3] = {
-            n_images_in_buffer,
+            n_images_to_copy,
             MODULE_Y_SIZE*n_modules_,
             MODULE_X_SIZE};
     H5::DataSpace b_i_space(3, b_i_dims);
@@ -129,7 +134,7 @@ void JFH5Writer::write(
                            MODULE_X_SIZE};
     H5::DataSpace f_i_space(3, f_i_dims);
 
-    hsize_t i_count[] = {n_images_in_buffer,
+    hsize_t i_count[] = {n_images_to_copy,
                          MODULE_Y_SIZE*n_modules_,
                          MODULE_X_SIZE};
     hsize_t i_start[] = {current_write_index_, 0, 0};
@@ -145,7 +150,7 @@ void JFH5Writer::write(
                 &(metadata->pulse_id[0]) + current_write_index_;
         memcpy(b_current_ptr,
                metadata_pulse_id_ptr,
-               sizeof(uint64_t) * n_images_in_buffer);
+               sizeof(uint64_t) * n_images_to_copy);
     }
 
     {
@@ -154,7 +159,7 @@ void JFH5Writer::write(
                 &(metadata->frame_index[0]) + current_write_index_;
         memcpy(b_current_ptr,
                metadata_pulse_id_ptr,
-               sizeof(uint64_t) * n_images_in_buffer);
+               sizeof(uint64_t) * n_images_to_copy);
     }
 
     {
@@ -163,7 +168,7 @@ void JFH5Writer::write(
                 &(metadata->daq_rec[0]) + current_write_index_;
         memcpy(b_current_ptr,
                metadata_pulse_id_ptr,
-               sizeof(uint32_t) * n_images_in_buffer);
+               sizeof(uint32_t) * n_images_to_copy);
     }
 
     {
@@ -172,8 +177,8 @@ void JFH5Writer::write(
                 &(metadata->is_good_image[0]) + current_write_index_;
         memcpy(b_current_ptr,
                metadata_pulse_id_ptr,
-               sizeof(uint8_t) * n_images_in_buffer);
+               sizeof(uint8_t) * n_images_to_copy);
     }
 
-    current_write_index_ += n_images_in_buffer;
+    current_write_index_ += n_images_to_copy;
 }
