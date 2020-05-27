@@ -150,7 +150,11 @@ int main (int argc, char *argv[])
 
     writer.close_file();
 
-    //wait till receive thread is finished
-    replay_receive_thread.join(); 
+    for (auto& reading_thread :reading_threads) {
+        if (reading_thread.joinable()) {
+            reading_thread.join();
+        }
+    }
+
     return 0;
 }
