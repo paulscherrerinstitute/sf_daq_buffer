@@ -143,8 +143,6 @@ int main (int argc, char *argv[])
         cout << write_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 
-    writer.close_file();
-
     for (auto& reading_thread :reading_threads) {
         if (reading_thread.joinable()) {
             reading_thread.join();

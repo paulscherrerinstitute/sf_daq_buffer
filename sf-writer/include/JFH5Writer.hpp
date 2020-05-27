@@ -19,6 +19,8 @@ class JFH5Writer {
 
     H5::DataSet image_dataset_;
 
+    void close_file();
+
 public:
     JFH5Writer(const std::string& output_file,
                const uint64_t start_pulse_id,
@@ -26,7 +28,7 @@ public:
                const size_t n_modules);
     ~JFH5Writer();
     void write(const ImageMetadataBlock* metadata, const char* data);
-    void close_file();
+
 
     uint64_t* b_pulse_id_;
     uint64_t* b_frame_index_;
