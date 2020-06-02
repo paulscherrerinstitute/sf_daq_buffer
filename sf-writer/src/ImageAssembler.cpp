@@ -44,14 +44,17 @@ void ImageAssembler::process(
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
 
+    // TODO: This offsets are not really readable.
     size_t slot_i_offset = slot_id * image_buffer_slot_n_bytes_;
     size_t module_i_offset = i_module * MODULE_N_BYTES;
 
-    size_t slot_m_offset = slot_id * n_modules_ * BUFFER_BLOCK_SIZE;
-    size_t module_m_offset = i_module * n_modules_;
+    size_t n_metadata_in_slot = n_modules_ * BUFFER_BLOCK_SIZE;
+    size_t slot_m_offset = slot_id * n_metadata_in_slot;
+    size_t module_m_offset = i_module;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
-        size_t metadata_offset = slot_m_offset + module_m_offset + i_pulse;
+        size_t metadata_offset = slot_m_offset + module_m_offset;
+        metadata_offset += i_pulse * n_modules_;
         memcpy(
             &(frame_metadata_buffer_[metadata_offset]),
             &(block_buffer->frame[i_pulse].metadata),
