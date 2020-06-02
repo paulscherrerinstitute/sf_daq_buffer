@@ -80,13 +80,13 @@ void ImageAssembler::free_slot(const int bunch_id)
     buffer_status_[bunch_id % IA_N_SLOTS].store(n_modules_);
 }
 
-ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)
+ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int bunch_id)
 {
-    return &(metadata_buffer_[slot_id % IA_N_SLOTS]);
+    return &(metadata_buffer_[bunch_id % IA_N_SLOTS]);
 }
 
-char* ImageAssembler::get_data_buffer(const int slot_id)
+char* ImageAssembler::get_data_buffer(const int bunch_id)
 {
     return image_buffer_ +
-           ((slot_id % IA_N_SLOTS) * image_buffer_slot_n_bytes_);
+           ((bunch_id % IA_N_SLOTS) * image_buffer_slot_n_bytes_);
 }

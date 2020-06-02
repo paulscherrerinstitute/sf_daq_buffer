@@ -29,8 +29,8 @@ public:
 
     void free_slot(const int bunch_id);
 
-    ImageMetadataBlock* get_metadata_buffer(const int slot_id);
-    char* get_data_buffer(const int slot_id);
+    ImageMetadataBlock* get_metadata_buffer(const int bunch_id);
+    char* get_data_buffer(const int bunch_id);
 };
 
 
