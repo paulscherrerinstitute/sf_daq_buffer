@@ -12,7 +12,8 @@ class ImageAssembler {
     const size_t image_buffer_slot_n_bytes_;
 
     char* image_buffer_;
-    ImageMetadataBlock* metadata_buffer_;
+    ImageMetadataBlock* image_metadata_buffer_;
+    ModuleFrame* frame_metadata_buffer_;
     std::atomic_int* buffer_status_;
 
 public:
