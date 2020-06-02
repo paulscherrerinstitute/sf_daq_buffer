@@ -25,20 +25,20 @@ ImageAssembler::~ImageAssembler()
     delete[] meta_buffer_;
 }
 
-bool ImageAssembler::is_slot_free(const int bunch_id)
+bool ImageAssembler::is_slot_free(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
     return buffer_status_[slot_id].load() > 0;
 }
 
-bool ImageAssembler::is_slot_full(const int bunch_id)
+bool ImageAssembler::is_slot_full(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
     return buffer_status_[slot_id].load() == 0;
 }
 
 void ImageAssembler::process(
-        int bunch_id,
+        const uint64_t bunch_id,
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
@@ -71,13 +71,13 @@ void ImageAssembler::process(
     buffer_status_[slot_id].fetch_sub(1);
 }
 
-void ImageAssembler::free_slot(const int bunch_id)
+void ImageAssembler::free_slot(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
     buffer_status_[slot_id].store(n_modules_);
 }
 
-ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int bunch_id)
+ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
 
@@ -92,13 +92,13 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int bunch_id)
 //            }
         }
 
-        meta_buffer_[slot_id].pulse_id[i_pulse]
+        meta_buffer_[slot_id].pulse_id[i_pulse];
     }
 
     return &(meta_buffer_[slot_id]);
 }
 
-char* ImageAssembler::get_data_buffer(const int bunch_id)
+char* ImageAssembler::get_data_buffer(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
     return image_buffer_ + (slot_id * image_buffer_slot_n_bytes_);

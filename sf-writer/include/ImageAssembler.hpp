@@ -21,17 +21,17 @@ public:
 
     virtual ~ImageAssembler();
 
-    bool is_slot_free(const int bunch_id);
-    bool is_slot_full(const int bunch_id);
+    bool is_slot_free(const uint64_t bunch_id);
+    bool is_slot_full(const uint64_t bunch_id);
 
-    void process(int bunch_id,
+    void process(uint64_t bunch_id,
                  const int i_module,
                  const BufferBinaryBlock* block_buffer);
 
-    void free_slot(const int bunch_id);
+    void free_slot(const uint64_t bunch_id);
 
-    ImageMetadataBlock* get_metadata_buffer(const int bunch_id);
-    char* get_data_buffer(const int bunch_id);
+    ImageMetadataBlock* get_metadata_buffer(const uint64_t bunch_id);
+    char* get_data_buffer(const uint64_t bunch_id);
 };
 
 
