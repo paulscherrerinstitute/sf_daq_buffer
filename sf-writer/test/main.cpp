@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "test_WriterZmqReceiver.cpp"
 #include "test_WriterH5Writer.cpp"
 
 using namespace std;
