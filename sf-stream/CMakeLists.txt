@@ -12,7 +12,8 @@ set_target_properties(sf-stream PROPERTIES OUTPUT_NAME sf_stream)
 target_link_libraries(sf-stream
         sf-stream-lib
         zmq
-        pthread)
+        pthread
+        jsoncpp)
 
 enable_testing()
 add_subdirectory(test/)

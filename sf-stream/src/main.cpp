@@ -120,7 +120,7 @@ int main (int argc, char *argv[])
         header["pulse_id"]      = (Json::Value::UInt64)pulse_id;
 
         //this needs to be re-read from external source
-        header["pedestal_file"] = "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200423_1018.JF07T32V01.res.h5";
+        header["pedestal_file"] = "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200529_1408.JF07T32V01.res.h5";
         header["gain_file"] = "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5";
 
         header["number_frames_expected"] = 10000;
