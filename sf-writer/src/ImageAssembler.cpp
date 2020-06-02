@@ -42,9 +42,9 @@ void ImageAssembler::process(
 
     // TODO: Temp workaround. Make proper initialization.
     if (i_module == 0) {
-        metadata_buffer_[slot_id].block_first_pulse_id =
+        metadata_buffer_[slot_id].block_start_pulse_id =
                 block_buffer->frame[0].metadata.pulse_id;
-        metadata_buffer_[slot_id].block_last_pulse_id =
+        metadata_buffer_[slot_id].block_stop_pulse_id =
                 block_buffer->frame[BUFFER_BLOCK_SIZE-1].metadata.pulse_id;
     }
 

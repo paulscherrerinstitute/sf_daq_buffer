@@ -131,8 +131,8 @@ void JFH5Writer::write(
         const ImageMetadataBlock* metadata, const char* data)
 {
     size_t n_images_offset = 0;
-    if (start_pulse_id_ > metadata->block_first_pulse_id) {
-        n_images_offset = start_pulse_id_ - metadata->block_first_pulse_id;
+    if (start_pulse_id_ > metadata->block_start_pulse_id) {
+        n_images_offset = start_pulse_id_ - metadata->block_start_pulse_id;
     }
 
     if (n_images_offset > BUFFER_BLOCK_SIZE) {
@@ -140,8 +140,8 @@ void JFH5Writer::write(
     }
 
     size_t n_images_to_copy = BUFFER_BLOCK_SIZE - n_images_offset;
-    if (stop_pulse_id_ < metadata->block_last_pulse_id) {
-        n_images_to_copy -= metadata->block_last_pulse_id - stop_pulse_id_;
+    if (stop_pulse_id_ < metadata->block_stop_pulse_id) {
+        n_images_to_copy -= metadata->block_stop_pulse_id - stop_pulse_id_;
     }
 
     if (n_images_to_copy < 1) {
