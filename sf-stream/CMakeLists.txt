@@ -13,7 +13,8 @@ target_link_libraries(sf-stream
         external
         sf-stream-lib
         zmq
-        pthread)
+        pthread
+        jsoncpp)
 
 enable_testing()
 add_subdirectory(test/)
