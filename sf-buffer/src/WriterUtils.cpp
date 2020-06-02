@@ -45,6 +45,7 @@ void WriterUtils::create_destination_folder(const string& output_file)
 
         string output_folder(output_file.substr(0, file_separator_index));
 
+        // TODO: filesystem::create_directories(output_folder)
         string create_folder_command("mkdir -p " + output_folder);
         system(create_folder_command.c_str());
     }
