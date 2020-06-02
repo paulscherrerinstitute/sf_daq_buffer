@@ -82,7 +82,6 @@ int main (int argc, char *argv[])
 
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
-    auto n_blocks = stop_block - start_block + 1;
 
     ImageAssembler image_assembler(n_modules);
 
