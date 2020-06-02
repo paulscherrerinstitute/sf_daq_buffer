@@ -45,17 +45,7 @@ void WriterUtils::create_destination_folder(const string& output_file)
 
         string output_folder(output_file.substr(0, file_separator_index));
 
-        if(!filesystem::create_directories(output_folder)) {
-            stringstream err_msg;
-
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[WriterUtils::create_destination_folder]";
-            err_msg << " Cannot create directory ";
-            err_msg << output_folder << endl;
-
-            throw runtime_error(err_msg.str());
-        }
+        string create_folder_command("mkdir -p " + output_folder);
+        system(create_folder_command.c_str());
     }
 }
