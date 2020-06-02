@@ -170,7 +170,7 @@ int main (int argc, char *argv[])
         }
         if ( send_streamvis == 0 ) {
             auto& shape = header["shape"];
-            shape[0] = 16384;
+            shape[0] = n_modules*512;
             shape[1] = 1024;
         } else{
             auto& shape = header["shape"];
@@ -210,7 +210,7 @@ int main (int argc, char *argv[])
         }
         if ( send_live_analysis == 0 ) {
             auto& shape = header["shape"];
-            shape[0] = 16384;
+            shape[0] = n_modules*512;
             shape[1] = 1024;
         } else{
             auto& shape = header["shape"];
