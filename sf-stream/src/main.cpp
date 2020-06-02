@@ -10,8 +10,11 @@
 #include <cstring>
 #include <zmq.h>
 #include <LiveRecvModule.hpp>
-#include "date.h"
-#include <jsoncpp/json/json.h>
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+
+
 
 using namespace std;
 using namespace core_buffer;
@@ -59,8 +62,13 @@ int main (int argc, char *argv[])
     }
 
     uint16_t data_empty [] = { 0, 0, 0, 0};
-    Json::Value header;
-    Json::StreamWriterBuilder builder;
+
+    rapidjson::Document header(rapidjson::kObjectType);
+    auto& header_alloc = header.GetAllocator();
+
+    rapidjson::StringBuffer header_buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> header_writer(header_buffer);
+    header.Accept(header_writer);
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
@@ -112,39 +120,52 @@ int main (int argc, char *argv[])
             }
         }
 
-        //Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
+        // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
 
-        header["frame"]         = (Json::Value::UInt64)frame_index;
-        header["is_good_frame"] = is_good_frame;
-        header["daq_rec"]       = (Json::Value::UInt64)daq_rec;
-        header["pulse_id"]      = (Json::Value::UInt64)pulse_id;
+        header.AddMember("frame", frame_index, header_alloc);
+        header.AddMember("is_good_frame", is_good_frame, header_alloc);
+        header.AddMember("daq_rec", daq_rec, header_alloc);
+        header.AddMember("pulse_id", pulse_id, header_alloc);
 
-        //this needs to be re-read from external source
-        header["pedestal_file"] = "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200423_1018.JF07T32V01.res.h5";
-        header["gain_file"] = "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5";
+        // TODO: this needs to be re-read from external source
+        header.AddMember("pedestal_file", "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200423_1018.JF07T32V01.res.h5", header_alloc);
+        header.AddMember("gain_file", "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5", header_alloc);
 
-        header["number_frames_expected"] = 10000;
-        header["run_name"] = to_string(uint64_t(pulse_id/10000)*10000);
+        header.AddMember("number_frames_expected", 10000, header_alloc);
 
-        // detector name should come as parameter to sf_stream
-        header["detector_name"] = "JF07T32V01";
+        rapidjson::Value run_name;
+        run_name.SetString(
+                to_string(uint64_t(pulse_id/10000)*10000).c_str(),
+                header_alloc);
+        header.AddMember("run_name", run_name, header_alloc);
 
-        header["htype"] = "array-1.0";
-        header["type"]  = "uint16";
+        // TODO: Detector name should come as parameter to sf_stream
+        header.AddMember("number_frames_expected", "JF07T32V01", header_alloc);
+
+        header.AddMember("htype", "array-1.0", header_alloc);
+        header.AddMember("type", "uint16", header_alloc);
+
+        // To be retrieved and filled with correct values down.
+        auto shape_value = rapidjson::Value(rapidjson::kArrayType);
+        shape_value.PushBack((uint64_t)0, header_alloc);
+        shape_value.PushBack((uint64_t)0, header_alloc);
+        header.AddMember("shape", shape_value, header_alloc);
 
         int send_streamvis = 0;
         if ( reduction_factor_streamvis > 1 ) {
             send_streamvis = rand() % reduction_factor_streamvis;
         }
         if ( send_streamvis == 0 ) {
-            header["shape"][0] = 16384;
-            header["shape"][1] = 1024;
+            auto& shape = header["shape"];
+            shape[0] = 16384;
+            shape[1] = 1024;
         } else{
-            header["shape"][0] = 2;
-            header["shape"][1] = 2;
+            auto& shape = header["shape"];
+            shape[0] = 2;
+            shape[1] = 2;
         }
 
-        string text_header = Json::writeString(builder, header);
+        string text_header = header_buffer.GetString();
 
         zmq_send(socket_streamvis,
              text_header.c_str(),
@@ -169,14 +190,16 @@ int main (int argc, char *argv[])
             send_live_analysis = rand() % reduction_factor_live_analysis;
         }
         if ( send_live_analysis == 0 ) {
-            header["shape"][0] = 16384;
-            header["shape"][1] = 1024;
+            auto& shape = header["shape"];
+            shape[0] = 16384;
+            shape[1] = 1024;
         } else{
-            header["shape"][0] = 2;
-            header["shape"][1] = 2;
+            auto& shape = header["shape"];
+            shape[0] = 2;
+            shape[1] = 2;
         }
 
-        text_header = Json::writeString(builder, header);
+        text_header = header_buffer.GetString();
 
         zmq_send(socket_live,
              text_header.c_str(),
