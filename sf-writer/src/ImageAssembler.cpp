@@ -25,12 +25,12 @@ ImageAssembler::~ImageAssembler()
 
 bool ImageAssembler::is_slot_free(const int bunch_id)
 {
-    return buffer_status_[bunch_id % IA_N_SLOTS] > 0;
+    return buffer_status_[bunch_id % IA_N_SLOTS].load() > 0;
 }
 
 bool ImageAssembler::is_slot_full(const int bunch_id)
 {
-    return buffer_status_[bunch_id % IA_N_SLOTS] == 0;
+    return buffer_status_[bunch_id % IA_N_SLOTS].load() == 0;
 }
 
 void ImageAssembler::process(
@@ -72,12 +72,12 @@ void ImageAssembler::process(
         }
     }
 
-    buffer_status_[bunch_id]--;
+    buffer_status_[bunch_id].fetch_sub(1);
 }
 
 void ImageAssembler::free_slot(const int bunch_id)
 {
-    buffer_status_[bunch_id % IA_N_SLOTS] = n_modules_;
+    buffer_status_[bunch_id % IA_N_SLOTS].store(n_modules_);
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)
