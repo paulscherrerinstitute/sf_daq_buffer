@@ -11,7 +11,7 @@ TEST(WriterH5Writer, basic_interaction)
 {
     size_t n_modules = 2;
     uint64_t start_pulse_id = 1;
-    uint64_t end_pulse_id = 5;
+    uint64_t stop_pulse_id = 5;
 
     auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES*BUFFER_BLOCK_SIZE);
     auto metadata = make_shared<ImageMetadataBlock>();
@@ -20,74 +20,93 @@ TEST(WriterH5Writer, basic_interaction)
     metadata->block_start_pulse_id = 0;
     metadata->block_stop_pulse_id = BUFFER_BLOCK_SIZE - 1;
 
-    JFH5Writer writer("ignore.h5", start_pulse_id, end_pulse_id, n_modules);
+    JFH5Writer writer("ignore.h5", start_pulse_id, stop_pulse_id, n_modules);
     writer.write(metadata.get(), data.get());
 }
 
-TEST(WriterH5Writer, test_compression)
+TEST(WriterH5Writer, test_writing)
 {
-//    size_t n_modules = 2;
-//    size_t n_frames = 2;
-//
-//    auto comp_buffer_size = bshuf_compress_lz4_bound(
-//            MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-//
-//    auto f_raw_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
-//    auto f_comp_buffer = make_unique<char[]>(comp_buffer_size);
-//
-//    auto i_comp_buffer = make_unique<char[]>(
-//            (comp_buffer_size * n_modules) + BSHUF_LZ4_HEADER_BYTES);
-//    auto i_raw_buffer = make_unique<uint16_t[]>(
-//            MODULE_N_PIXELS * n_modules * n_frames);
-//
-//    bshuf_write_uint64_BE(&i_comp_buffer[0],
-//            MODULE_N_BYTES * n_modules);
-//    bshuf_write_uint32_BE(&i_comp_buffer[8],
-//            MODULE_N_PIXELS * PIXEL_N_BYTES);
-//
-//    size_t total_compressed_size = BSHUF_LZ4_HEADER_BYTES;
-//    for (int i_module=0; i_module<n_modules; i_module++) {
-//
-//        for (size_t i=0; i<MODULE_N_PIXELS; i++) {
-//            f_raw_buffer[i] = (uint16_t)((i % 100) + (i_module*100));
-//        }
-//
-//        auto compressed_size = bshuf_compress_lz4(
-//                f_raw_buffer.get(), f_comp_buffer.get(),
-//                MODULE_N_PIXELS, PIXEL_N_BYTES, MODULE_N_PIXELS);
-//
-//        memcpy((i_comp_buffer.get() + total_compressed_size),
-//               f_comp_buffer.get(),
-//               compressed_size);
-//
-//        total_compressed_size += compressed_size;
-//    }
-//
-//    auto metadata = make_shared<ImageMetadata>();
-//    metadata->data_n_bytes = total_compressed_size;
-//
-//    metadata->is_good_frame = 1;
-//    metadata->frame_index = 3;
-//    metadata->pulse_id = 3;
-//    metadata->daq_rec = 3;
-//
-//    auto result = bshuf_decompress_lz4(
-//            &i_comp_buffer[12], &i_raw_buffer[0],
-//            MODULE_N_PIXELS*n_modules, PIXEL_N_BYTES, MODULE_N_PIXELS);
-//
-//    WriterH5Writer writer("ignore.h5", n_frames, n_modules);
-//    writer.write(metadata.get(), &i_comp_buffer[0]);
-//    writer.close_file();
-//
-//    H5::H5File reader("ignore.h5", H5F_ACC_RDONLY);
-//    auto image_dataset = reader.openDataSet("image");
-//    image_dataset.read(&i_raw_buffer[0], H5::PredType::NATIVE_UINT16);
-//
-//    for (int i_module=0; i_module<n_modules; i_module++) {
-//        for (int i_pixel=0; i_pixel<MODULE_N_PIXELS; i_pixel++) {
-//            size_t offset = (i_module * MODULE_N_PIXELS) + i_pixel;
-//            ASSERT_EQ(i_raw_buffer[offset],
-//                    (uint16_t)((i_pixel % 100) + (i_module*100)));
-//        }
-//    }
+    size_t n_modules = 2;
+    uint64_t start_pulse_id = 5;
+    uint64_t stop_pulse_id = 10;
+    auto n_images = stop_pulse_id - start_pulse_id + 1;
+
+    auto metadata = make_shared<ImageMetadataBlock>();
+    metadata->block_start_pulse_id = 0;
+    metadata->block_stop_pulse_id = BUFFER_BLOCK_SIZE - 1;
+
+    for (uint64_t pulse_id=start_pulse_id;
+         pulse_id<=stop_pulse_id;
+         pulse_id++) {
+
+        metadata->pulse_id[pulse_id] = pulse_id;
+        metadata->frame_index[pulse_id] = pulse_id + 10;
+        metadata->daq_rec[pulse_id] = pulse_id + 100;
+        metadata->is_good_image[pulse_id] = 1;
+    }
+
+
+    auto image_buffer = make_unique<uint16_t[]>(
+            MODULE_N_PIXELS * n_modules * BUFFER_BLOCK_SIZE);
+
+    for (int i_block=0; i_block<=BUFFER_BLOCK_SIZE; i_block++) {
+        for (int i_module=0; i_module<n_modules; i_module++) {
+            auto offset = i_block * MODULE_N_PIXELS;
+            offset += i_module * MODULE_N_PIXELS;
+
+            for (int i_pixel=0; i_pixel<MODULE_N_PIXELS; i_pixel++) {
+                image_buffer[offset + i_pixel] = i_pixel % 100;
+            }
+        }
+    }
+
+    // The writer closes the file on destruction.
+    {
+        JFH5Writer writer(
+                "ignore.h5", start_pulse_id, stop_pulse_id, n_modules);
+        writer.write(metadata.get(), (char*)(&image_buffer[0]));
+    }
+
+    H5::H5File reader("ignore.h5", H5F_ACC_RDONLY);
+    auto image_dataset = reader.openDataSet("image");
+    image_dataset.read(&image_buffer[0], H5::PredType::NATIVE_UINT16);
+
+    for (int i_image=0; i_image < n_images; i_image++) {
+        for (int i_module=0; i_module<n_modules; i_module++) {
+
+            auto offset = i_image * MODULE_N_PIXELS;
+            offset += i_module * MODULE_N_PIXELS;
+
+            for (int i_pixel=0; i_pixel<MODULE_N_PIXELS; i_pixel++) {
+                ASSERT_EQ(image_buffer[offset + i_pixel], i_pixel % 100);
+            }
+        }
+    }
+
+    auto pulse_id_data = make_unique<uint64_t[]>(n_images);
+    auto pulse_id_dataset = reader.openDataSet("pulse_id");
+    pulse_id_dataset.read(&pulse_id_data[0], H5::PredType::NATIVE_UINT64);
+
+    auto frame_index_data = make_unique<uint64_t[]>(n_images);
+    auto frame_index_dataset = reader.openDataSet("frame_index");
+    frame_index_dataset.read(&frame_index_data[0], H5::PredType::NATIVE_UINT64);
+
+    auto daq_rec_data = make_unique<uint32_t[]>(n_images);
+    auto daq_rec_dataset = reader.openDataSet("daq_rec");
+    daq_rec_dataset.read(&daq_rec_data[0], H5::PredType::NATIVE_UINT32);
+
+    auto is_good_frame_data = make_unique<uint8_t[]>(n_images);
+    auto is_good_frame_dataset = reader.openDataSet("is_good_frame");
+    is_good_frame_dataset.read(
+            &is_good_frame_data[0], H5::PredType::NATIVE_UINT8);
+
+    for (uint64_t pulse_id=start_pulse_id;
+         pulse_id<=stop_pulse_id;
+         pulse_id++) {
+
+        ASSERT_EQ(pulse_id_data[pulse_id - start_pulse_id], pulse_id);
+        ASSERT_EQ(frame_index_data[pulse_id - start_pulse_id], pulse_id + 10);
+        ASSERT_EQ(daq_rec_data[pulse_id - start_pulse_id], pulse_id + 100);
+        ASSERT_EQ(is_good_frame_data[pulse_id - start_pulse_id], 1);
+    }
 }
