@@ -107,8 +107,9 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
     auto meta_offset = get_metadata_offset(slot_id, 0);
     const auto meta_offset_step = 1;
 
-    meta_buffer_->block_start_pulse_id = bunch_id * BUFFER_BLOCK_SIZE;
-    meta_buffer_->block_stop_pulse_id =
+    meta_buffer_[slot_id].block_start_pulse_id =
+            bunch_id * BUFFER_BLOCK_SIZE;
+    meta_buffer_[slot_id].block_stop_pulse_id =
             meta_buffer_->block_start_pulse_id + BUFFER_BLOCK_SIZE - 1;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
