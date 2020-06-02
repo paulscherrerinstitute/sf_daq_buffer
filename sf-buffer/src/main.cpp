@@ -17,11 +17,12 @@ using namespace std;
 using namespace core_buffer;
 
 int main (int argc, char *argv[]) {
-    if (argc != 5) {
+    if (argc != 6) {
         cout << endl;
-        cout << "Usage: sf_buffer [device_name] [udp_port] [root_folder]";
+        cout << "Usage: sf_buffer [detector_name] [device_name] [udp_port] [root_folder]";
         cout << "[source_id]";
         cout << endl;
+        cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
         cout << "\tdevice_name: Name to write to disk.";
         cout << "\tudp_port: UDP port to connect to." << endl;
         cout << "\troot_folder: FS root folder." << endl;
@@ -31,13 +32,15 @@ int main (int argc, char *argv[]) {
         exit(-1);
     }
 
-    string device_name = string(argv[1]);
-    int udp_port = atoi(argv[2]);
-    string root_folder = string(argv[3]);
-    int source_id = atoi(argv[4]);
+    string detector_name = string(argv[1]);
+    string device_name = string(argv[2]);
+    int udp_port = atoi(argv[3]);
+    string root_folder = string(argv[4]);
+    int source_id = atoi(argv[5]);
 
     stringstream ipc_stream;
-    ipc_stream << BUFFER_LIVE_IPC_URL << source_id;
+    string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL + detector_name + "-";
+    ipc_stream << LIVE_IPC_URL << source_id;
     const auto ipc_address = ipc_stream.str();
 
     auto ctx = zmq_ctx_new();
