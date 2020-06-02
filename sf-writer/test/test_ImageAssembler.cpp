@@ -29,4 +29,8 @@ TEST(ImageAssembler, basic_interaction)
 
     assembler.free_slot(bunch_id);
     ASSERT_EQ(assembler.is_slot_free(bunch_id), true);
+
+    for (size_t i_pulse = 0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
+        ASSERT_EQ(metadata->is_good_image[i_pulse], 0);
+    }
 }
