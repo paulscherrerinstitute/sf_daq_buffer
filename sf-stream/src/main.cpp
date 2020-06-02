@@ -140,7 +140,7 @@ int main (int argc, char *argv[])
         header.AddMember("pedestal_file", pedestal_file, header_alloc);
 
         rapidjson::Value gain_file;
-        gain_file.SetString(PEDE_FILENAME.c_str(), header_alloc);
+        gain_file.SetString(GAIN_FILENAME.c_str(), header_alloc);
         header.AddMember("gain_file", gain_file, header_alloc);
 
         header.AddMember("number_frames_expected", 10000, header_alloc);
