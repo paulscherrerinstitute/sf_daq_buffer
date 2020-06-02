@@ -3,12 +3,12 @@
 #include <cstring>
 #include <hdf5_hl.h>
 
-
-//extern "C"
-//{
+extern "C"
+{
 //    #include "H5DOpublic.h"
 //    #include <bitshuffle/bshuf_h5filter.h>
-//}
+    #include "H5DOpublic.h"
+}
 
 using namespace std;
 using namespace core_buffer;
@@ -33,9 +33,9 @@ JFH5Writer::JFH5Writer(const std::string& output_file,
 
     H5::DataSpace image_dataspace(3, image_dataset_dims);
 
-    auto chunk_size = min(n_images_, BUFFER_BLOCK_SIZE);
+//    auto chunk_size = min(n_images_, BUFFER_BLOCK_SIZE);
     hsize_t image_dataset_chunking[3] =
-            {chunk_size, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
+            {1, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
     H5::DSetCreatPropList image_dataset_properties;
     image_dataset_properties.setChunk(3, image_dataset_chunking);
 
@@ -148,30 +148,6 @@ void JFH5Writer::write(
         throw runtime_error("Received unexpected block for stop_pulse_id.");
     }
 
-    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace b_i_space(3, b_i_dims);
-    hsize_t b_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t b_i_start[] = {n_images_offset, 0, 0};
-    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
-
-    hsize_t f_i_dims[3] = {n_images_,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace f_i_space(3, f_i_dims);
-    hsize_t f_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t f_i_start[] = {current_write_index_, 0, 0};
-    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    image_dataset_.write(
-            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
-
-
     // pulse_id
     {
         auto b_current_ptr = b_pulse_id_ + current_write_index_;
@@ -204,5 +180,25 @@ void JFH5Writer::write(
                sizeof(uint8_t) * n_images_to_copy);
     }
 
-    current_write_index_ += n_images_to_copy;
+    // images - direct chunk write one by one.
+    for (size_t i_pulse=n_images_offset;
+         i_pulse<BUFFER_BLOCK_SIZE;
+         i_pulse++) {
+
+        auto image_ptr = data + (i_pulse * n_modules_ * MODULE_N_BYTES);
+        hsize_t offset[] = {current_write_index_, 0, 0};
+
+        if(H5DOwrite_chunk(image_dataset_.getId(), H5P_DEFAULT, 0,
+                offset, MODULE_N_BYTES*n_modules_, data)) {
+
+            stringstream error_message;
+            error_message << "[JFH5Writer::write]";
+            error_message << "Error while writing image chunk to file.";
+            error_message << "Offset " << current_write_index_ << endl;
+
+            throw invalid_argument(error_message.str());
+        }
+
+        current_write_index_++;
+    }
 }
