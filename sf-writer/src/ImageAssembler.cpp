@@ -37,35 +37,53 @@ bool ImageAssembler::is_slot_full(const uint64_t bunch_id)
     return buffer_status_[slot_id].load() == 0;
 }
 
+inline size_t ImageAssembler::get_data_offset(
+        const uint64_t slot_id, const int i_module)
+{
+    size_t slot_i_offset = slot_id * image_buffer_slot_n_bytes_;
+    size_t module_i_offset = i_module * MODULE_N_BYTES;
+
+    return slot_i_offset + module_i_offset;
+}
+
+inline size_t ImageAssembler::get_metadata_offset(
+        const uint64_t slot_id, const int i_module)
+{
+    size_t n_metadata_in_slot = n_modules_ * BUFFER_BLOCK_SIZE;
+    size_t slot_m_offset = slot_id * n_metadata_in_slot;
+    size_t module_m_offset = i_module;
+
+    return slot_m_offset + module_m_offset;
+}
+
 void ImageAssembler::process(
         const uint64_t bunch_id,
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    const auto slot_id = bunch_id % IA_N_SLOTS;
 
-    // TODO: This offsets are not really readable.
-    size_t slot_i_offset = slot_id * image_buffer_slot_n_bytes_;
-    size_t module_i_offset = i_module * MODULE_N_BYTES;
+    const auto image_offset = get_data_offset(slot_id, i_module);
+    const auto image_offset_step = MODULE_N_BYTES * n_modules_;
 
-    size_t n_metadata_in_slot = n_modules_ * BUFFER_BLOCK_SIZE;
-    size_t slot_m_offset = slot_id * n_metadata_in_slot;
-    size_t module_m_offset = i_module;
+    const auto meta_offset = get_metadata_offset(slot_id, i_module);
+    const auto meta_offset_step = 1;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
-        size_t metadata_offset = slot_m_offset + module_m_offset;
-        metadata_offset += i_pulse * n_modules_;
+
         memcpy(
-            &(frame_metadata_buffer_[metadata_offset]),
+            &(frame_metadata_buffer_[meta_offset]),
             &(block_buffer->frame[i_pulse].metadata),
             sizeof(ModuleFrame));
 
-        size_t image_offset = slot_i_offset + module_i_offset;
-        image_offset += i_pulse * MODULE_N_BYTES * n_modules_;
+        meta_offset += meta_offset_step;
+
         memcpy(
             image_buffer_ + image_offset,
             &(block_buffer->frame[i_pulse].data[0]),
             MODULE_N_BYTES);
+
+        image_offset += image_offset_step;
     }
 
     buffer_status_[slot_id].fetch_sub(1);
@@ -85,7 +103,7 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
         auto is_not_init = false;
 
         for (size_t i_module=0; i_module < n_modules_; i_module++) {
-
+            auto metadata_offset = get_metadata_offset(slot_id, i_module);
 //
 //            if (is_not_init) {
 //                if ()
