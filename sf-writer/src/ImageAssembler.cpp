@@ -9,7 +9,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     image_buffer_slot_n_bytes_(BUFFER_BLOCK_SIZE * MODULE_N_BYTES * n_modules_)
 {
     image_buffer_ = new char[IA_N_SLOTS * image_buffer_slot_n_bytes_];
-    image_metadata_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
+    meta_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
     frame_metadata_buffer_ =
             new ModuleFrame[IA_N_SLOTS * n_modules * BUFFER_BLOCK_SIZE];
     buffer_status_ = new atomic_int[IA_N_SLOTS];
@@ -22,7 +22,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
 ImageAssembler::~ImageAssembler()
 {
     delete[] image_buffer_;
-    delete[] image_metadata_buffer_;
+    delete[] meta_buffer_;
 }
 
 bool ImageAssembler::is_slot_free(const int bunch_id)
@@ -80,7 +80,22 @@ void ImageAssembler::free_slot(const int bunch_id)
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
-    return &(image_metadata_buffer_[slot_id]);
+
+    for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
+        auto is_not_init = false;
+
+        for (size_t i_module=0; i_module < n_modules_; i_module++) {
+
+//
+//            if (is_not_init) {
+//                if ()
+//            }
+        }
+
+        meta_buffer_[slot_id].pulse_id[i_pulse]
+    }
+
+    return &(meta_buffer_[slot_id]);
 }
 
 char* ImageAssembler::get_data_buffer(const int bunch_id)
