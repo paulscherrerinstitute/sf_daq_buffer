@@ -74,6 +74,9 @@ TEST(ImageAssembler, reconstruction)
     assembler.free_slot(bunch_id);
     ASSERT_EQ(assembler.is_slot_free(bunch_id), true);
 
+    ASSERT_EQ(metadata->block_start_pulse_id, 0);
+    ASSERT_EQ(metadata->block_stop_pulse_id, BUFFER_BLOCK_SIZE-1);
+
     for (size_t i_pulse = 0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
         ASSERT_EQ(metadata->pulse_id[i_pulse], 100 + i_pulse);
         ASSERT_EQ(metadata->daq_rec[i_pulse], 1000 + i_pulse);
