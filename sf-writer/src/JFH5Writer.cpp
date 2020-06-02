@@ -56,8 +56,6 @@ JFH5Writer::JFH5Writer(const std::string& output_file,
             image_dataspace,
             image_dataset_properties);
 
-
-
     b_pulse_id_ = new uint64_t[n_images_];
     b_frame_index_= new uint64_t[n_images_];
     b_daq_rec_ = new uint32_t[n_images_];
@@ -181,11 +179,11 @@ void JFH5Writer::write(
     }
 
     // images - direct chunk write one by one.
-    for (size_t i_pulse=n_images_offset;
-         i_pulse<BUFFER_BLOCK_SIZE;
-         i_pulse++) {
+    for (size_t i_image=n_images_offset;
+         i_image < n_images_to_copy;
+         i_image++) {
 
-        auto image_ptr = data + (i_pulse * n_modules_ * MODULE_N_BYTES);
+        auto image_ptr = data + (i_image * n_modules_ * MODULE_N_BYTES);
         hsize_t offset[] = {current_write_index_, 0, 0};
 
         if(H5DOwrite_chunk(image_dataset_.getId(), H5P_DEFAULT, 0,
