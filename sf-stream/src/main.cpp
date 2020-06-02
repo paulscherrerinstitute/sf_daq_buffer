@@ -72,10 +72,7 @@ int main (int argc, char *argv[])
 
     rapidjson::Document header(rapidjson::kObjectType);
     auto& header_alloc = header.GetAllocator();
-
-    rapidjson::StringBuffer header_buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> header_writer(header_buffer);
-    header.Accept(header_writer);
+    string text_header;
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
@@ -176,7 +173,14 @@ int main (int argc, char *argv[])
             shape[1] = 2;
         }
 
-        string text_header = header_buffer.GetString();
+
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            header.Accept(writer);
+
+            text_header = buffer.GetString();
+        }
 
         zmq_send(socket_streamvis,
              text_header.c_str(),
@@ -210,7 +214,13 @@ int main (int argc, char *argv[])
             shape[1] = 2;
         }
 
-        text_header = header_buffer.GetString();
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            header.Accept(writer);
+
+            text_header = buffer.GetString();
+        }
 
         zmq_send(socket_live,
              text_header.c_str(),
