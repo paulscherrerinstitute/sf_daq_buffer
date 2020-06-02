@@ -16,6 +16,9 @@ class ImageAssembler {
     ModuleFrame* frame_meta_buffer_;
     std::atomic_int* buffer_status_;
 
+    size_t get_data_offset(const uint64_t slot_id, const int i_module);
+    size_t get_metadata_offset(const uint64_t slot_id, const int i_module);
+
 public:
     ImageAssembler(const size_t n_modules);
 

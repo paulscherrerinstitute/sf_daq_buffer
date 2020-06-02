@@ -63,10 +63,10 @@ void ImageAssembler::process(
 {
     const auto slot_id = bunch_id % IA_N_SLOTS;
 
-    const auto image_offset = get_data_offset(slot_id, i_module);
+    auto image_offset = get_data_offset(slot_id, i_module);
     const auto image_offset_step = MODULE_N_BYTES * n_modules_;
 
-    const auto meta_offset = get_metadata_offset(slot_id, i_module);
+    auto meta_offset = get_metadata_offset(slot_id, i_module);
     const auto meta_offset_step = n_modules_;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
@@ -97,20 +97,62 @@ void ImageAssembler::free_slot(const uint64_t bunch_id)
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    const auto slot_id = bunch_id % IA_N_SLOTS;
+
+    auto& image_pulse_id = meta_buffer_[slot_id].pulse_id;
+    auto& image_frame_index = meta_buffer_[slot_id].frame_index;
+    auto& image_daq_rec = meta_buffer_[slot_id].daq_rec;
+    auto& image_is_good_frame = meta_buffer_[slot_id].is_good_image;
+
+    auto meta_offset = get_metadata_offset(slot_id, 0);
+    const auto meta_offset_step = 1;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
-        auto is_not_init = false;
-        meta
-        for (size_t i_module=0; i_module < n_modules_; i_module++) {
-            auto metadata_offset = get_metadata_offset(slot_id, i_module);
-//
-//            if (is_not_init) {
-//                if ()
-//            }
-        }
 
-        meta_buffer_[slot_id].pulse_id[i_pulse];
+        auto is_pulse_init = false;
+        image_is_good_frame[i_pulse] = 1;
+
+        for (size_t i_module=0; i_module < n_modules_; i_module++) {
+
+            auto& frame_meta = frame_meta_buffer_[meta_offset];
+            auto is_good_frame =
+                    frame_meta.n_received_packets == JF_N_PACKETS_PER_FRAME;
+
+            if (!is_good_frame) {
+                image_is_good_frame[i_pulse] = 0;
+                // TODO: Update meta_offset only once in the loop.
+                meta_offset += meta_offset_step;
+                continue;
+            }
+
+            if (!is_pulse_init) {
+                image_pulse_id[i_pulse] = frame_meta.pulse_id;
+                image_frame_index[i_pulse] = frame_meta.frame_index;
+                image_daq_rec[i_pulse] = frame_meta.daq_rec;
+
+                is_pulse_init = true;
+            }
+
+            if (image_is_good_frame[i_pulse] == 1) {
+                if (image_pulse_id[i_pulse] != frame_meta.pulse_id) {
+                    image_is_good_frame[i_pulse] = 0;
+                }
+
+                if (image_frame_index[i_pulse] != frame_meta.frame_index) {
+                    image_is_good_frame[i_pulse] = 0;
+                }
+
+                if (image_daq_rec[i_pulse] != frame_meta.daq_rec) {
+                    image_is_good_frame[i_pulse] = 0;
+                }
+
+                if (frame_meta.n_received_packets != JF_N_PACKETS_PER_FRAME) {
+                    image_is_good_frame[i_pulse] = 0;
+                }
+            }
+
+            meta_offset += meta_offset_step;
+        }
     }
 
     return &(meta_buffer_[slot_id]);
