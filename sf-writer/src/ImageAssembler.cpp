@@ -11,7 +11,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     image_buffer_ = new char[IA_N_SLOTS * image_buffer_slot_n_bytes_];
     image_metadata_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
     frame_metadata_buffer_ =
-            new ModuleFrame[IA_N_SLOTS * BUFFER_BLOCK_SIZE * n_modules];
+            new ModuleFrame[IA_N_SLOTS * n_modules * BUFFER_BLOCK_SIZE];
     buffer_status_ = new atomic_int[IA_N_SLOTS];
 
     for (size_t i=0; i<IA_N_SLOTS; i++) {
@@ -44,39 +44,25 @@ void ImageAssembler::process(
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
 
-    // TODO: Temp workaround. Make proper initialization.
-    if (i_module == 0) {
-        image_metadata_buffer_[slot_id].block_start_pulse_id =
-                block_buffer->frame[0].metadata.pulse_id;
-        image_metadata_buffer_[slot_id].block_stop_pulse_id =
-                block_buffer->frame[BUFFER_BLOCK_SIZE-1].metadata.pulse_id;
-    }
+    size_t slot_i_offset = slot_id * image_buffer_slot_n_bytes_;
+    size_t module_i_offset = i_module * MODULE_N_BYTES;
 
-    auto metadata_offset =
-    frame_metadata_buffer_[metadata_offset] = 0;
-
-    size_t slot_offset = slot_id * image_buffer_slot_n_bytes_;
-    size_t module_image_offset = i_module * MODULE_N_BYTES;
+    size_t slot_m_offset = slot_id * n_modules_ * BUFFER_BLOCK_SIZE;
+    size_t module_m_offset = i_module * n_modules_;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
-        size_t image_offset = i_pulse * MODULE_N_BYTES * n_modules_;
-
+        size_t metadata_offset = slot_m_offset + module_m_offset + i_pulse;
         memcpy(
-            image_buffer_ + slot_offset + image_offset + module_image_offset,
+            &(frame_metadata_buffer_[metadata_offset]),
+            &(block_buffer->frame[i_pulse].metadata),
+            sizeof(ModuleFrame));
+
+        size_t image_offset = slot_i_offset + module_i_offset;
+        image_offset += i_pulse * MODULE_N_BYTES * n_modules_;
+        memcpy(
+            image_buffer_ + image_offset,
             &(block_buffer->frame[i_pulse].data[0]),
             MODULE_N_BYTES);
-
-        // TODO: Temp workaround. We need to synchronize this access.
-        if (i_module == 0) {
-            image_metadata_buffer_[slot_id].pulse_id[i_pulse] =
-                    block_buffer->frame[i_pulse].metadata.pulse_id;
-            image_metadata_buffer_[slot_id].frame_index[i_pulse] =
-                    block_buffer->frame[i_pulse].metadata.frame_index;
-            image_metadata_buffer_[slot_id].daq_rec[i_pulse] =
-                    block_buffer->frame[i_pulse].metadata.daq_rec;
-//            metadata_buffer_[slot_id].is_good_image[i_pulse] =
-//                    block_buffer->frame[i_pulse].is_good_image.pulse_id;
-        }
     }
 
     buffer_status_[slot_id].fetch_sub(1);
