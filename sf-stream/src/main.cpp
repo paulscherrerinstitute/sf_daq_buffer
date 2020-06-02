@@ -13,42 +13,42 @@
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
-
-
+#include <rapidjson/istreamwrapper.h>
+#include <fstream>
 
 using namespace std;
 using namespace core_buffer;
 
-// TODO: this needs to be re-read from external source
-const string PEDE_FILENAME =
-    "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200529_1408.JF07T32V01.res.h5";
-const string GAIN_FILENAME =
-    "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5";
-
-
 int main (int argc, char *argv[])
 {
-    if (argc != 5) {
+    if (argc != 2) {
         cout << endl;
         cout << "Usage: sf_stream ";
-        cout << " [streamvis_address] [reduction_factor_streamvis]";
-        cout << " [live_analysis_address] [reduction_factor_live_analysis]";
+        cout << " [config_json_file]";
         cout << endl;
-        cout << "\tstreamvis_address: address to streamvis, example tcp://129.129.241.42:9007" << endl;
-        cout << "\treduction_factor_streamvis: 1 out of N (example 10) images to send to streamvis. For remaining send metadata." << endl;
-        cout << "\tlive_analysis_address: address to live_analysis, example tcp://129.129.241.42:9107" << endl;
-        cout << "\treduction_factor_live_analysis: 1 out of N (example 10) images to send to live analysis. For remaining send metadata. N<=1 - send every image" << endl;
+        cout << "\tconfig_json_file: json file with the configuration parameters(detector name, number of modules, pedestal and gain files" << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    string streamvis_address = string(argv[1]);
-    int reduction_factor_streamvis = (int) atoll(argv[2]);
-    string live_analysis_address = string(argv[3]);
-    int reduction_factor_live_analysis = (uint64_t) atoll(argv[4]);
+    string config_json_file = string(argv[1]);
+  
+    ifstream ifs(config_json_file);
+    rapidjson::IStreamWrapper isw(ifs);
+    rapidjson::Document config_parameters;
+    config_parameters.ParseStream(isw);
 
-    size_t n_modules = 32;
+    string streamvis_address = config_parameters["streamvis_stream"].GetString();
+    int reduction_factor_streamvis = config_parameters["streamvis_rate"].GetInt();
+    string live_analysis_address = config_parameters["live_stream"].GetString();
+    int reduction_factor_live_analysis = config_parameters["live_rate"].GetInt();
+
+    const string PEDE_FILENAME = config_parameters["pedestal_file"].GetString();
+    const string GAIN_FILENAME = config_parameters["gain_file"].GetString();
+    const string DETECTOR_NAME = config_parameters["detector_name"].GetString();
+    size_t n_modules = config_parameters["n_modules"].GetInt();
+
     FastQueue<ModuleFrameBuffer> queue(
             n_modules * MODULE_N_BYTES,
             STREAM_FASTQUEUE_SLOTS);
@@ -56,7 +56,9 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    LiveRecvModule recv_module(queue, n_modules, ctx, BUFFER_LIVE_IPC_URL);
+    const string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL+DETECTOR_NAME+"-";
+
+    LiveRecvModule recv_module(queue, n_modules, ctx, LIVE_IPC_URL);
 
     // 0mq sockets to streamvis and live analysis
     void *socket_streamvis = zmq_socket(ctx, ZMQ_PUB);
@@ -150,8 +152,9 @@ int main (int argc, char *argv[])
                 header_alloc);
         header.AddMember("run_name", run_name, header_alloc);
 
-        // TODO: Detector name should come as parameter to sf_stream
-        header.AddMember("number_frames_expected", "JF07T32V01", header_alloc);
+        rapidjson::Value detector_name;
+        detector_name.SetString(DETECTOR_NAME.c_str(), header_alloc);
+        header.AddMember("detector_name", detector_name, header_alloc);
 
         header.AddMember("htype", "array-1.0", header_alloc);
         header.AddMember("type", "uint16", header_alloc);
