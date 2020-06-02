@@ -13,7 +13,7 @@ class ImageAssembler {
 
     char* image_buffer_;
     ImageMetadataBlock* meta_buffer_;
-    ModuleFrame* frame_metadata_buffer_;
+    ModuleFrame* frame_meta_buffer_;
     std::atomic_int* buffer_status_;
 
 public:
