@@ -19,6 +19,13 @@
 using namespace std;
 using namespace core_buffer;
 
+// TODO: this needs to be re-read from external source
+const string PEDE_FILENAME =
+    "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200529_1408.JF07T32V01.res.h5";
+const string GAIN_FILENAME =
+    "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5";
+
+
 int main (int argc, char *argv[])
 {
     if (argc != 5) {
@@ -127,9 +134,13 @@ int main (int argc, char *argv[])
         header.AddMember("daq_rec", daq_rec, header_alloc);
         header.AddMember("pulse_id", pulse_id, header_alloc);
 
-        // TODO: this needs to be re-read from external source
-        header.AddMember("pedestal_file", "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200423_1018.JF07T32V01.res.h5", header_alloc);
-        header.AddMember("gain_file", "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5", header_alloc);
+        rapidjson::Value pedestal_file;
+        pedestal_file.SetString(PEDE_FILENAME.c_str(), header_alloc);
+        header.AddMember("pedestal_file", pedestal_file, header_alloc);
+
+        rapidjson::Value gain_file;
+        gain_file.SetString(PEDE_FILENAME.c_str(), header_alloc);
+        header.AddMember("gain_file", gain_file, header_alloc);
 
         header.AddMember("number_frames_expected", 10000, header_alloc);
 
