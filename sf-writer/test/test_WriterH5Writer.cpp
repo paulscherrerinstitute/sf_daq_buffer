@@ -1,26 +1,27 @@
+#include <memory>
 
 #include "JFH5Writer.hpp"
 #include "gtest/gtest.h"
 #include "bitshuffle/bitshuffle.h"
 
-
+using namespace std;
 using namespace core_buffer;
 
 TEST(WriterH5Writer, basic_interaction)
 {
     size_t n_modules = 2;
-    size_t n_frames = 5;
+    uint64_t start_pulse_id = 1;
+    uint64_t end_pulse_id = 5;
 
-    auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES);
+    auto data = make_unique<char[]>(n_modules*MODULE_N_BYTES*BUFFER_BLOCK_SIZE);
     auto metadata = make_shared<ImageMetadataBlock>();
 
     // Needed by writer.
-    metadata->data_n_bytes[0] = 500;
-    metadata->n_pulses_in_buffer = 1;
+    metadata->block_start_pulse_id = 0;
+    metadata->block_stop_pulse_id = BUFFER_BLOCK_SIZE - 1;
 
-    JFH5Writer writer("ignore.h5", n_frames, n_modules);
+    JFH5Writer writer("ignore.h5", start_pulse_id, end_pulse_id, n_modules);
     writer.write(metadata.get(), data.get());
-    writer.close_file();
 }
 
 TEST(WriterH5Writer, test_compression)
