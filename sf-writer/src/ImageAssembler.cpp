@@ -23,32 +23,32 @@ ImageAssembler::~ImageAssembler()
     delete[] metadata_buffer_;
 }
 
-bool ImageAssembler::is_slot_free(const int slot_id)
+bool ImageAssembler::is_slot_free(const int bunch_id)
 {
-    return buffer_status_[slot_id % IA_N_SLOTS] > 0;
+    return buffer_status_[bunch_id % IA_N_SLOTS] > 0;
 }
 
-bool ImageAssembler::is_slot_full(const int slot_id)
+bool ImageAssembler::is_slot_full(const int bunch_id)
 {
-    return buffer_status_[slot_id % IA_N_SLOTS] == 0;
+    return buffer_status_[bunch_id % IA_N_SLOTS] == 0;
 }
 
 void ImageAssembler::process(
-        int slot_id,
+        int bunch_id,
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
-    slot_id %= IA_N_SLOTS;
+    bunch_id %= IA_N_SLOTS;
 
     // TODO: Temp workaround. Make proper initialization.
     if (i_module == 0) {
-        metadata_buffer_[slot_id].block_start_pulse_id =
+        metadata_buffer_[bunch_id].block_start_pulse_id =
                 block_buffer->frame[0].metadata.pulse_id;
-        metadata_buffer_[slot_id].block_stop_pulse_id =
+        metadata_buffer_[bunch_id].block_stop_pulse_id =
                 block_buffer->frame[BUFFER_BLOCK_SIZE-1].metadata.pulse_id;
     }
 
-    size_t slot_offset = slot_id * image_buffer_slot_n_bytes_;
+    size_t slot_offset = bunch_id * image_buffer_slot_n_bytes_;
     size_t module_image_offset = i_module * MODULE_N_BYTES;
 
     for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
@@ -61,23 +61,23 @@ void ImageAssembler::process(
 
         // TODO: Temp workaround. We need to synchronize this access.
         if (i_module == 0) {
-            metadata_buffer_[slot_id].pulse_id[i_pulse] =
+            metadata_buffer_[bunch_id].pulse_id[i_pulse] =
                     block_buffer->frame[i_pulse].metadata.pulse_id;
-            metadata_buffer_[slot_id].frame_index[i_pulse] =
+            metadata_buffer_[bunch_id].frame_index[i_pulse] =
                     block_buffer->frame[i_pulse].metadata.frame_index;
-            metadata_buffer_[slot_id].daq_rec[i_pulse] =
+            metadata_buffer_[bunch_id].daq_rec[i_pulse] =
                     block_buffer->frame[i_pulse].metadata.daq_rec;
 //            metadata_buffer_[slot_id].is_good_image[i_pulse] =
 //                    block_buffer->frame[i_pulse].is_good_image.pulse_id;
         }
     }
 
-    buffer_status_[slot_id]--;
+    buffer_status_[bunch_id]--;
 }
 
-void ImageAssembler::free_slot(const int slot_id)
+void ImageAssembler::free_slot(const int bunch_id)
 {
-    buffer_status_[slot_id % IA_N_SLOTS] = n_modules_;
+    buffer_status_[bunch_id % IA_N_SLOTS] = n_modules_;
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const int slot_id)

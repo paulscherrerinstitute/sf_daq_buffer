@@ -20,14 +20,14 @@ public:
 
     virtual ~ImageAssembler();
 
-    bool is_slot_free(const int slot_id);
-    bool is_slot_full(const int slot_id);
+    bool is_slot_free(const int bunch_id);
+    bool is_slot_full(const int bunch_id);
 
-    void process(int slot_id,
+    void process(int bunch_id,
                  const int i_module,
                  const BufferBinaryBlock* block_buffer);
 
-    void free_slot(const int slot_id);
+    void free_slot(const int bunch_id);
 
     ImageMetadataBlock* get_metadata_buffer(const int slot_id);
     char* get_data_buffer(const int slot_id);
