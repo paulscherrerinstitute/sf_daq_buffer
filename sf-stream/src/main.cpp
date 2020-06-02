@@ -72,9 +72,7 @@ int main (int argc, char *argv[])
 
     uint16_t data_empty [] = { 0, 0, 0, 0};
 
-    rapidjson::Document header(rapidjson::kObjectType);
-    auto& header_alloc = header.GetAllocator();
-    string text_header;
+
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
@@ -83,6 +81,10 @@ int main (int argc, char *argv[])
     size_t read_max_us = 0;
 
     while (true) {
+
+        rapidjson::Document header(rapidjson::kObjectType);
+        auto& header_alloc = header.GetAllocator();
+        string text_header;
 
         auto start_time = chrono::steady_clock::now();
 
@@ -175,7 +177,6 @@ int main (int argc, char *argv[])
             shape[0] = 2;
             shape[1] = 2;
         }
-
 
         {
             rapidjson::StringBuffer buffer;
