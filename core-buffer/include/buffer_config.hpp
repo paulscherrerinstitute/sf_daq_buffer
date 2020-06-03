@@ -50,25 +50,11 @@ namespace core_buffer {
     // Size of buffer between the receiving and sending part.
     const int STREAM_FASTQUEUE_SLOTS = 5;
 
-    // Address where Replay streams and writer receives.
-    const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
+
     // How many frames to read at once from file.
     const size_t BUFFER_BLOCK_SIZE = 100;
-    // How many slots to have in the internal queue between read and send.
-    const int REPLAY_FASTQUEUE_N_SLOTS = 2;
-    // How many frames do we buffer in send.
-    const size_t REPLAY_SNDHWM = 100;
-
-    // Writer RECV queue on each ZMQ connection.
-    const int WRITER_RCVHWM = 100;
-    // ZMQ threads for receiving data from sf_replay.
-    const int WRITER_ZMQ_IO_THREADS = 2;
     // MS to retry reading from the image assembler.
     const size_t WRITER_IMAGE_ASSEMBLER_RETRY_MS = 5;
-    // How large are metadata chunks in the HDF5.
-    const size_t WRITER_METADATA_CHUNK_N_IMAGES = 100;
-    // How large should the data cache be in N images.
-    const size_t WRITER_DATA_CACHE_N_IMAGES = 100;
 }
 
 #endif //BUFFERCONFIG_HPP
