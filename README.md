@@ -35,6 +35,8 @@ https://portal.hdfgroup.org/display/HDF5/Chunking+in+HDF5
 https://support.hdfgroup.org/pubs/rfcs/RFC_chunk_cache_functions.pdf
 - Memory model synchronization modes
 https://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync
+- Is Parallel Programming Hard, And, If So, What Can You Do About It?
+https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.2018.12.08a.pdf
 
 
 ### Linux configuration
