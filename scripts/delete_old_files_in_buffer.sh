@@ -26,5 +26,5 @@ then
     exit
 fi
 
-#find /gpfs/photonics/swissfel/buffer/JF* -type f -mmin +$((${hours}*60)) -delete
+find /gpfs/photonics/swissfel/buffer/JF* -type f -mmin +$((${hours}*60)) -delete
 find /gpfs/photonics/swissfel/buffer/JF*/M* -type d -mmin +$((${hours}*60)) -delete
