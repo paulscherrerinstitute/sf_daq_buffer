@@ -86,7 +86,7 @@ void ImageAssembler::process(
         image_offset += image_offset_step;
     }
 
-    buffer_status_[slot_id].fetch_sub(1);
+    buffer_status_[slot_id].fetch_sub(1, memory_order_relaxed);
 }
 
 void ImageAssembler::free_slot(const uint64_t bunch_id)
