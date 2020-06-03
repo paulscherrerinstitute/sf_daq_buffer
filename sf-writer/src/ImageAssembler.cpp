@@ -8,14 +8,14 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     n_modules_(n_modules),
     image_buffer_slot_n_bytes_(BUFFER_BLOCK_SIZE * MODULE_N_BYTES * n_modules_)
 {
-    image_buffer_ = new char[IA_N_SLOTS * image_buffer_slot_n_bytes_];
-    meta_buffer_ = new ImageMetadataBlock[IA_N_SLOTS];
+    image_buffer_ = new char[WRITER_IA_N_SLOTS * image_buffer_slot_n_bytes_];
+    meta_buffer_ = new ImageMetadataBlock[WRITER_IA_N_SLOTS];
     frame_meta_buffer_ =
-            new ModuleFrame[IA_N_SLOTS * n_modules * BUFFER_BLOCK_SIZE];
-    buffer_status_ = new atomic_int[IA_N_SLOTS];
-    buffer_bunch_id_ = new atomic_uint64_t[IA_N_SLOTS];
+            new ModuleFrame[WRITER_IA_N_SLOTS * n_modules * BUFFER_BLOCK_SIZE];
+    buffer_status_ = new atomic_int[WRITER_IA_N_SLOTS];
+    buffer_bunch_id_ = new atomic_uint64_t[WRITER_IA_N_SLOTS];
 
-    for (size_t i=0; i<IA_N_SLOTS; i++) {
+    for (size_t i=0; i < WRITER_IA_N_SLOTS; i++) {
         free_slot(i);
     }
 }
@@ -28,7 +28,7 @@ ImageAssembler::~ImageAssembler()
 
 bool ImageAssembler::is_slot_free(const uint64_t bunch_id)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
 
     uint64_t slot_bunch_id = IA_EMPTY_SLOT_VALUE;
     if (buffer_bunch_id_[slot_id].compare_exchange_strong(
@@ -42,7 +42,7 @@ bool ImageAssembler::is_slot_free(const uint64_t bunch_id)
 
 bool ImageAssembler::is_slot_full(const uint64_t bunch_id)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
     return buffer_status_[slot_id].load(memory_order_relaxed) == 0;
 }
 
@@ -70,7 +70,7 @@ void ImageAssembler::process(
         const int i_module,
         const BufferBinaryBlock* block_buffer)
 {
-    const auto slot_id = bunch_id % IA_N_SLOTS;
+    const auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
 
     auto meta_offset = get_metadata_offset(slot_id, i_module);
     const auto meta_offset_step = n_modules_;
@@ -100,14 +100,14 @@ void ImageAssembler::process(
 
 void ImageAssembler::free_slot(const uint64_t bunch_id)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
     buffer_status_[slot_id].store(n_modules_, memory_order_relaxed);
     buffer_bunch_id_[slot_id].store(IA_EMPTY_SLOT_VALUE, memory_order_relaxed);
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 {
-    const auto slot_id = bunch_id % IA_N_SLOTS;
+    const auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
 
     auto& image_pulse_id = meta_buffer_[slot_id].pulse_id;
     auto& image_frame_index = meta_buffer_[slot_id].frame_index;
@@ -176,6 +176,6 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 
 char* ImageAssembler::get_data_buffer(const uint64_t bunch_id)
 {
-    auto slot_id = bunch_id % IA_N_SLOTS;
+    auto slot_id = bunch_id % WRITER_IA_N_SLOTS;
     return image_buffer_ + (slot_id * image_buffer_slot_n_bytes_);
 }

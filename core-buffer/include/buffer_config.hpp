@@ -55,6 +55,8 @@ namespace core_buffer {
     const size_t BUFFER_BLOCK_SIZE = 100;
     // MS to retry reading from the image assembler.
     const size_t WRITER_IMAGE_ASSEMBLER_RETRY_MS = 5;
+    // Number of slots in the reconstruction buffer.
+    const size_t WRITER_IA_N_SLOTS = 2;
 }
 
 #endif //BUFFERCONFIG_HPP

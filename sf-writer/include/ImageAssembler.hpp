@@ -5,7 +5,6 @@
 
 #include "formats.hpp"
 
-const size_t IA_N_SLOTS = 2;
 const uint64_t IA_EMPTY_SLOT_VALUE = 0;
 
 class ImageAssembler {
