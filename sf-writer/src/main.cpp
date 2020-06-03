@@ -49,9 +49,9 @@ void read_buffer(
         uint64_t compose_us_duration = duration_cast<microseconds>(
                 end_time-start_time).count();
 
-        cout << "sf_replay:avg_read_us ";
+        cout << "sf_writer:avg_read_us ";
         cout << read_us_duration / BUFFER_BLOCK_SIZE << endl;
-        cout << "sf_replay:avg_assemble_us ";
+        cout << "sf_writer:avg_assemble_us ";
         cout << compose_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 
