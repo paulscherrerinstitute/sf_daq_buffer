@@ -29,7 +29,7 @@ namespace core_buffer {
     const size_t BUFFER_UDP_N_RECV_MSG = 64;
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
-    // +1 for packet headers.
+    // 8246 bytes for each UDP packet.
     const int BUFFER_UDP_RCVBUF_BYTES =
             (128 * BUFFER_UDP_RCVBUF_N_SLOTS * 8246);
     // Microseconds timeout for UDP recv.
