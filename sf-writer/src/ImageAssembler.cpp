@@ -13,6 +13,7 @@ ImageAssembler::ImageAssembler(const size_t n_modules) :
     frame_meta_buffer_ =
             new ModuleFrame[IA_N_SLOTS * n_modules * BUFFER_BLOCK_SIZE];
     buffer_status_ = new atomic_int[IA_N_SLOTS];
+    buffer_bunch_id_ = new atomic_uint64_t[IA_N_SLOTS];
 
     for (size_t i=0; i<IA_N_SLOTS; i++) {
         free_slot(i);
@@ -28,13 +29,21 @@ ImageAssembler::~ImageAssembler()
 bool ImageAssembler::is_slot_free(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
-    return buffer_status_[slot_id].load() > 0;
+
+    uint64_t slot_bunch_id = IA_EMPTY_SLOT_VALUE;
+    if (buffer_bunch_id_[slot_id].compare_exchange_strong(
+            slot_bunch_id, bunch_id)) {
+        return true;
+    }
+
+    auto is_free = buffer_status_[slot_id].load(memory_order_relaxed) > 0;
+    return is_free && (slot_bunch_id == bunch_id);
 }
 
 bool ImageAssembler::is_slot_full(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
-    return buffer_status_[slot_id].load() == 0;
+    return buffer_status_[slot_id].load(memory_order_relaxed) == 0;
 }
 
 size_t ImageAssembler::get_data_offset(
@@ -63,24 +72,24 @@ void ImageAssembler::process(
 {
     const auto slot_id = bunch_id % IA_N_SLOTS;
 
-    auto image_offset = get_data_offset(slot_id, i_module);
-    const auto image_offset_step = MODULE_N_BYTES * n_modules_;
-
     auto meta_offset = get_metadata_offset(slot_id, i_module);
     const auto meta_offset_step = n_modules_;
 
-    for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
+    auto image_offset = get_data_offset(slot_id, i_module);
+    const auto image_offset_step = MODULE_N_BYTES * n_modules_;
+
+    for (const auto& frame : block_buffer->frame) {
 
         memcpy(
             &(frame_meta_buffer_[meta_offset]),
-            &(block_buffer->frame[i_pulse].metadata),
+            &(frame.metadata),
             sizeof(ModuleFrame));
 
         meta_offset += meta_offset_step;
 
         memcpy(
             image_buffer_ + image_offset,
-            &(block_buffer->frame[i_pulse].data[0]),
+            &(frame.data[0]),
             MODULE_N_BYTES);
 
         image_offset += image_offset_step;
@@ -92,7 +101,8 @@ void ImageAssembler::process(
 void ImageAssembler::free_slot(const uint64_t bunch_id)
 {
     auto slot_id = bunch_id % IA_N_SLOTS;
-    buffer_status_[slot_id].store(n_modules_);
+    buffer_status_[slot_id].store(n_modules_, memory_order_relaxed);
+    buffer_bunch_id_[slot_id].store(IA_EMPTY_SLOT_VALUE, memory_order_relaxed);
 }
 
 ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)

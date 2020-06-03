@@ -6,6 +6,7 @@
 #include "formats.hpp"
 
 const size_t IA_N_SLOTS = 2;
+const uint64_t IA_EMPTY_SLOT_VALUE = 0;
 
 class ImageAssembler {
     const size_t n_modules_;
@@ -15,6 +16,7 @@ class ImageAssembler {
     ImageMetadataBlock* meta_buffer_;
     ModuleFrame* frame_meta_buffer_;
     std::atomic_int* buffer_status_;
+    std::atomic_uint64_t* buffer_bunch_id_;
 
     size_t get_data_offset(const uint64_t slot_id, const int i_module);
     size_t get_metadata_offset(const uint64_t slot_id, const int i_module);
