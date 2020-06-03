@@ -60,13 +60,15 @@ void read_buffer(
 
 int main (int argc, char *argv[])
 {
-    if (argc != 5) {
+    if (argc != 6) {
         cout << endl;
         cout << "Usage: sf_writer [output_file] [device]";
+        cout << "  [n_modules]";
         cout << "  [start_pulse_id] [stop_pulse_id]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
         cout << "\tdevice: Name of detector." << endl;
+        cout << "\tn_modules: number of modules" << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
         cout << "\tstop_pulse_id: Stop pulse_id of retrieval." << endl;
         cout << endl;
@@ -76,9 +78,10 @@ int main (int argc, char *argv[])
 
     string output_file = string(argv[1]);
     const string device = string(argv[2]);
-    uint64_t start_pulse_id = (uint64_t) atoll(argv[3]);
-    uint64_t stop_pulse_id = (uint64_t) atoll(argv[4]);
-    size_t n_modules = 32;
+    size_t n_modules = atoi(argv[3]);
+    //size_t n_modules = 32;
+    uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
+    uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
 
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;

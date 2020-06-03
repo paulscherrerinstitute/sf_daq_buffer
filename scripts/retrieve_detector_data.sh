@@ -23,6 +23,20 @@ else
     OUTFILE=/gpfs/photonics/swissfel/buffer/test.${START_PULSE_ID}-${STOP_PULSE_ID}.h5
 fi
 
+case ${DETECTOR} in
+'JF01T03V01')
+  NM=3
+  ;;
+'JF07T32V01')
+  NM=32
+  ;;
+'JF13T01V01')
+  NM=1
+  ;;
+*)
+  NM=1
+esac
+
 #8 replay workers per core
 #coreAssociated_replay=(20 20 20 20 20 20 20 20 21 21 21 21 21 21 21 21 22 22 22 22 22 22 22 22 23 23 23 23 23 23 23 23)
 #4 replay workers per core
@@ -66,7 +80,7 @@ echo "Started actual retrieve : "`date`
 #    taskset -c ${coreAssociated_replay[10#${M}]} /usr/bin/sf_replay ${PROCESS_PID} ${DETECTOR} M${M} ${M} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve_replay.log &
 #done
 
-taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve.log &
+taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} >> /tmp/detector_retrieve.log &
 
 wait
 
