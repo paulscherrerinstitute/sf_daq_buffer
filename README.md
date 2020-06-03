@@ -33,6 +33,8 @@ https://de.slideshare.net/HDFEOS/caching-and-buffering-in-hdf5
 https://portal.hdfgroup.org/display/HDF5/Chunking+in+HDF5
 - Setting Raw Data Chunk Cache Parameters in HDF5
 https://support.hdfgroup.org/pubs/rfcs/RFC_chunk_cache_functions.pdf
+- Memory model synchronization modes
+https://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync
 
 
 ### Linux configuration
