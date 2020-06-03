@@ -19,7 +19,7 @@ namespace core_buffer {
     // Must be power of 10 and >= than FILE_MOD.
     const size_t FOLDER_MOD = 100000;
     // Extension of our file format.
-    const std::string FILE_EXTENSION = ".h5";
+    const std::string FILE_EXTENSION = ".bin";
     // Number of pulses between each statistics print out.
     const size_t STATS_MODULO = 100;
     // If the RB is empty, how much time to wait before trying to read it again.
@@ -29,9 +29,9 @@ namespace core_buffer {
     const size_t BUFFER_UDP_N_RECV_MSG = 64;
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
-    // +1 for packet headers.
+    // 8246 bytes for each UDP packet.
     const int BUFFER_UDP_RCVBUF_BYTES =
-            (128 * 8246 * BUFFER_UDP_RCVBUF_N_SLOTS);
+            (128 * BUFFER_UDP_RCVBUF_N_SLOTS * 8246);
     // Microseconds timeout for UDP recv.
     const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
     // HWM for live stream from buffer.
@@ -53,7 +53,7 @@ namespace core_buffer {
     // Address where Replay streams and writer receives.
     const std::string REPLAY_STREAM_IPC_URL = "ipc:///tmp/sf-replay-";
     // How many frames to read at once from file.
-    const size_t REPLAY_READ_BUFFER_SIZE = 100;
+    const size_t BUFFER_BLOCK_SIZE = 100;
     // How many slots to have in the internal queue between read and send.
     const int REPLAY_FASTQUEUE_N_SLOTS = 2;
     // How many frames do we buffer in send.
@@ -63,8 +63,8 @@ namespace core_buffer {
     const int WRITER_RCVHWM = 100;
     // ZMQ threads for receiving data from sf_replay.
     const int WRITER_ZMQ_IO_THREADS = 2;
-    // Size of buffer between the receiving and writing part.
-    const int WRITER_FASTQUEUE_N_SLOTS = 5;
+    // MS to retry reading from the image assembler.
+    const size_t WRITER_IMAGE_ASSEMBLER_RETRY_MS = 5;
     // How large are metadata chunks in the HDF5.
     const size_t WRITER_METADATA_CHUNK_N_IMAGES = 100;
     // How large should the data cache be in N images.

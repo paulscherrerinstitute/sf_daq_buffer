@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "test_WriterZmqReceiver.cpp"
 #include "test_WriterH5Writer.cpp"
+#include "test_ImageAssembler.cpp"
 
 using namespace std;
 

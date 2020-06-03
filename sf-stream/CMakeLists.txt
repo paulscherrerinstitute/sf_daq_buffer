@@ -10,9 +10,11 @@ target_link_libraries(sf-stream-lib
 add_executable(sf-stream src/main.cpp)
 set_target_properties(sf-stream PROPERTIES OUTPUT_NAME sf_stream)
 target_link_libraries(sf-stream
+        external
         sf-stream-lib
         zmq
-        pthread)
+        pthread
+        jsoncpp)
 
 enable_testing()
 add_subdirectory(test/)

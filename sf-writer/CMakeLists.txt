@@ -13,6 +13,7 @@ target_link_libraries(sf-writer
         sf-writer-lib
         zmq
         hdf5
+        hdf5_hl
         hdf5_cpp
         pthread
         )

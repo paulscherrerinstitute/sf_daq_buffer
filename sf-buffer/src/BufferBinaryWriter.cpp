@@ -1,21 +1,23 @@
 #include "BufferBinaryWriter.hpp"
+
 #include <unistd.h>
 #include <iostream>
 #include "date.h"
 #include <cerrno>
 #include <chrono>
 #include <cstring>
-#include <BufferUtils.hpp>
 #include <fcntl.h>
-#include <WriterUtils.hpp>
+
+#include "BufferUtils.hpp"
+#include "WriterUtils.hpp"
 
 using namespace std;
 
 BufferBinaryWriter::BufferBinaryWriter(
-        const string& device_name,
-        const string& root_folder) :
-        device_name_(device_name),
+        const string& root_folder,
+        const string& device_name):
         root_folder_(root_folder),
+        device_name_(device_name),
         latest_filename_(root_folder + "/" + device_name + "/LATEST"),
         current_output_filename_(""),
         output_file_fd_(-1)
@@ -27,7 +29,9 @@ BufferBinaryWriter::~BufferBinaryWriter()
     close_current_file();
 }
 
-void BufferBinaryWriter::write(uint64_t pulse_id, const BufferBinaryFormat* buffer)
+void BufferBinaryWriter::write(
+        uint64_t pulse_id,
+        const BufferBinaryFormat* buffer)
 {
     auto current_frame_file =
             BufferUtils::get_filename(root_folder_, device_name_, pulse_id);
@@ -37,7 +41,8 @@ void BufferBinaryWriter::write(uint64_t pulse_id, const BufferBinaryFormat* buff
     }
 
     size_t n_bytes_offset =
-            BufferUtils::get_file_frame_index(pulse_id) * sizeof(BufferBinaryFormat);
+            BufferUtils::get_file_frame_index(pulse_id) *
+            sizeof(BufferBinaryFormat);
 
     auto lseek_result = lseek(output_file_fd_, n_bytes_offset, SEEK_SET);
     if (lseek_result < 0) {
@@ -118,7 +123,7 @@ void BufferBinaryWriter::close_current_file()
 
         BufferUtils::update_latest_file(
                 latest_filename_, current_output_filename_);
-    }
 
-    current_output_filename_ = "";
+        current_output_filename_ = "";
+    }
 }

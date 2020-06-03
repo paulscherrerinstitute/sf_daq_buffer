@@ -2,12 +2,13 @@
 #define BINARYWRITER_HPP
 
 #include <string>
-#include "BufferBinaryFormat.hpp"
+
+#include "formats.hpp"
 
 class BufferBinaryWriter {
 
-    const std::string device_name_;
     const std::string root_folder_;
+    const std::string device_name_;
     std::string latest_filename_;
 
     std::string current_output_filename_;
@@ -19,8 +20,8 @@ class BufferBinaryWriter {
 
 public:
     BufferBinaryWriter(
-            const std::string& device_name,
-            const std::string& root_folder);
+            const std::string& root_folder,
+            const std::string& device_name);
 
     virtual ~BufferBinaryWriter();
 

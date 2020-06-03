@@ -10,35 +10,45 @@
 #include <cstring>
 #include <zmq.h>
 #include <LiveRecvModule.hpp>
-#include "date.h"
-#include <jsoncpp/json/json.h>
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+#include <rapidjson/istreamwrapper.h>
+#include <fstream>
 
 using namespace std;
 using namespace core_buffer;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 5) {
+    if (argc != 2) {
         cout << endl;
         cout << "Usage: sf_stream ";
-        cout << " [streamvis_address] [reduction_factor_streamvis]";
-        cout << " [live_analysis_address] [reduction_factor_live_analysis]";
+        cout << " [config_json_file]";
         cout << endl;
-        cout << "\tstreamvis_address: address to streamvis, example tcp://129.129.241.42:9007" << endl;
-        cout << "\treduction_factor_streamvis: 1 out of N (example 10) images to send to streamvis. For remaining send metadata." << endl;
-        cout << "\tlive_analysis_address: address to live_analysis, example tcp://129.129.241.42:9107" << endl;
-        cout << "\treduction_factor_live_analysis: 1 out of N (example 10) images to send to live analysis. For remaining send metadata. N<=1 - send every image" << endl;
+        cout << "\tconfig_json_file: json file with the configuration parameters(detector name, number of modules, pedestal and gain files" << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    string streamvis_address = string(argv[1]);
-    int reduction_factor_streamvis = (int) atoll(argv[2]);
-    string live_analysis_address = string(argv[3]);
-    int reduction_factor_live_analysis = (uint64_t) atoll(argv[4]);
+    string config_json_file = string(argv[1]);
+  
+    ifstream ifs(config_json_file);
+    rapidjson::IStreamWrapper isw(ifs);
+    rapidjson::Document config_parameters;
+    config_parameters.ParseStream(isw);
 
-    size_t n_modules = 32;
+    string streamvis_address = config_parameters["streamvis_stream"].GetString();
+    int reduction_factor_streamvis = config_parameters["streamvis_rate"].GetInt();
+    string live_analysis_address = config_parameters["live_stream"].GetString();
+    int reduction_factor_live_analysis = config_parameters["live_rate"].GetInt();
+
+    const string PEDE_FILENAME = config_parameters["pedestal_file"].GetString();
+    const string GAIN_FILENAME = config_parameters["gain_file"].GetString();
+    const string DETECTOR_NAME = config_parameters["detector_name"].GetString();
+    size_t n_modules = config_parameters["n_modules"].GetInt();
+
     FastQueue<ModuleFrameBuffer> queue(
             n_modules * MODULE_N_BYTES,
             STREAM_FASTQUEUE_SLOTS);
@@ -46,7 +56,9 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    LiveRecvModule recv_module(queue, n_modules, ctx, BUFFER_LIVE_IPC_URL);
+    const string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL+DETECTOR_NAME+"-";
+
+    LiveRecvModule recv_module(queue, n_modules, ctx, LIVE_IPC_URL);
 
     // 0mq sockets to streamvis and live analysis
     void *socket_streamvis = zmq_socket(ctx, ZMQ_PUB);
@@ -59,8 +71,8 @@ int main (int argc, char *argv[])
     }
 
     uint16_t data_empty [] = { 0, 0, 0, 0};
-    Json::Value header;
-    Json::StreamWriterBuilder builder;
+
+
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
@@ -69,6 +81,10 @@ int main (int argc, char *argv[])
     size_t read_max_us = 0;
 
     while (true) {
+
+        rapidjson::Document header(rapidjson::kObjectType);
+        auto& header_alloc = header.GetAllocator();
+        string text_header;
 
         auto start_time = chrono::steady_clock::now();
 
@@ -112,39 +128,63 @@ int main (int argc, char *argv[])
             }
         }
 
-        //Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
+        // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
 
-        header["frame"]         = (Json::Value::UInt64)frame_index;
-        header["is_good_frame"] = is_good_frame;
-        header["daq_rec"]       = (Json::Value::UInt64)daq_rec;
-        header["pulse_id"]      = (Json::Value::UInt64)pulse_id;
+        header.AddMember("frame", frame_index, header_alloc);
+        header.AddMember("is_good_frame", is_good_frame, header_alloc);
+        header.AddMember("daq_rec", daq_rec, header_alloc);
+        header.AddMember("pulse_id", pulse_id, header_alloc);
 
-        //this needs to be re-read from external source
-        header["pedestal_file"] = "/sf/bernina/data/p17534/res/JF_pedestals/pedestal_20200423_1018.JF07T32V01.res.h5";
-        header["gain_file"] = "/sf/bernina/config/jungfrau/gainMaps/JF07T32V01/gains.h5";
+        rapidjson::Value pedestal_file;
+        pedestal_file.SetString(PEDE_FILENAME.c_str(), header_alloc);
+        header.AddMember("pedestal_file", pedestal_file, header_alloc);
 
-        header["number_frames_expected"] = 10000;
-        header["run_name"] = to_string(uint64_t(pulse_id/10000)*10000);
+        rapidjson::Value gain_file;
+        gain_file.SetString(GAIN_FILENAME.c_str(), header_alloc);
+        header.AddMember("gain_file", gain_file, header_alloc);
 
-        // detector name should come as parameter to sf_stream
-        header["detector_name"] = "JF07T32V01";
+        header.AddMember("number_frames_expected", 10000, header_alloc);
 
-        header["htype"] = "array-1.0";
-        header["type"]  = "uint16";
+        rapidjson::Value run_name;
+        run_name.SetString(
+                to_string(uint64_t(pulse_id/10000)*10000).c_str(),
+                header_alloc);
+        header.AddMember("run_name", run_name, header_alloc);
+
+        rapidjson::Value detector_name;
+        detector_name.SetString(DETECTOR_NAME.c_str(), header_alloc);
+        header.AddMember("detector_name", detector_name, header_alloc);
+
+        header.AddMember("htype", "array-1.0", header_alloc);
+        header.AddMember("type", "uint16", header_alloc);
+
+        // To be retrieved and filled with correct values down.
+        auto shape_value = rapidjson::Value(rapidjson::kArrayType);
+        shape_value.PushBack((uint64_t)0, header_alloc);
+        shape_value.PushBack((uint64_t)0, header_alloc);
+        header.AddMember("shape", shape_value, header_alloc);
 
         int send_streamvis = 0;
         if ( reduction_factor_streamvis > 1 ) {
             send_streamvis = rand() % reduction_factor_streamvis;
         }
         if ( send_streamvis == 0 ) {
-            header["shape"][0] = 16384;
-            header["shape"][1] = 1024;
+            auto& shape = header["shape"];
+            shape[0] = n_modules*512;
+            shape[1] = 1024;
         } else{
-            header["shape"][0] = 2;
-            header["shape"][1] = 2;
+            auto& shape = header["shape"];
+            shape[0] = 2;
+            shape[1] = 2;
         }
 
-        string text_header = Json::writeString(builder, header);
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            header.Accept(writer);
+
+            text_header = buffer.GetString();
+        }
 
         zmq_send(socket_streamvis,
              text_header.c_str(),
@@ -169,14 +209,22 @@ int main (int argc, char *argv[])
             send_live_analysis = rand() % reduction_factor_live_analysis;
         }
         if ( send_live_analysis == 0 ) {
-            header["shape"][0] = 16384;
-            header["shape"][1] = 1024;
+            auto& shape = header["shape"];
+            shape[0] = n_modules*512;
+            shape[1] = 1024;
         } else{
-            header["shape"][0] = 2;
-            header["shape"][1] = 2;
+            auto& shape = header["shape"];
+            shape[0] = 2;
+            shape[1] = 2;
         }
 
-        text_header = Json::writeString(builder, header);
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            header.Accept(writer);
+
+            text_header = buffer.GetString();
+        }
 
         zmq_send(socket_live,
              text_header.c_str(),

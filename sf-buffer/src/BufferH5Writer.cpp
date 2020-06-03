@@ -84,7 +84,8 @@ void BufferH5Writer::set_pulse_id(const uint64_t pulse_id)
         if (h5_file_.getId() != -1) {
             auto latest_filename = output_filename_;
             close_file();
-            BufferUtils::update_latest_file(LATEST_filename_, latest_filename);
+            BufferUtils::update_latest_file(
+                    LATEST_filename_, latest_filename);
         }
 
         WriterUtils::create_destination_folder(new_output_filename);

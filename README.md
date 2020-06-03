@@ -125,3 +125,5 @@ terminology definitions should be followed:
 
 - frame (data from a single module)
 - image (data of the assembled image)
+- start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
+inclusive range (both start and stop pulse_id are included) of pulses.

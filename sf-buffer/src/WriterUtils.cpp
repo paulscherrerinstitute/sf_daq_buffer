@@ -1,5 +1,6 @@
 #include <iostream>
 #include <unistd.h>
+#include <filesystem>
 
 #include "WriterUtils.hpp"
 #include "date.h"
@@ -41,8 +42,10 @@ void WriterUtils::create_destination_folder(const string& output_file)
     auto file_separator_index = output_file.rfind('/');
 
     if (file_separator_index != string::npos) {
+
         string output_folder(output_file.substr(0, file_separator_index));
 
+        // TODO: filesystem::create_directories(output_folder)
         string create_folder_command("mkdir -p " + output_folder);
         system(create_folder_command.c_str());
     }
