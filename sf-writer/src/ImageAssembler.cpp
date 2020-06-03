@@ -140,15 +140,15 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
             }
 
             if (image_is_good_frame[i_pulse] == 1) {
-                if (image_pulse_id[i_pulse] != frame_meta.pulse_id) {
+                if (frame_meta.pulse_id != image_pulse_id[i_pulse]) {
                     image_is_good_frame[i_pulse] = 0;
                 }
 
-                if (image_frame_index[i_pulse] != frame_meta.frame_index) {
+                if (frame_meta.frame_index != image_frame_index[i_pulse]) {
                     image_is_good_frame[i_pulse] = 0;
                 }
 
-                if (image_daq_rec[i_pulse] != frame_meta.daq_rec) {
+                if (frame_meta.daq_rec != image_daq_rec[i_pulse]) {
                     image_is_good_frame[i_pulse] = 0;
                 }
 
