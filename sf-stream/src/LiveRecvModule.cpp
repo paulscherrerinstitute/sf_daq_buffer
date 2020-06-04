@@ -4,10 +4,12 @@
 #include <cstring>
 #include "zmq.h"
 #include "buffer_config.hpp"
+#include "stream_config.hpp"
 
 using namespace std;
 using namespace chrono;
 using namespace core_buffer;
+using namespace stream_config;
 
 LiveRecvModule::LiveRecvModule(
         FastQueue<ModuleFrameBuffer>& queue_,

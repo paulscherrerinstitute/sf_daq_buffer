@@ -1,23 +1,24 @@
 #include <iostream>
 #include <stdexcept>
-#include "buffer_config.hpp"
-
 #include <string>
-#include <jungfrau.hpp>
 #include <thread>
 #include <chrono>
-#include <FastQueue.hpp>
 #include <cstring>
 #include <zmq.h>
-#include <LiveRecvModule.hpp>
+#include "rapidjson/istreamwrapper.h"
+#include <fstream>
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
-#include <rapidjson/istreamwrapper.h>
-#include <fstream>
+
+#include "FastQueue.hpp"
+#include "LiveRecvModule.hpp"
+#include "buffer_config.hpp"
+#include "stream_config.hpp"
 
 using namespace std;
 using namespace core_buffer;
+using namespace stream_config;
 
 int main (int argc, char *argv[])
 {
@@ -50,8 +51,7 @@ int main (int argc, char *argv[])
     size_t n_modules = config_parameters["n_modules"].GetInt();
 
     FastQueue<ModuleFrameBuffer> queue(
-            n_modules * MODULE_N_BYTES,
-            STREAM_FASTQUEUE_SLOTS);
+            n_modules * MODULE_N_BYTES, STREAM_FASTQUEUE_SLOTS);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
@@ -263,6 +263,4 @@ int main (int argc, char *argv[])
             read_max_us = 0;
         }
     }
-
-    return 0;
 }
