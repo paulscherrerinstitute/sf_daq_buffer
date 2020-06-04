@@ -3,7 +3,7 @@
 
 #include <netinet/in.h>
 #include "UdpReceiver.hpp"
-#include "jungfrau.hpp"
+#include "formats.hpp"
 #include "buffer_config.hpp"
 
 class BufferUdpReceiver {

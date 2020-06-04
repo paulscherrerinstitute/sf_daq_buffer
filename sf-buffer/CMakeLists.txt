@@ -11,10 +11,7 @@ add_executable(sf-buffer src/main.cpp)
 set_target_properties(sf-buffer PROPERTIES OUTPUT_NAME sf_buffer)
 target_link_libraries(sf-buffer
         core-buffer-lib
-        sf-buffer-lib
-        zmq
-        hdf5
-        hdf5_cpp)
+        sf-buffer-lib)
 
 enable_testing()
 add_subdirectory(test/)
