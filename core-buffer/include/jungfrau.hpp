@@ -2,16 +2,12 @@
 #define JUNGFRAU_H
 
 #include <cstdint>
-#include "buffer_config.hpp"
 
 #define JUNGFRAU_N_MODULES 32
 #define JUNGFRAU_BYTES_PER_PACKET 8246
 #define JUNGFRAU_DATA_BYTES_PER_PACKET 8192
 #define JF_N_PACKETS_PER_FRAME 128
 #define JUNGFRAU_DATA_BYTES_PER_FRAME 1048576
-#define JF_BYTES_PER_FRAME (8246 * 128)
-
-
 
 // 6 bytes + 48 bytes + 8192 bytes = 8246 bytes
 #pragma pack(push)
@@ -37,23 +33,6 @@ struct jungfrau_packet {
     char data[JUNGFRAU_DATA_BYTES_PER_PACKET];
 };
 #pragma pack(pop)
-
-#define ModuleFrame_N_FIELDS 5
-
-#pragma pack(push)
-#pragma pack(1)
-struct ModuleFrame {
-    uint64_t pulse_id;
-    uint64_t frame_index;
-    uint64_t daq_rec;
-    uint64_t n_received_packets;
-    uint64_t module_id;
-};
-#pragma pack(pop)
-
-struct ModuleFrameBuffer {
-    ModuleFrame module[JUNGFRAU_N_MODULES];
-};
 
 
 #endif
