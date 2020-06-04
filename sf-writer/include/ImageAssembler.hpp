@@ -39,7 +39,7 @@ public:
     bool is_slot_free(const uint64_t bunch_id);
     bool is_slot_full(const uint64_t bunch_id);
 
-    void process(uint64_t bunch_id,
+    void process(const uint64_t bunch_id,
                  const int i_module,
                  const BufferBinaryBlock* block_buffer);
 
