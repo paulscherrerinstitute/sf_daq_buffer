@@ -20,7 +20,7 @@ TEST(JFH5Writer, basic_interaction)
     metadata->block_start_pulse_id = 0;
     metadata->block_stop_pulse_id = BUFFER_BLOCK_SIZE - 1;
 
-    JFH5Writer writer("ignore.h5", start_pulse_id, stop_pulse_id, n_modules);
+    JFH5Writer writer("ignore.h5", start_pulse_id, stop_pulse_id, n_modules, 1);
     writer.write(metadata.get(), data.get());
 }
 
@@ -63,7 +63,7 @@ TEST(JFH5Writer, test_writing)
     // The writer closes the file on destruction.
     {
         JFH5Writer writer(
-                "ignore.h5", start_pulse_id, stop_pulse_id, n_modules);
+                "ignore.h5", start_pulse_id, stop_pulse_id, n_modules, 1);
         writer.write(metadata.get(), (char*)(&image_buffer[0]));
     }
 
