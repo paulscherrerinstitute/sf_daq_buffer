@@ -117,7 +117,6 @@ int main (int argc, char *argv[]) {
 
         if (stats_counter == STATS_MODULO) {
             cout << "sf_buffer:device_name " << device_name;
-            cout << " sf_buffer:pulse_id " << pulse_id;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
 
