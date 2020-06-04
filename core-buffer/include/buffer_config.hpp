@@ -24,6 +24,8 @@ namespace core_buffer {
     const size_t STATS_MODULO = 100;
     // If the RB is empty, how much time to wait before trying to read it again.
     const size_t RB_READ_RETRY_INTERVAL_MS = 5;
+    // How many frames to read at once from file.
+    const size_t BUFFER_BLOCK_SIZE = 100;
 
 
     const size_t BUFFER_UDP_N_RECV_MSG = 64;
@@ -45,14 +47,6 @@ namespace core_buffer {
     const size_t STREAM_RCVHWM = 100;
     // Size of buffer between the receiving and sending part.
     const int STREAM_FASTQUEUE_SLOTS = 5;
-
-
-    // How many frames to read at once from file.
-    const size_t BUFFER_BLOCK_SIZE = 100;
-    // MS to retry reading from the image assembler.
-    const size_t WRITER_IMAGE_ASSEMBLER_RETRY_MS = 5;
-    // Number of slots in the reconstruction buffer.
-    const size_t WRITER_IA_N_SLOTS = 2;
 }
 
 #endif //BUFFERCONFIG_HPP

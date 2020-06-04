@@ -1,7 +1,11 @@
 #include <cstring>
+
 #include "ImageAssembler.hpp"
+#include "writer_config.hpp"
+#include "buffer_config.hpp"
 
 using namespace std;
+using namespace writer_config;
 using namespace core_buffer;
 
 ImageAssembler::ImageAssembler(const size_t n_modules) :

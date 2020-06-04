@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <H5Cpp.h>
-#include "buffer_config.hpp"
+
 #include "formats.hpp"
 
 class JFH5Writer {

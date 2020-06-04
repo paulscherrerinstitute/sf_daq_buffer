@@ -1,8 +1,11 @@
 #include "JFH5Writer.hpp"
+
 #include <sstream>
 #include <cstring>
 #include <hdf5_hl.h>
 
+#include "writer_config.hpp"
+#include "buffer_config.hpp"
 
 //extern "C"
 //{
@@ -11,6 +14,7 @@
 //}
 
 using namespace std;
+using namespace writer_config;
 using namespace core_buffer;
 
 JFH5Writer::JFH5Writer(const std::string& output_file,

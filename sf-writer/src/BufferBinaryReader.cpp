@@ -7,8 +7,11 @@
 #include <fcntl.h>
 
 #include "BufferUtils.hpp"
+#include "writer_config.hpp"
+#include "buffer_config.hpp"
 
 using namespace std;
+using namespace writer_config;
 using namespace core_buffer;
 
 BufferBinaryReader::BufferBinaryReader(
@@ -18,9 +21,7 @@ BufferBinaryReader::BufferBinaryReader(
             channel_name_(channel_name),
             current_input_file_(""),
             input_file_fd_(-1)
-{
-
-}
+{}
 
 BufferBinaryReader::~BufferBinaryReader()
 {

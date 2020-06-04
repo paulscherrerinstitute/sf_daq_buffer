@@ -2,10 +2,10 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include <cstring>
 
 #include "date.h"
 #include "zmq.h"
+#include "writer_config.hpp"
 #include "buffer_config.hpp"
 #include "bitshuffle/bitshuffle.h"
 #include "JFH5Writer.hpp"
@@ -13,6 +13,7 @@
 #include "BufferBinaryReader.hpp"
 
 using namespace std;
+using namespace writer_config;
 using namespace core_buffer;
 using namespace chrono;
 
