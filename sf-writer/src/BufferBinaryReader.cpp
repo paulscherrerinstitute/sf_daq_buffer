@@ -2,7 +2,6 @@
 
 #include <unistd.h>
 #include <sstream>
-#include <date.h>
 #include <cstring>
 #include <fcntl.h>
 
@@ -15,10 +14,10 @@ using namespace writer_config;
 using namespace core_buffer;
 
 BufferBinaryReader::BufferBinaryReader(
-        const std::string &device,
-        const std::string &channel_name) :
-            device_(device),
-            channel_name_(channel_name),
+        const std::string &root_folder,
+        const std::string &device_name) :
+            root_folder_(root_folder),
+            device_name_(device_name),
             current_input_file_(""),
             input_file_fd_(-1)
 {}
@@ -33,7 +32,7 @@ void BufferBinaryReader::get_block(
 {
     uint64_t block_start_pulse_id = block_id * BUFFER_BLOCK_SIZE;
     auto current_block_file = BufferUtils::get_filename(
-            device_, channel_name_, block_start_pulse_id);
+            root_folder_, device_name_, block_start_pulse_id);
 
     if (current_block_file != current_input_file_)  {
         open_file(current_block_file);
@@ -47,15 +46,10 @@ void BufferBinaryReader::get_block(
     if (lseek_result < 0) {
         stringstream err_msg;
 
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
         err_msg << "[BufferBinaryReader::get_block]";
         err_msg << " Error while lseek on file ";
-        err_msg << current_input_file_;
-        err_msg << " for n_bytes_offset ";
-        err_msg << n_bytes_offset << ": ";
-        err_msg << strerror(errno) << endl;
+        err_msg << current_input_file_ << " for n_bytes_offset ";
+        err_msg << n_bytes_offset << ": " << strerror(errno) << endl;
 
         throw runtime_error(err_msg.str());
     }
@@ -66,13 +60,9 @@ void BufferBinaryReader::get_block(
     if (n_bytes < sizeof(BufferBinaryFormat)) {
         stringstream err_msg;
 
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
         err_msg << "[BufferBinaryReader::get_block]";
         err_msg << " Error while reading from file ";
-        err_msg << current_input_file_ << ": ";
-        err_msg << strerror(errno) << endl;
+        err_msg << current_input_file_ << ": " << strerror(errno) << endl;
 
         throw runtime_error(err_msg.str());
     }
@@ -87,12 +77,8 @@ void BufferBinaryReader::open_file(const std::string& filename)
     if (input_file_fd_ < 0) {
         stringstream err_msg;
 
-        using namespace date;
-        using namespace chrono;
-        err_msg << "[" << system_clock::now() << "]";
         err_msg << "[BufferBinaryReader::open_file]";
-        err_msg << " Cannot open file ";
-        err_msg << filename << ": ";
+        err_msg << " Cannot open file " << filename << ": ";
         err_msg << strerror(errno) << endl;
 
         throw runtime_error(err_msg.str());
@@ -107,13 +93,9 @@ void BufferBinaryReader::close_current_file()
         if (close(input_file_fd_) < 0) {
             stringstream err_msg;
 
-            using namespace date;
-            using namespace chrono;
-            err_msg << "[" << system_clock::now() << "]";
             err_msg << "[BinaryWriter::close_current_file]";
-            err_msg << " Error while closing file ";
-            err_msg << current_input_file_ << ": ";
-            err_msg << strerror(errno) << endl;
+            err_msg << " Error while closing file " << current_input_file_;
+            err_msg << ": " << strerror(errno) << endl;
 
             throw runtime_error(err_msg.str());
         }
