@@ -84,6 +84,14 @@ size_t JFH5Writer::get_n_pulses_in_range(
         const uint64_t stop_pulse_id,
         const int pulse_id_step)
 {
+    if (stop_pulse_id < start_pulse_id) {
+        throw runtime_error("stop_pulse_id smaller than start_pulse_id.");
+    }
+
+    if (100 % pulse_id_step != 0) {
+        throw runtime_error("100 is not divisible by the pulse_id step.");
+    }
+
     size_t n_pulses = 0;
     if (start_pulse_id % pulse_id_step == 0) {
         n_pulses++;
