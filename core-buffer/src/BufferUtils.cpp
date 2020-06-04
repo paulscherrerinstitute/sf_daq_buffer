@@ -1,6 +1,6 @@
 #include "BufferUtils.hpp"
+
 #include <sstream>
-#include <fstream>
 #include <buffer_config.hpp>
 
 using namespace std;
@@ -48,36 +48,16 @@ void BufferUtils::update_latest_file(
     system(str_latest_command.c_str());
 }
 
-string BufferUtils::get_latest_file(const string& latest_filename)
+void BufferUtils::create_destination_folder(const string& output_file)
 {
-    std::ifstream latest_input_file;
-    latest_input_file.open(latest_filename);
+    auto file_separator_index = output_file.rfind('/');
 
-    std::stringstream strStream;
-    strStream << latest_input_file.rdbuf();
-    std::string filename = strStream.str();
+    if (file_separator_index != string::npos) {
 
-    return filename.substr(0, filename.size()-1);
-}
+        string output_folder(output_file.substr(0, file_separator_index));
 
-vector<BufferUtils::path_sufix> BufferUtils::get_path_suffixes (
-        const uint64_t start_pulse_id,
-        const uint64_t stop_pulse_id)
-{
-    vector<BufferUtils::path_sufix> result;
-
-    uint64_t start_file_base = start_pulse_id / core_buffer::FILE_MOD;
-    start_file_base *= core_buffer::FILE_MOD;
-
-    for (uint64_t first_pulse_id=start_file_base;
-            first_pulse_id <= stop_pulse_id;
-            first_pulse_id += core_buffer::FILE_MOD) {
-
-        result.emplace_back<BufferUtils::path_sufix>(
-                {first_pulse_id,
-                 first_pulse_id + core_buffer::FILE_MOD - 1,
-                 get_filename("", "", first_pulse_id)});
+        // TODO: filesystem::create_directories(output_folder)
+        string create_folder_command("mkdir -p " + output_folder);
+        system(create_folder_command.c_str());
     }
-
-    return result;
 }
