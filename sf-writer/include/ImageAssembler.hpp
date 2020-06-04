@@ -4,6 +4,7 @@
 #include <atomic>
 
 #include "buffer_config.hpp"
+#include "formats.hpp"
 
 const uint64_t IA_EMPTY_SLOT_VALUE = 0;
 
