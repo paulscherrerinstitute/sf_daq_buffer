@@ -17,14 +17,18 @@ using namespace std;
 using namespace writer_config;
 using namespace buffer_config;
 
-JFH5Writer::JFH5Writer(const std::string& output_file,
+JFH5Writer::JFH5Writer(const string& output_file,
+                       const size_t n_modules,
                        const uint64_t start_pulse_id,
                        const uint64_t stop_pulse_id,
-                       const size_t n_modules) :
+                       const int pulse_id_step) :
+        n_modules_(n_modules),
         start_pulse_id_(start_pulse_id),
         stop_pulse_id_(stop_pulse_id),
-        n_modules_(n_modules),
-        n_images_(stop_pulse_id - start_pulse_id + 1),
+        pulse_id_step_(pulse_id_step),
+        n_images_(get_n_pulses_in_range(start_pulse_id,
+                                        stop_pulse_id,
+                                        pulse_id_step)),
         current_write_index_(0)
 {
 
@@ -73,6 +77,22 @@ JFH5Writer::~JFH5Writer()
     delete[] b_frame_index_;
     delete[] b_daq_rec_;
     delete[] b_is_good_frame_;
+}
+
+size_t JFH5Writer::get_n_pulses_in_range(
+        const uint64_t start_pulse_id,
+        const uint64_t stop_pulse_id,
+        const int pulse_id_step)
+{
+    size_t n_pulses = 0;
+    if (start_pulse_id % pulse_id_step == 0) {
+        n_pulses++;
+    }
+
+    n_pulses += stop_pulse_id / pulse_id_step;
+    n_pulses -= start_pulse_id / pulse_id_step;
+
+    return n_pulses;
 }
 
 void JFH5Writer::close_file()

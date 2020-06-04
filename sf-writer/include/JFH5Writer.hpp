@@ -24,6 +24,9 @@ class JFH5Writer {
     uint32_t* b_daq_rec_;
     uint8_t* b_is_good_frame_ ;
 
+    size_t get_n_pulses_in_range(const uint64_t start_pulse_id,
+                                 const uint64_t stop_pulse_id,
+                                 const int pulse_id_step);
     void close_file();
 
 public:
