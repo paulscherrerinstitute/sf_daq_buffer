@@ -13,9 +13,9 @@
 #include "BufferBinaryReader.hpp"
 
 using namespace std;
+using namespace chrono;
 using namespace writer_config;
 using namespace buffer_config;
-using namespace chrono;
 
 void read_buffer(
         const string device,
@@ -30,8 +30,7 @@ void read_buffer(
     for (uint64_t block_id:buffer_blocks) {
 
         while(!image_assembler.is_slot_free(block_id)) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    WRITER_IMAGE_ASSEMBLER_RETRY_MS));
+            this_thread::sleep_for(chrono::milliseconds(ASSEMBLER_RETRY_MS));
         }
 
         auto start_time = steady_clock::now();
@@ -80,7 +79,7 @@ int main (int argc, char *argv[])
     string output_file = string(argv[1]);
     const string device = string(argv[2]);
     size_t n_modules = atoi(argv[3]);
-    //size_t n_modules = 32;
+
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
 
@@ -91,10 +90,8 @@ int main (int argc, char *argv[])
 
     // Generate list of buffer blocks that need to be loaded.
     std::vector<uint64_t> buffer_blocks;
-    for (uint64_t curr_block=start_block;
-         curr_block<=stop_block;
-         curr_block++) {
-        buffer_blocks.push_back(curr_block);
+    for (uint64_t i_block=start_block; i_block <= stop_block; i_block++) {
+        buffer_blocks.push_back(i_block);
     }
 
     std::vector<std::thread> reading_threads(n_modules);
@@ -121,8 +118,7 @@ int main (int argc, char *argv[])
     for (uint64_t block_id:buffer_blocks) {
 
         while(!image_assembler.is_slot_full(block_id)) {
-            this_thread::sleep_for(chrono::milliseconds(
-                    WRITER_IMAGE_ASSEMBLER_RETRY_MS));
+            this_thread::sleep_for(chrono::milliseconds(ASSEMBLER_RETRY_MS));
         }
 
         auto metadata = image_assembler.get_metadata_buffer(block_id);
@@ -133,7 +129,7 @@ int main (int argc, char *argv[])
         writer.write(metadata, data);
 
         auto end_time = steady_clock::now();
-        auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
+        auto write_us_duration = duration_cast<microseconds>(
                 end_time-start_time).count();
 
         image_assembler.free_slot(block_id);
@@ -142,7 +138,7 @@ int main (int argc, char *argv[])
         cout << write_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 
-    for (auto& reading_thread :reading_threads) {
+    for (auto& reading_thread : reading_threads) {
         if (reading_thread.joinable()) {
             reading_thread.join();
         }
