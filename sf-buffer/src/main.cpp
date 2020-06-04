@@ -1,26 +1,25 @@
 #include <iostream>
 #include <stdexcept>
-#include <BufferBinaryWriter.hpp>
-#include "zmq.h"
+#include <zmq.h>
+#include <chrono>
+#include <sstream>
+#include <zconf.h>
+
+#include "formats.hpp"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "BufferUdpReceiver.hpp"
-#include <chrono>
-#include <sstream>
-
-#include <sys/resource.h>
-#include <syscall.h>
-#include <zconf.h>
-#include "formats.hpp"
+#include "BufferBinaryWriter.hpp"
 
 using namespace std;
 using namespace core_buffer;
 
 int main (int argc, char *argv[]) {
+
     if (argc != 6) {
         cout << endl;
-        cout << "Usage: sf_buffer [detector_name] [device_name] [udp_port] [root_folder]";
-        cout << "[source_id]";
+        cout << "Usage: sf_buffer [detector_name] [device_name]";
+        cout << " [udp_port] [root_folder] [source_id]";
         cout << endl;
         cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
         cout << "\tdevice_name: Name to write to disk.";
@@ -47,29 +46,25 @@ int main (int argc, char *argv[]) {
     auto socket = zmq_socket(ctx, ZMQ_PUB);
 
     const int sndhwm = BUFFER_ZMQ_SNDHWM;
-    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0)
+    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
         throw runtime_error(zmq_strerror(errno));
+    }
 
-    const int linger_ms = 0;
-    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger_ms, sizeof(linger_ms)) != 0)
+    const int linger = 0;
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
         throw runtime_error(zmq_strerror(errno));
+    }
 
-    if (zmq_bind(socket, ipc_address.c_str()) != 0)
+    if (zmq_bind(socket, ipc_address.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
+    }
 
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
-    uint64_t n_missed_frames = 0;
     uint64_t n_corrupted_frames = 0;
-    uint64_t last_pulse_id = 0;
 
     BufferBinaryWriter writer(root_folder, device_name);
     BufferUdpReceiver receiver(udp_port, source_id);
-
-    pid_t tid;
-    tid = syscall(SYS_gettid);
-    int ret = setpriority(PRIO_PROCESS, tid, 0);
-    if (ret == -1) throw runtime_error("cannot set nice");
 
     BufferBinaryFormat* binary_buffer = new BufferBinaryFormat();
 
@@ -120,15 +115,9 @@ int main (int argc, char *argv[]) {
             n_corrupted_frames++;
         }
 
-        if (last_pulse_id>0) {
-            n_missed_frames += (pulse_id - last_pulse_id) - 1;
-        }
-        last_pulse_id = pulse_id;
-
         if (stats_counter == STATS_MODULO) {
             cout << "sf_buffer:device_name " << device_name;
             cout << " sf_buffer:pulse_id " << pulse_id;
-            cout << " sf_buffer:n_missed_frames " << n_missed_frames;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
 
@@ -141,7 +130,6 @@ int main (int argc, char *argv[]) {
             stats_counter = 0;
             n_missed_packets = 0;
             n_corrupted_frames = 0;
-            n_missed_frames = 0;
 
             write_total_us = 0;
             write_max_us = 0;
