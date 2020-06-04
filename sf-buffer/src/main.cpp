@@ -12,6 +12,7 @@
 #include "BufferBinaryWriter.hpp"
 
 using namespace std;
+using namespace chrono;
 using namespace core_buffer;
 
 int main (int argc, char *argv[]) {
@@ -78,22 +79,22 @@ int main (int argc, char *argv[]) {
         auto pulse_id = receiver.get_frame_from_udp(
                 binary_buffer->metadata, binary_buffer->data);
 
-        auto start_time = chrono::steady_clock::now();
+        auto start_time = steady_clock::now();
 
         writer.write(pulse_id, binary_buffer);
 
-        auto write_end_time = chrono::steady_clock::now();
-        auto write_us_duration = chrono::duration_cast<chrono::microseconds>(
+        auto write_end_time = steady_clock::now();
+        auto write_us_duration = duration_cast<microseconds>(
                 write_end_time-start_time).count();
 
-        start_time = chrono::steady_clock::now();
+        start_time = steady_clock::now();
 
         zmq_send(socket, &(binary_buffer->metadata), sizeof(ModuleFrame),
                 ZMQ_SNDMORE);
         zmq_send(socket, binary_buffer->data, MODULE_N_BYTES, 0);
 
-        auto send_end_time = chrono::steady_clock::now();
-        auto send_us_duration = chrono::duration_cast<chrono::microseconds>(
+        auto send_end_time = steady_clock::now();
+        auto send_us_duration = duration_cast<microseconds>(
                 send_end_time-start_time).count();
 
         // TODO: Make real statistics, please.
