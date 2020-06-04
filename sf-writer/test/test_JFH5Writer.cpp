@@ -109,3 +109,25 @@ TEST(JFH5Writer, test_writing)
         ASSERT_EQ(is_good_frame_data[pulse_id - start_pulse_id], 1);
     }
 }
+
+TEST(JFH5Writer, test_step_pulse_id)
+{
+    // Start pulse id (5) larger than stop pulse id (4).
+    ASSERT_THROW(JFH5Writer writer("ignore.h5", 1,
+            5, 4, 1), runtime_error);
+
+    // Start pulse id (5) is equal to stop pulse id (5).
+    ASSERT_NO_THROW(JFH5Writer writer("ignore.h5", 1, 5, 5, 1));
+
+    // The step is exactly on start nad stop pulse id.
+    ASSERT_NO_THROW(JFH5Writer writer("ignore.h5", 1, 5, 5, 5));
+
+    // No pulses in given range with step = 10
+    ASSERT_THROW(JFH5Writer writer("ignore.h5", 1, 1, 9, 10), runtime_error);
+
+    // Stop pulse id is divisible by step.
+    ASSERT_NO_THROW(JFH5Writer writer("ignore.h5", 1, 5, 10, 10));
+
+    // Start pulse id is divisible by step.
+    ASSERT_NO_THROW(JFH5Writer writer("ignore.h5", 1, 10, 19, 10));
+}
