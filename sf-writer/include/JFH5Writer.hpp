@@ -9,9 +9,10 @@
 
 class JFH5Writer {
 
+    const size_t n_modules_;
     const uint64_t start_pulse_id_;
     const uint64_t stop_pulse_id_;
-    const size_t n_modules_;
+    const int pulse_id_step_;
     const size_t n_images_;
     size_t current_write_index_;
 
@@ -27,9 +28,10 @@ class JFH5Writer {
 
 public:
     JFH5Writer(const std::string& output_file,
+               const size_t n_modules,
                const uint64_t start_pulse_id,
                const uint64_t stop_pulse_id,
-               const size_t n_modules);
+               const int pulse_id_step);
     ~JFH5Writer();
     void write(const ImageMetadataBlock* metadata, const char* data);
 };

@@ -60,17 +60,17 @@ void read_buffer(
 
 int main (int argc, char *argv[])
 {
-    if (argc != 6) {
+    if (argc != 7) {
         cout << endl;
-        cout << "Usage: sf_writer [output_file] [device]";
-        cout << "  [n_modules]";
-        cout << "  [start_pulse_id] [stop_pulse_id]";
+        cout << "Usage: sf_writer [output_file] [device] [n_modules]";
+        cout << " [start_pulse_id] [stop_pulse_id] [pulse_id_step]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
         cout << "\tdevice: Name of detector." << endl;
         cout << "\tn_modules: number of modules" << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
         cout << "\tstop_pulse_id: Stop pulse_id of retrieval." << endl;
+        cout << "\tpulse_id_step: 1==100Hz, 2==50hz, 4==25Hz.." << endl;
         cout << endl;
 
         exit(-1);
@@ -79,9 +79,9 @@ int main (int argc, char *argv[])
     string output_file = string(argv[1]);
     const string device = string(argv[2]);
     size_t n_modules = atoi(argv[3]);
-
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
+    int pulse_id_step = atoi(argv[6]);
 
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
@@ -113,7 +113,8 @@ int main (int argc, char *argv[])
                 ref(image_assembler));
     }
 
-    JFH5Writer writer(output_file, start_pulse_id, stop_pulse_id, n_modules);
+    JFH5Writer writer(output_file, n_modules,
+            start_pulse_id, stop_pulse_id, pulse_id_step);
 
     for (uint64_t block_id:buffer_blocks) {
 
