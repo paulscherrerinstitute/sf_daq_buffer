@@ -4,25 +4,25 @@
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 
-struct ImageMetadataBlock
-{
-    uint64_t pulse_id[core_buffer::BUFFER_BLOCK_SIZE];
-    uint64_t frame_index[core_buffer::BUFFER_BLOCK_SIZE];
-    uint32_t daq_rec[core_buffer::BUFFER_BLOCK_SIZE];
-    uint8_t is_good_image[core_buffer::BUFFER_BLOCK_SIZE];
-    uint64_t block_start_pulse_id;
-    uint64_t block_stop_pulse_id;
+#pragma pack(push)
+#pragma pack(1)
+struct ModuleFrame {
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint64_t daq_rec;
+    uint64_t n_received_packets;
+    uint64_t module_id;
 };
+#pragma pack(pop)
 
-const char BUFFER_FORMAT_START_BYTE = 0xBE;
+struct ModuleFrameBuffer {
+    ModuleFrame module[JUNGFRAU_N_MODULES];
+};
 
 #pragma pack(push)
 #pragma pack(1)
 struct BufferBinaryFormat {
-
-    BufferBinaryFormat() : FORMAT_MARKER(BUFFER_FORMAT_START_BYTE) {};
-
-    const char FORMAT_MARKER;
+    const char FORMAT_MARKER = 0xBE;
     ModuleFrame metadata;
     char data[core_buffer::MODULE_N_BYTES];
 };
