@@ -1,10 +1,12 @@
 #ifndef SF_DAQ_BUFFER_LIVERECVMODULE_HPP
 #define SF_DAQ_BUFFER_LIVERECVMODULE_HPP
 
-#include "FastQueue.hpp"
-#include <thread>
-#include "jungfrau.hpp"
 #include <vector>
+#include <thread>
+
+#include "FastQueue.hpp"
+#include "jungfrau.hpp"
+#include "formats.hpp"
 
 class LiveRecvModule {
 
@@ -15,6 +17,14 @@ class LiveRecvModule {
     std::atomic_bool is_receiving_;
     std::thread receiving_thread_;
 
+    void* connect_socket(size_t module_id);
+    void receive_thread();
+    void recv_single_module(void* socket, ModuleFrame* metadata, char* data);
+    uint64_t align_modules(const std::vector<void*>& sockets,
+                           ModuleFrameBuffer *metadata,
+                           char *data);
+    void stop();
+
 public:
     LiveRecvModule(
             FastQueue<ModuleFrameBuffer>& queue,
@@ -22,17 +32,7 @@ public:
             void* ctx,
             const std::string& ipc_prefix);
 
-    virtual ~LiveRecvModule();
-    void* connect_socket(size_t module_id);
-    void recv_single_module(void* socket, ModuleFrame* metadata, char* data);
-    void receive_thread();
-    uint64_t align_modules(
-            const std::vector<void*>& sockets,
-            ModuleFrameBuffer *metadata,
-            char *data);
-
-    void stop();
-
+    ~LiveRecvModule();
 };
 
 
