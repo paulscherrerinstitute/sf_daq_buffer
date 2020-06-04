@@ -8,7 +8,7 @@
 
 using namespace std;
 using namespace chrono;
-using namespace core_buffer;
+using namespace buffer_config;
 using namespace stream_config;
 
 LiveRecvModule::LiveRecvModule(

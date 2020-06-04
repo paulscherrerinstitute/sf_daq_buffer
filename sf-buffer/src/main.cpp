@@ -13,7 +13,7 @@
 
 using namespace std;
 using namespace chrono;
-using namespace core_buffer;
+using namespace buffer_config;
 
 void* get_live_stream_socket(const string& detector_name, const int source_id)
 {

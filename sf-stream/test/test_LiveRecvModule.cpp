@@ -5,7 +5,7 @@
 #include <future>
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 TEST(LiveRecvModule, transfer_test) {
     // TODO: Make this test work again.

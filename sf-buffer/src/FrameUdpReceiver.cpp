@@ -3,7 +3,7 @@
 #include "FrameUdpReceiver.hpp"
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 FrameUdpReceiver::FrameUdpReceiver(
         const uint16_t port,

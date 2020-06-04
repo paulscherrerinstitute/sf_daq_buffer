@@ -15,7 +15,7 @@
 
 using namespace std;
 using namespace writer_config;
-using namespace core_buffer;
+using namespace buffer_config;
 
 JFH5Writer::JFH5Writer(const std::string& output_file,
                        const uint64_t start_pulse_id,

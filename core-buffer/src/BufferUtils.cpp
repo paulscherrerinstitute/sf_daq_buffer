@@ -10,25 +10,25 @@ string BufferUtils::get_filename(
         std::string device_name,
         uint64_t pulse_id)
 {
-    uint64_t folder_base = pulse_id / core_buffer::FOLDER_MOD;
-    folder_base *= core_buffer::FOLDER_MOD;
+    uint64_t folder_base = pulse_id / buffer_config::FOLDER_MOD;
+    folder_base *= buffer_config::FOLDER_MOD;
 
-    uint64_t file_base = pulse_id / core_buffer::FILE_MOD;
-    file_base *= core_buffer::FILE_MOD;
+    uint64_t file_base = pulse_id / buffer_config::FILE_MOD;
+    file_base *= buffer_config::FILE_MOD;
 
     stringstream folder;
     folder << root_folder << "/";
     folder << device_name << "/";
     folder << folder_base << "/";
-    folder << file_base << core_buffer::FILE_EXTENSION;
+    folder << file_base << buffer_config::FILE_EXTENSION;
 
     return folder.str();
 }
 
 size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
 {
-    uint64_t file_base = pulse_id / core_buffer::FILE_MOD;
-    file_base *= core_buffer::FILE_MOD;
+    uint64_t file_base = pulse_id / buffer_config::FILE_MOD;
+    file_base *= buffer_config::FILE_MOD;
 
     return pulse_id - file_base;
 }

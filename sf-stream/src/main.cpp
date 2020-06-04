@@ -17,7 +17,7 @@
 #include "stream_config.hpp"
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 using namespace stream_config;
 
 int main (int argc, char *argv[])
@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
 
         if(slot_id == -1) {
             this_thread::sleep_for(chrono::milliseconds(
-                    core_buffer::RB_READ_RETRY_INTERVAL_MS));
+                    buffer_config::RB_READ_RETRY_INTERVAL_MS));
             continue;
         }
 
@@ -193,9 +193,9 @@ int main (int argc, char *argv[])
 
         if ( send_streamvis == 0 ) {
             zmq_send(socket_streamvis,
-            (char*)data,
-            core_buffer::MODULE_N_BYTES*n_modules,
-            0);
+                     (char*)data,
+                     buffer_config::MODULE_N_BYTES * n_modules,
+                     0);
         } else {
             zmq_send(socket_streamvis,
             (char*)data_empty,
@@ -233,9 +233,9 @@ int main (int argc, char *argv[])
 
         if ( send_live_analysis == 0 ) {
             zmq_send(socket_live,
-            (char*)data,
-            core_buffer::MODULE_N_BYTES*n_modules,
-            0);
+                     (char*)data,
+                     buffer_config::MODULE_N_BYTES * n_modules,
+                     0);
         } else {
             zmq_send(socket_live,
             (char*)data_empty,

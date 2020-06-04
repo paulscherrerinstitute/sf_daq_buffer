@@ -10,10 +10,10 @@ const uint64_t IA_EMPTY_SLOT_VALUE = 0;
 
 struct ImageMetadataBlock
 {
-    uint64_t pulse_id[core_buffer::BUFFER_BLOCK_SIZE];
-    uint64_t frame_index[core_buffer::BUFFER_BLOCK_SIZE];
-    uint32_t daq_rec[core_buffer::BUFFER_BLOCK_SIZE];
-    uint8_t is_good_image[core_buffer::BUFFER_BLOCK_SIZE];
+    uint64_t pulse_id[buffer_config::BUFFER_BLOCK_SIZE];
+    uint64_t frame_index[buffer_config::BUFFER_BLOCK_SIZE];
+    uint32_t daq_rec[buffer_config::BUFFER_BLOCK_SIZE];
+    uint8_t is_good_image[buffer_config::BUFFER_BLOCK_SIZE];
     uint64_t block_start_pulse_id;
     uint64_t block_stop_pulse_id;
 };

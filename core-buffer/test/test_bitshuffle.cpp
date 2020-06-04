@@ -6,7 +6,7 @@ extern "C" {
 }
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 TEST(bitshuffle, simple_compression)
 {

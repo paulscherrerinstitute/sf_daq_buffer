@@ -11,10 +11,10 @@ class FrameUdpReceiver {
 
     UdpReceiver udp_receiver_;
 
-    jungfrau_packet packet_buffer_[core_buffer::BUFFER_UDP_N_RECV_MSG];
-    iovec recv_buff_ptr_[core_buffer::BUFFER_UDP_N_RECV_MSG];
-    mmsghdr msgs_[core_buffer::BUFFER_UDP_N_RECV_MSG];
-    sockaddr_in sock_from_[core_buffer::BUFFER_UDP_N_RECV_MSG];
+    jungfrau_packet packet_buffer_[buffer_config::BUFFER_UDP_N_RECV_MSG];
+    iovec recv_buff_ptr_[buffer_config::BUFFER_UDP_N_RECV_MSG];
+    mmsghdr msgs_[buffer_config::BUFFER_UDP_N_RECV_MSG];
+    sockaddr_in sock_from_[buffer_config::BUFFER_UDP_N_RECV_MSG];
 
     bool packet_buffer_loaded_ = false;
     int packet_buffer_n_packets_ = 0;

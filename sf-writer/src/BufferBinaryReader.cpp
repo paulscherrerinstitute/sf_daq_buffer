@@ -11,7 +11,7 @@
 
 using namespace std;
 using namespace writer_config;
-using namespace core_buffer;
+using namespace buffer_config;
 
 BufferBinaryReader::BufferBinaryReader(
         const std::string &root_folder,

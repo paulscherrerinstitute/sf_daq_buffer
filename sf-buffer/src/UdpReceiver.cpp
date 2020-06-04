@@ -7,7 +7,7 @@
 #include "buffer_config.hpp"
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 UdpReceiver::UdpReceiver() :
     socket_fd_(-1)

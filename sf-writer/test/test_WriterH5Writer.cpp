@@ -5,7 +5,7 @@
 #include "bitshuffle/bitshuffle.h"
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 TEST(WriterH5Writer, basic_interaction)
 {

@@ -6,7 +6,7 @@
 
 using namespace std;
 using namespace writer_config;
-using namespace core_buffer;
+using namespace buffer_config;
 
 ImageAssembler::ImageAssembler(const size_t n_modules) :
     n_modules_(n_modules),

@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 using namespace std;
-using namespace core_buffer;
+using namespace buffer_config;
 
 TEST(ImageAssembler, basic_interaction)
 {

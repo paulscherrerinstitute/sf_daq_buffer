@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <string>
 
-namespace core_buffer {
+namespace buffer_config {
 
     const size_t MODULE_X_SIZE = 1024;
     const size_t MODULE_Y_SIZE = 512;

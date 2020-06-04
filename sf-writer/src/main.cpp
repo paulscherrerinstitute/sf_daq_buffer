@@ -14,7 +14,7 @@
 
 using namespace std;
 using namespace writer_config;
-using namespace core_buffer;
+using namespace buffer_config;
 using namespace chrono;
 
 void read_buffer(

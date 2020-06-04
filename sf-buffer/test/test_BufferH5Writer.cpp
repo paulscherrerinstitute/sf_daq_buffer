@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-using namespace core_buffer;
+using namespace buffer_config;
 
 // TODO: Rewrite tests with new format.
 

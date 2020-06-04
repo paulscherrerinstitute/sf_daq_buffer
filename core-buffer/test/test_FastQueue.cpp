@@ -2,7 +2,7 @@
 #include "formats.hpp"
 #include "gtest/gtest.h"
 
-using namespace core_buffer;
+using namespace buffer_config;
 
 TEST(FastQueue, basic_interaction)
 {
