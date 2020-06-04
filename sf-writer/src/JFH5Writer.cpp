@@ -100,6 +100,10 @@ size_t JFH5Writer::get_n_pulses_in_range(
     n_pulses += stop_pulse_id / pulse_id_step;
     n_pulses -= start_pulse_id / pulse_id_step;
 
+    if (n_pulses == 0) {
+        throw runtime_error("Zero pulses to write in given range.");
+    }
+
     return n_pulses;
 }
 
