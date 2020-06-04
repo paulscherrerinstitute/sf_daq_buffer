@@ -136,7 +136,7 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 
             auto& frame_meta = frame_meta_buffer_[meta_offset];
             auto is_good_frame =
-                    frame_meta.n_received_packets == JF_N_PACKETS_PER_FRAME;
+                    frame_meta.n_recv_packets == JF_N_PACKETS_PER_FRAME;
 
             if (!is_good_frame) {
                 image_is_good_frame[i_pulse] = 0;
@@ -166,7 +166,7 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
                     image_is_good_frame[i_pulse] = 0;
                 }
 
-                if (frame_meta.n_received_packets != JF_N_PACKETS_PER_FRAME) {
+                if (frame_meta.n_recv_packets != JF_N_PACKETS_PER_FRAME) {
                     image_is_good_frame[i_pulse] = 0;
                 }
             }

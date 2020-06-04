@@ -56,7 +56,7 @@ TEST(BufferUdpReceiver, simple_recv)
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
-        ASSERT_EQ(metadata.n_received_packets, n_packets);
+        ASSERT_EQ(metadata.n_recv_packets, n_packets);
         ASSERT_EQ(metadata.module_id, source_id);
     }
 
@@ -114,7 +114,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
-        ASSERT_EQ(metadata.n_received_packets, n_packets-1);
+        ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
         ASSERT_EQ(metadata.module_id, source_id);
     }
 
@@ -172,7 +172,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
-        ASSERT_EQ(metadata.n_received_packets, n_packets-1);
+        ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
         ASSERT_EQ(metadata.module_id, source_id);
     }
 
@@ -231,7 +231,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
-        ASSERT_EQ(metadata.n_received_packets, n_packets-1);
+        ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
         ASSERT_EQ(metadata.module_id, source_id);
     }
 

@@ -109,9 +109,9 @@ int main (int argc, char *argv[]) {
             send_max_us = send_us_duration;
         }
 
-        if (binary_buffer->metadata.n_received_packets < JF_N_PACKETS_PER_FRAME) {
+        if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
             n_missed_packets += JF_N_PACKETS_PER_FRAME -
-                    binary_buffer->metadata.n_received_packets;
+                    binary_buffer->metadata.n_recv_packets;
             n_corrupted_frames++;
         }
 

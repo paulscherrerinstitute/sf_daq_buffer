@@ -55,7 +55,7 @@ TEST(ImageAssembler, reconstruction)
             frame_meta.pulse_id = 100 + i_pulse;
             frame_meta.daq_rec = 1000 + i_pulse;
             frame_meta.frame_index = 10000 + i_pulse;
-            frame_meta.n_received_packets = JF_N_PACKETS_PER_FRAME;
+            frame_meta.n_recv_packets = JF_N_PACKETS_PER_FRAME;
 
             for (size_t i_pixel=0; i_pixel < MODULE_N_PIXELS; i_pixel++) {
                 buffer_block->frame[i_pulse].data[i_pixel] =

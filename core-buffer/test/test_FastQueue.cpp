@@ -128,7 +128,7 @@ TEST(FaseQueue, array_parameter)
         frame.pulse_id = i_module;
         frame.frame_index = i_module;
         frame.daq_rec = i_module;
-        frame.n_received_packets = i_module;
+        frame.n_recv_packets = i_module;
         frame.module_id = i_module;
 
         ModuleFrame* p_metadata = &module_metadata;
@@ -142,7 +142,7 @@ TEST(FaseQueue, array_parameter)
         ASSERT_EQ(module_metadata.pulse_id, i_module);
         ASSERT_EQ(module_metadata.frame_index, i_module);
         ASSERT_EQ(module_metadata.daq_rec, i_module);
-        ASSERT_EQ(module_metadata.n_received_packets, i_module);
+        ASSERT_EQ(module_metadata.n_recv_packets, i_module);
         ASSERT_EQ(module_metadata.module_id, i_module);
     }
 }

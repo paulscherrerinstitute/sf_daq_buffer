@@ -116,7 +116,7 @@ int main (int argc, char *argv[])
                 frame_index = module_metadata.frame_index;
                 daq_rec     = module_metadata.daq_rec;
 
-                if ( module_metadata.n_received_packets != 128 ) is_good_frame = false;
+                if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
             } else {
                 if (module_metadata.pulse_id != pulse_id) is_good_frame = false;
 
@@ -124,7 +124,7 @@ int main (int argc, char *argv[])
 
                 if (module_metadata.daq_rec != daq_rec) is_good_frame = false;
 
-                if (module_metadata.n_received_packets != 128 ) is_good_frame = false;
+                if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
             }
         }
 

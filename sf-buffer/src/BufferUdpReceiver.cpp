@@ -46,7 +46,7 @@ inline void BufferUdpReceiver::copy_packet_to_buffers(
             packet_buffer_[i_packet].data,
             JUNGFRAU_DATA_BYTES_PER_PACKET);
 
-    metadata.n_received_packets++;
+    metadata.n_recv_packets++;
 }
 
 inline uint64_t BufferUdpReceiver::process_packets(
@@ -105,7 +105,7 @@ uint64_t BufferUdpReceiver::get_frame_from_udp(
 {
     // Reset the metadata and frame buffer for the next frame.
     metadata.pulse_id = 0;
-    metadata.n_received_packets = 0;
+    metadata.n_recv_packets = 0;
     memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
 
     // Happens when last packet from previous frame was missed.
