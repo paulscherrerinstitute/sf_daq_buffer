@@ -131,3 +131,8 @@ TEST(JFH5Writer, test_step_pulse_id)
     // Start pulse id is divisible by step.
     ASSERT_NO_THROW(JFH5Writer writer("ignore.h5", 1, 10, 19, 10));
 }
+
+TEST(JFH5Writer, test_writing_with_step)
+{
+    // TODO: Implement this test.
+}
