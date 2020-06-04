@@ -72,7 +72,7 @@ int main (int argc, char *argv[]) {
     BufferBinaryWriter writer(root_folder, device_name);
     BufferUdpReceiver receiver(udp_port, source_id);
 
-    BufferBinaryFormat* binary_buffer = new BufferBinaryFormat();
+    auto binary_buffer = new BufferBinaryFormat();
     auto socket = get_live_stream_socket(detector_name, source_id);
 
     size_t write_total_us = 0;
@@ -90,7 +90,7 @@ int main (int argc, char *argv[]) {
         writer.write(pulse_id, binary_buffer);
 
         auto write_end_time = steady_clock::now();
-        auto write_us_duration = duration_cast<microseconds>(
+        size_t write_us_duration = duration_cast<microseconds>(
                 write_end_time-start_time).count();
 
         start_time = steady_clock::now();
@@ -100,7 +100,7 @@ int main (int argc, char *argv[]) {
         zmq_send(socket, binary_buffer->data, MODULE_N_BYTES, 0);
 
         auto send_end_time = steady_clock::now();
-        auto send_us_duration = duration_cast<microseconds>(
+        size_t send_us_duration = duration_cast<microseconds>(
                 send_end_time-start_time).count();
 
         // TODO: Make real statistics, please.
@@ -108,13 +108,8 @@ int main (int argc, char *argv[]) {
         write_total_us += write_us_duration;
         send_total_us += send_us_duration;
 
-        if (write_us_duration > write_max_us) {
-            write_max_us = write_us_duration;
-        }
-
-        if (send_us_duration > send_max_us) {
-            send_max_us = send_us_duration;
-        }
+        write_max_us = max(write_max_us, write_us_duration);
+        send_max_us = max(send_max_us, send_us_duration);
 
         if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
             n_missed_packets += JF_N_PACKETS_PER_FRAME -
@@ -143,6 +138,4 @@ int main (int argc, char *argv[]) {
             send_max_us = 0;
         }
     }
-
-    delete binary_buffer;
 }
