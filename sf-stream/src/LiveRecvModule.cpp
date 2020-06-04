@@ -13,11 +13,11 @@ LiveRecvModule::LiveRecvModule(
         const size_t n_modules,
         void* ctx_,
         const string& ipc_prefix) :
-        queue_(queue_),
-        n_modules_(n_modules),
-        ctx_(ctx_),
-        ipc_prefix_(ipc_prefix),
-        is_receiving_(true)
+            queue_(queue_),
+            n_modules_(n_modules),
+            ctx_(ctx_),
+            ipc_prefix_(ipc_prefix),
+            is_receiving_(true)
 {
     receiving_thread_ = thread(&LiveRecvModule::receive_thread, this);
 }
@@ -35,17 +35,18 @@ void LiveRecvModule::stop()
 
 void* LiveRecvModule::connect_socket(size_t module_id)
 {
-    void* sock = zmq_socket(ctx_, ZMQ_SUB);
-    if (sock == nullptr) {
+    void* socket = zmq_socket(ctx_, ZMQ_SUB);
+    if (socket == nullptr) {
         throw runtime_error(zmq_strerror(errno));
     }
 
     int rcvhwm = STREAM_RCVHWM;
-    if (zmq_setsockopt(sock, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+    if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
+
     int linger = 0;
-    if (zmq_setsockopt(sock, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
@@ -53,45 +54,38 @@ void* LiveRecvModule::connect_socket(size_t module_id)
     ipc_addr << ipc_prefix_ << module_id;
     const auto ipc = ipc_addr.str();
 
-    if (zmq_connect(sock, ipc.c_str()) != 0) {
+    if (zmq_connect(socket, ipc.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
-    if (zmq_setsockopt(sock, ZMQ_SUBSCRIBE, "", 0) != 0) {
+    if (zmq_setsockopt(socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
-    return sock;
+    return socket;
 }
 
 void LiveRecvModule::recv_single_module(
-        void* socket, ModuleFrame* metadata, char* data)
+        void* socket, ModuleFrame* meta, char* data)
 {
-    auto n_bytes_metadata = zmq_recv(
-            socket,
-            metadata,
-            sizeof(ModuleFrame),
-            0);
+    auto n_bytes_meta = zmq_recv(socket, meta, sizeof(ModuleFrame), 0);
 
-    if (n_bytes_metadata == -1) {
+    if (n_bytes_meta == -1) {
         throw runtime_error(zmq_strerror(errno));
-    }else if (n_bytes_metadata != sizeof(ModuleFrame)) {
+    }
+    if (n_bytes_meta != sizeof(ModuleFrame)) {
         throw runtime_error("Stream header of wrong size.");
     }
-
-    if (metadata->pulse_id == 0) {
+    if (meta->pulse_id == 0) {
         throw runtime_error("Received invalid pulse_id=0.");
     }
 
-    auto n_bytes_image = zmq_recv(
-            socket,
-            data,
-            MODULE_N_BYTES,
-            0);
+    auto n_bytes_frame = zmq_recv(socket, data, MODULE_N_BYTES, 0);
 
-    if (n_bytes_image == -1) {
+    if (n_bytes_frame == -1) {
         throw runtime_error(zmq_strerror(errno));
-    } else if (n_bytes_image != MODULE_N_BYTES) {
+    }
+    if (n_bytes_frame != MODULE_N_BYTES) {
         throw runtime_error("Stream data of wrong size.");
     }
 }
@@ -153,10 +147,9 @@ void LiveRecvModule::receive_thread()
                     data + (MODULE_N_BYTES * i_module));
         }
 
-        auto current_pulse_id = align_modules(sockets, metadata, data);
+        align_modules(sockets, metadata, data);
 
         queue_.commit();
-        current_pulse_id++;
 
         while(is_receiving_.load(memory_order_relaxed)) {
             auto slot_id = queue_.reserve();
@@ -169,6 +162,7 @@ void LiveRecvModule::receive_thread()
             metadata = queue_.get_metadata_buffer(slot_id);
             data = queue_.get_data_buffer(slot_id);
 
+            uint64_t frame_pulse_id;
             bool sync_needed = false;
             for (size_t i_module = 0; i_module < n_modules_; i_module++) {
                 auto& module_metadata = metadata->module[i_module];
@@ -178,7 +172,10 @@ void LiveRecvModule::receive_thread()
                         &module_metadata,
                         data + (MODULE_N_BYTES * i_module));
 
-                if (module_metadata.pulse_id != current_pulse_id) {
+                if (i_module == 0) {
+                    frame_pulse_id = module_metadata.pulse_id;
+
+                } else if (frame_pulse_id != module_metadata.pulse_id) {
                     sync_needed = true;
                 }
             }
@@ -186,9 +183,7 @@ void LiveRecvModule::receive_thread()
             if (sync_needed) {
                 auto start_time = chrono::steady_clock::now();
 
-                auto new_pulse_id = align_modules(sockets, metadata, data);
-                auto lost_pulses = new_pulse_id - current_pulse_id;
-                current_pulse_id = new_pulse_id;
+                auto lost_pulses = align_modules(sockets, metadata, data);
 
                 auto end_time = chrono::steady_clock::now();
                 auto us_duration = chrono::duration_cast<chrono::microseconds>(
@@ -200,7 +195,6 @@ void LiveRecvModule::receive_thread()
             }
 
             queue_.commit();
-            current_pulse_id++;
         }
 
         for (size_t i = 0; i < n_modules_; i++) {

@@ -19,7 +19,7 @@ class LiveRecvModule {
 
     void* connect_socket(size_t module_id);
     void receive_thread();
-    void recv_single_module(void* socket, ModuleFrame* metadata, char* data);
+    void recv_single_module(void* socket, ModuleFrame* meta, char* data);
     uint64_t align_modules(const std::vector<void*>& sockets,
                            ModuleFrameBuffer *metadata,
                            char *data);
