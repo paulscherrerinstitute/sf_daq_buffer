@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "test_WriterH5Writer.cpp"
+#include "test_JFH5Writer.cpp"
 #include "test_ImageAssembler.cpp"
 
 using namespace std;

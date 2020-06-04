@@ -7,7 +7,7 @@
 using namespace std;
 using namespace buffer_config;
 
-TEST(WriterH5Writer, basic_interaction)
+TEST(JFH5Writer, basic_interaction)
 {
     size_t n_modules = 2;
     uint64_t start_pulse_id = 1;
@@ -24,7 +24,7 @@ TEST(WriterH5Writer, basic_interaction)
     writer.write(metadata.get(), data.get());
 }
 
-TEST(WriterH5Writer, test_writing)
+TEST(JFH5Writer, test_writing)
 {
     size_t n_modules = 2;
     uint64_t start_pulse_id = 5;
