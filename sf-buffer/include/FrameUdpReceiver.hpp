@@ -1,12 +1,12 @@
-#ifndef SF_DAQ_BUFFER_BUFFERUDPRECEIVER_HPP
-#define SF_DAQ_BUFFER_BUFFERUDPRECEIVER_HPP
+#ifndef SF_DAQ_BUFFER_FRAMEUDPRECEIVER_HPP
+#define SF_DAQ_BUFFER_FRAMEUDPRECEIVER_HPP
 
 #include <netinet/in.h>
 #include "UdpReceiver.hpp"
 #include "formats.hpp"
 #include "buffer_config.hpp"
 
-class BufferUdpReceiver {
+class FrameUdpReceiver {
     const int source_id_;
 
     UdpReceiver udp_receiver_;
@@ -27,10 +27,10 @@ class BufferUdpReceiver {
             const int n_packets, ModuleFrame& metadata, char* frame_buffer);
 
 public:
-    BufferUdpReceiver(const uint16_t port, const int source_id);
-    virtual ~BufferUdpReceiver();
+    FrameUdpReceiver(const uint16_t port, const int source_id);
+    virtual ~FrameUdpReceiver();
     uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
 };
 
 
-#endif //SF_DAQ_BUFFER_BUFFERUDPRECEIVER_HPP
+#endif //SF_DAQ_BUFFER_FRAMEUDPRECEIVER_HPP

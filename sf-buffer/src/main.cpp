@@ -8,7 +8,7 @@
 #include "formats.hpp"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
-#include "BufferUdpReceiver.hpp"
+#include "FrameUdpReceiver.hpp"
 #include "BufferBinaryWriter.hpp"
 
 using namespace std;
@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
     uint64_t n_corrupted_frames = 0;
 
     BufferBinaryWriter writer(root_folder, device_name);
-    BufferUdpReceiver receiver(udp_port, source_id);
+    FrameUdpReceiver receiver(udp_port, source_id);
 
     auto binary_buffer = new BufferBinaryFormat();
     auto socket = get_live_stream_socket(detector_name, source_id);

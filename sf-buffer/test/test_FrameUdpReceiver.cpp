@@ -1,7 +1,7 @@
 #include <netinet/in.h>
 #include <jungfrau.hpp>
 #include "gtest/gtest.h"
-#include "BufferUdpReceiver.hpp"
+#include "FrameUdpReceiver.hpp"
 #include "mock/udp.hpp"
 
 #include <thread>
@@ -21,7 +21,7 @@ TEST(BufferUdpReceiver, simple_recv)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    BufferUdpReceiver udp_receiver(udp_port, source_id);
+    FrameUdpReceiver udp_receiver(udp_port, source_id);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -74,7 +74,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    BufferUdpReceiver udp_receiver(udp_port, source_id);
+    FrameUdpReceiver udp_receiver(udp_port, source_id);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -132,7 +132,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    BufferUdpReceiver udp_receiver(udp_port, source_id);
+    FrameUdpReceiver udp_receiver(udp_port, source_id);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -190,7 +190,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    BufferUdpReceiver udp_receiver(udp_port, source_id);
+    FrameUdpReceiver udp_receiver(udp_port, source_id);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){

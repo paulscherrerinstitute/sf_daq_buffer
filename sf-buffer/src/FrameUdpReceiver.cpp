@@ -1,11 +1,11 @@
 #include <cstring>
 #include <jungfrau.hpp>
-#include "BufferUdpReceiver.hpp"
+#include "FrameUdpReceiver.hpp"
 
 using namespace std;
 using namespace core_buffer;
 
-BufferUdpReceiver::BufferUdpReceiver(
+FrameUdpReceiver::FrameUdpReceiver(
         const uint16_t port,
         const int source_id) :
             source_id_(source_id)
@@ -23,11 +23,11 @@ BufferUdpReceiver::BufferUdpReceiver(
     }
 }
 
-BufferUdpReceiver::~BufferUdpReceiver() {
+FrameUdpReceiver::~FrameUdpReceiver() {
     udp_receiver_.disconnect();
 }
 
-inline void BufferUdpReceiver::init_frame(
+inline void FrameUdpReceiver::init_frame(
         ModuleFrame& frame_metadata, const int i_packet)
 {
     frame_metadata.pulse_id = packet_buffer_[i_packet].bunchid;
@@ -36,7 +36,7 @@ inline void BufferUdpReceiver::init_frame(
     frame_metadata.module_id = (int64_t) source_id_;
 }
 
-inline void BufferUdpReceiver::copy_packet_to_buffers(
+inline void FrameUdpReceiver::copy_packet_to_buffers(
         ModuleFrame& metadata, char* frame_buffer, const int i_packet)
 {
     size_t frame_buffer_offset =
@@ -49,7 +49,7 @@ inline void BufferUdpReceiver::copy_packet_to_buffers(
     metadata.n_recv_packets++;
 }
 
-inline uint64_t BufferUdpReceiver::process_packets(
+inline uint64_t FrameUdpReceiver::process_packets(
         const int start_offset,
         ModuleFrame& metadata,
         char* frame_buffer)
@@ -100,7 +100,7 @@ inline uint64_t BufferUdpReceiver::process_packets(
     return 0;
 }
 
-uint64_t BufferUdpReceiver::get_frame_from_udp(
+uint64_t FrameUdpReceiver::get_frame_from_udp(
         ModuleFrame& metadata, char* frame_buffer)
 {
     // Reset the metadata and frame buffer for the next frame.

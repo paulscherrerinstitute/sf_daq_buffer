@@ -2,7 +2,7 @@
 #include "test_UdpReceiver.cpp"
 #include "test_BufferBinaryWriter.cpp"
 #include "test_BufferH5Writer.cpp"
-#include "test_BufferUdpReceiver.cpp"
+#include "test_FrameUdpReceiver.cpp"
 
 using namespace std;
 
