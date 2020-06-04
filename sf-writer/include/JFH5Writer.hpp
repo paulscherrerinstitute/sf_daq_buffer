@@ -5,7 +5,7 @@
 #include <string>
 #include <H5Cpp.h>
 
-#include "formats.hpp"
+#include "ImageAssembler.hpp"
 
 class JFH5Writer {
 
@@ -16,8 +16,12 @@ class JFH5Writer {
     size_t current_write_index_;
 
     H5::H5File file_;
-
     H5::DataSet image_dataset_;
+
+    uint64_t* b_pulse_id_;
+    uint64_t* b_frame_index_;
+    uint32_t* b_daq_rec_;
+    uint8_t* b_is_good_frame_ ;
 
     void close_file();
 
@@ -28,13 +32,6 @@ public:
                const size_t n_modules);
     ~JFH5Writer();
     void write(const ImageMetadataBlock* metadata, const char* data);
-
-
-    uint64_t* b_pulse_id_;
-    uint64_t* b_frame_index_;
-    uint32_t* b_daq_rec_;
-    uint8_t* b_is_good_frame_ ;
 };
-
 
 #endif //SFWRITER_HPP
