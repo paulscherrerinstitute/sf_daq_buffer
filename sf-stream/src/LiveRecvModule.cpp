@@ -127,8 +127,7 @@ uint64_t LiveRecvModule::align_modules(
     for (size_t i_module = 0; i_module < n_modules_; i_module++) {
         auto& module_meta = meta->module[i_module];
 
-        size_t diff_to_max = max_pulse_id - module_meta.pulse_id;
-        for (size_t i = 0; i < diff_to_max; i++) {
+        while (module_meta.pulse_id < max_pulse_id) {
             recv_single_module(
                     sockets[i_module],
                     &module_meta,
