@@ -105,6 +105,24 @@ uint64_t LiveRecvModule::align_modules(
         max_pulse_id = max(max_pulse_id, module_meta.pulse_id);
     }
 
+    auto max_diff = max_pulse_id - min_pulse_id;
+    if (max_diff > PULSE_OFFSET_LIMIT) {
+        stringstream err_msg;
+
+        err_msg << "[LiveRecvModule::align_modules]";
+        err_msg << " PULSE_OFFSET_LIMIT exceeded.";
+        err_msg << " Modules out of sync for " << max_diff << " pulses.";
+
+        for (auto& module_meta : meta->module) {
+            err_msg << " (" << module_meta.module_id << ", ";
+            err_msg << module_meta.pulse_id << "),";
+        }
+
+        err_msg << endl;
+
+        throw runtime_error(err_msg.str());
+    }
+
     // Second pass - align all receivers to max_pulse_id.
     for (size_t i_module = 0; i_module < n_modules_; i_module++) {
         auto& module_meta = meta->module[i_module];

@@ -6,4 +6,6 @@ namespace stream_config
     const size_t STREAM_RCVHWM = 100;
     // Size of buffer between the receiving and sending part.
     const int STREAM_FASTQUEUE_SLOTS = 5;
+    // If the modules are offset more than 1000 pulses, crush.
+    const uint64_t PULSE_OFFSET_LIMIT = 1000;
 }
