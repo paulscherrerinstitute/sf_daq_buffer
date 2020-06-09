@@ -63,10 +63,12 @@ JFH5Writer::JFH5Writer(const string& output_file,
             H5::PredType::NATIVE_UINT16,
             image_dataspace);
 
-    b_pulse_id_ = new uint64_t[n_images_];
-    b_frame_index_= new uint64_t[n_images_];
-    b_daq_rec_ = new uint32_t[n_images_];
-    b_is_good_frame_ = new uint8_t[n_images_];
+    auto n_pulses = stop_pulse_id_ - start_pulse_id_ + 1;
+
+    b_pulse_id_ = new uint64_t[n_pulses];
+    b_frame_index_= new uint64_t[n_pulses];
+    b_daq_rec_ = new uint32_t[n_pulses];
+    b_is_good_frame_ = new uint8_t[n_pulses];
 }
 
 JFH5Writer::~JFH5Writer()
@@ -180,6 +182,11 @@ void JFH5Writer::write(
     if (n_images_to_copy < 1) {
         throw runtime_error("Received unexpected block for stop_pulse_id.");
     }
+
+//    for (uint64_t i_pulse=0; i_pulse < n_images_to_copy; i_pulse++) {
+//        auto pulse_index_in_block = i_pulse + n_images_offset;
+//
+//    }
 
     hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
                            MODULE_Y_SIZE * n_modules_,
