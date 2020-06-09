@@ -88,7 +88,7 @@ int main (int argc, char *argv[])
         if (stats_counter == STATS_MODULO) {
             cout << "sf_stream:read_us " << read_total_us / STATS_MODULO;
             cout << " sf_stream:read_max_us " << read_max_us;
-            cout << "sf_stream:send_us " << send_total_us / STATS_MODULO;
+            cout << " sf_stream:send_us " << send_total_us / STATS_MODULO;
             cout << " sf_stream:send_max_us " << send_max_us;
             cout << endl;
 
