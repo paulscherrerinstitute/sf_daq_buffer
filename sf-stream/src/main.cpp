@@ -4,7 +4,6 @@
 #include <cstring>
 #include <zmq.h>
 
-#include "FastQueue.hpp"
 #include "LiveRecvModule.hpp"
 #include "buffer_config.hpp"
 #include "stream_config.hpp"
@@ -33,15 +32,13 @@ int main (int argc, char *argv[])
     auto config = read_json_config(string(argv[1]));
     string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.DETECTOR_NAME + "-";
 
-    FastQueue<ModuleFrameBuffer> queue(
-            config.n_modules * MODULE_N_BYTES, STREAM_FASTQUEUE_SLOTS);
+    ModuleFrameBuffer* meta = new ModuleFrameBuffer();
+    char* data = new char[config.n_modules * MODULE_N_BYTES];
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
     ZmqLiveReceiver receiver(config.n_modules, ctx, RECV_IPC_URL);
-    LiveRecvModule recv_module(queue, receiver);
-
     ZmqLiveSender sender(ctx, config);
 
     // TODO: Remove stats trash.
@@ -55,13 +52,11 @@ int main (int argc, char *argv[])
 
         auto start_time = steady_clock::now();
 
-        int slot_id;
-        while((slot_id = queue.read()) == -1) {
-            this_thread::sleep_for(milliseconds(RB_READ_RETRY_INTERVAL_MS));
-        }
+        auto n_lost_pulses = receiver.get_next_image(meta, data);
 
-        auto meta = queue.get_metadata_buffer(slot_id);
-        auto data = queue.get_data_buffer(slot_id);
+        if (n_lost_pulses > 0) {
+            cout << "sf_stream:resync_lost_pulses " << n_lost_pulses << endl;
+        }
 
         auto end_time = steady_clock::now();
         size_t read_us_duration = duration_cast<microseconds>(
@@ -74,8 +69,6 @@ int main (int argc, char *argv[])
         end_time = steady_clock::now();
         size_t send_us_duration = duration_cast<microseconds>(
                 end_time - start_time).count();
-
-        queue.release();
 
         // TODO: Some poor statistics.
         stats_counter++;
