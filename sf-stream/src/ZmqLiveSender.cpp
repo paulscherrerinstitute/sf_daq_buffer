@@ -44,9 +44,9 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     uint64_t daq_rec     = 0;
     bool is_good_frame   = true;
 
-    for (size_t i_module = 0; i_module < n_modules; i_module++) {
+    for (size_t i_module = 0; i_module < config_.n_modules; i_module++) {
         // TODO: Place this tests in the appropriate spot.
-        auto& module_metadata = metadata->module[i_module];
+        auto& module_metadata = meta->module[i_module];
         if (i_module == 0) {
             pulse_id    = module_metadata.pulse_id;
             frame_index = module_metadata.frame_index;
@@ -72,11 +72,11 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     header.AddMember("pulse_id", pulse_id, header_alloc);
 
     rapidjson::Value pedestal_file;
-    pedestal_file.SetString(PEDE_FILENAME.c_str(), header_alloc);
+    pedestal_file.SetString(config_.PEDE_FILENAME.c_str(), header_alloc);
     header.AddMember("pedestal_file", pedestal_file, header_alloc);
 
     rapidjson::Value gain_file;
-    gain_file.SetString(GAIN_FILENAME.c_str(), header_alloc);
+    gain_file.SetString(config_.GAIN_FILENAME.c_str(), header_alloc);
     header.AddMember("gain_file", gain_file, header_alloc);
 
     header.AddMember("number_frames_expected", 10000, header_alloc);
@@ -88,7 +88,7 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     header.AddMember("run_name", run_name, header_alloc);
 
     rapidjson::Value detector_name;
-    detector_name.SetString(DETECTOR_NAME.c_str(), header_alloc);
+    detector_name.SetString(config_.DETECTOR_NAME.c_str(), header_alloc);
     header.AddMember("detector_name", detector_name, header_alloc);
 
     header.AddMember("htype", "array-1.0", header_alloc);
@@ -101,12 +101,12 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     header.AddMember("shape", shape_value, header_alloc);
 
     int send_streamvis = 0;
-    if ( reduction_factor_streamvis > 1 ) {
-        send_streamvis = rand() % reduction_factor_streamvis;
+    if ( config_.reduction_factor_streamvis > 1 ) {
+        send_streamvis = rand() % config_.reduction_factor_streamvis;
     }
     if ( send_streamvis == 0 ) {
         auto& shape = header["shape"];
-        shape[0] = n_modules*512;
+        shape[0] = config_.n_modules*512;
         shape[1] = 1024;
     } else{
         auto& shape = header["shape"];
@@ -122,18 +122,18 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
         text_header = buffer.GetString();
     }
 
-    zmq_send(socket_streamvis,
+    zmq_send(socket_streamvis_,
              text_header.c_str(),
              text_header.size(),
              ZMQ_SNDMORE);
 
     if ( send_streamvis == 0 ) {
-        zmq_send(socket_streamvis,
+        zmq_send(socket_streamvis_,
                  (char*)data,
-                 buffer_config::MODULE_N_BYTES * n_modules,
+                 buffer_config::MODULE_N_BYTES * config_.n_modules,
                  0);
     } else {
-        zmq_send(socket_streamvis,
+        zmq_send(socket_streamvis_,
                  (char*)data_empty,
                  8,
                  0);
@@ -141,12 +141,12 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
 
     //same for live analysis
     int send_live_analysis = 0;
-    if ( reduction_factor_live_analysis > 1 ) {
-        send_live_analysis = rand() % reduction_factor_live_analysis;
+    if ( config_.reduction_factor_live_analysis > 1 ) {
+        send_live_analysis = rand() % config_.reduction_factor_live_analysis;
     }
     if ( send_live_analysis == 0 ) {
         auto& shape = header["shape"];
-        shape[0] = n_modules*512;
+        shape[0] = config_.n_modules*512;
         shape[1] = 1024;
     } else{
         auto& shape = header["shape"];
@@ -162,18 +162,18 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
         text_header = buffer.GetString();
     }
 
-    zmq_send(socket_live,
+    zmq_send(socket_live_,
              text_header.c_str(),
              text_header.size(),
              ZMQ_SNDMORE);
 
     if ( send_live_analysis == 0 ) {
-        zmq_send(socket_live,
+        zmq_send(socket_live_,
                  (char*)data,
-                 buffer_config::MODULE_N_BYTES * n_modules,
+                 buffer_config::MODULE_N_BYTES * config_.n_modules,
                  0);
     } else {
-        zmq_send(socket_live,
+        zmq_send(socket_live_,
                  (char*)data_empty,
                  8,
                  0);
