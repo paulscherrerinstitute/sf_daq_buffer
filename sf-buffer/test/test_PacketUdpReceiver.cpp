@@ -2,21 +2,21 @@
 #include <jungfrau.hpp>
 #include "gtest/gtest.h"
 #include "mock/udp.hpp"
-#include "UdpReceiver.hpp"
+#include "PacketUdpReceiver.hpp"
 
 #include <thread>
 #include <chrono>
 
 using namespace std;
 
-TEST(UdpReceiver, simple_recv)
+TEST(PacketUdpReceiver, simple_recv)
 {
     uint16_t udp_port = MOCK_UDP_PORT;
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    UdpReceiver udp_receiver;
+    PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
     jungfrau_packet send_udp_buffer;
@@ -52,14 +52,14 @@ TEST(UdpReceiver, simple_recv)
     ::close(send_socket_fd);
 }
 
-TEST(UdpReceiver, false_recv)
+TEST(PacketUdpReceiver, false_recv)
 {
     uint16_t udp_port = MOCK_UDP_PORT;
 
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    UdpReceiver udp_receiver;
+    PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
     jungfrau_packet send_udp_buffer;
@@ -104,7 +104,7 @@ TEST(UdpReceiver, false_recv)
     ::close(send_socket_fd);
 }
 
-TEST(UdpReceiver, receive_many)
+TEST(PacketUdpReceiver, receive_many)
 {
     auto n_msg_buffer = JF_N_PACKETS_PER_FRAME;
     jungfrau_packet recv_buffer[n_msg_buffer];
@@ -127,7 +127,7 @@ TEST(UdpReceiver, receive_many)
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    UdpReceiver udp_receiver;
+    PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
     jungfrau_packet send_udp_buffer;

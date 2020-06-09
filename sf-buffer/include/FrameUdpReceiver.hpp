@@ -2,14 +2,14 @@
 #define SF_DAQ_BUFFER_FRAMEUDPRECEIVER_HPP
 
 #include <netinet/in.h>
-#include "UdpReceiver.hpp"
+#include "PacketUdpReceiver.hpp"
 #include "formats.hpp"
 #include "buffer_config.hpp"
 
 class FrameUdpReceiver {
     const int source_id_;
 
-    UdpReceiver udp_receiver_;
+    PacketUdpReceiver udp_receiver_;
 
     jungfrau_packet packet_buffer_[buffer_config::BUFFER_UDP_N_RECV_MSG];
     iovec recv_buff_ptr_[buffer_config::BUFFER_UDP_N_RECV_MSG];

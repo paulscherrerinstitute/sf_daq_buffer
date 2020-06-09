@@ -1,6 +1,6 @@
 #include <netinet/in.h>
 #include <iostream>
-#include "UdpReceiver.hpp"
+#include "PacketUdpReceiver.hpp"
 #include "jungfrau.hpp"
 #include <unistd.h>
 #include <cstring>
@@ -9,17 +9,17 @@
 using namespace std;
 using namespace buffer_config;
 
-UdpReceiver::UdpReceiver() :
+PacketUdpReceiver::PacketUdpReceiver() :
     socket_fd_(-1)
 {
 }
 
-UdpReceiver::~UdpReceiver()
+PacketUdpReceiver::~PacketUdpReceiver()
 {
     disconnect();
 }
 
-void UdpReceiver::bind(const uint16_t port)
+void PacketUdpReceiver::bind(const uint16_t port)
 {
     if (socket_fd_ > -1) {
         throw runtime_error("Socket already bound.");
@@ -62,12 +62,12 @@ void UdpReceiver::bind(const uint16_t port)
     }
 }
 
-int UdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
+int PacketUdpReceiver::receive_many(mmsghdr* msgs, const size_t n_msgs)
 {
     return recvmmsg(socket_fd_, msgs, n_msgs, 0, 0);
 }
 
-bool UdpReceiver::receive(void* buffer, const size_t buffer_n_bytes)
+bool PacketUdpReceiver::receive(void* buffer, const size_t buffer_n_bytes)
 {
     auto data_len = recv(socket_fd_, buffer, buffer_n_bytes, 0);
 
@@ -82,7 +82,7 @@ bool UdpReceiver::receive(void* buffer, const size_t buffer_n_bytes)
     return true;
 }
 
-void UdpReceiver::disconnect()
+void PacketUdpReceiver::disconnect()
 {
     close(socket_fd_);
     socket_fd_ = -1;
