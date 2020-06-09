@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
         auto n_lost_pulses = receiver.get_next_image(meta, data);
 
         if (n_lost_pulses > 0) {
-            cout << "sf_stream:resync_lost_pulses " << n_lost_pulses << endl;
+            cout << "sf_stream:sync_lost_pulses " << n_lost_pulses << endl;
         }
 
         auto end_time = steady_clock::now();
