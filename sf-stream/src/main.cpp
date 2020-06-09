@@ -56,9 +56,10 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    const string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL+DETECTOR_NAME+"-";
+    const string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL+DETECTOR_NAME + "-";
+    ZmqLiveReceiver receiver(n_modules, ctx, LIVE_IPC_URL);
 
-    LiveRecvModule recv_module(queue, n_modules, ctx, LIVE_IPC_URL);
+    LiveRecvModule recv_module(queue, receiver);
 
     // 0mq sockets to streamvis and live analysis
     void *socket_streamvis = zmq_socket(ctx, ZMQ_PUB);
@@ -71,8 +72,6 @@ int main (int argc, char *argv[])
     }
 
     uint16_t data_empty [] = { 0, 0, 0, 0};
-
-
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
