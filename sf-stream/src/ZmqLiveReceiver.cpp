@@ -140,36 +140,28 @@ uint64_t ZmqLiveReceiver::align_modules(ModuleFrameBuffer *meta, char *data)
     return max_pulse_id - min_pulse_id;
 }
 
-void ZmqLiveReceiver::get_next_image(ModuleFrameBuffer* meta, char* data)
+uint64_t ZmqLiveReceiver::get_next_image(ModuleFrameBuffer* meta, char* data)
 {
     uint64_t frame_pulse_id;
     bool sync_needed = false;
-    for (size_t i_module = 0; i_module < n_modules_; i_module++) {
-        auto& module_metadata = meta->module[i_module];
 
-        recv_single_module(
-                sockets_[i_module],
-                &module_metadata,
-                data + (MODULE_N_BYTES * i_module));
+    for (size_t i_module = 0; i_module < n_modules_; i_module++) {
+        auto& module_meta = meta->module[i_module];
+
+        char* buffer = data + (MODULE_N_BYTES * i_module);
+        recv_single_module(sockets_[i_module], &module_meta, buffer);
 
         if (i_module == 0) {
-            frame_pulse_id = module_metadata.pulse_id;
-        } else if (frame_pulse_id != module_metadata.pulse_id) {
+            frame_pulse_id = module_meta.pulse_id;
+        } else if (frame_pulse_id != module_meta.pulse_id) {
             sync_needed = true;
         }
     }
 
     if (sync_needed) {
-        auto start_time = steady_clock::now();
-
         auto lost_pulses = align_modules(meta, data);
-
-        auto end_time = steady_clock::now();
-        auto us_duration = duration_cast<microseconds>(
-                end_time-start_time).count();
-
-        cout << "sf_stream:sync_lost_pulses " << lost_pulses;
-        cout << " sf_stream::sync_us " << us_duration;
-        cout << endl;
+        return lost_pulses;
     }
+
+    return 0;
 }

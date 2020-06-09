@@ -26,7 +26,7 @@ public:
 
     ~ZmqLiveReceiver();
 
-    void get_next_image(ModuleFrameBuffer* meta, char* data);
+    uint64_t get_next_image(ModuleFrameBuffer* meta, char* data);
 };
 
 
