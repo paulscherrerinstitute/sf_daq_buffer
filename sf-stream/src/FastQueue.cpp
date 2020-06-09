@@ -72,7 +72,7 @@ void FastQueue<T>::commit()
     }
 
     write_slot_id_++;
-    write_slot_id_ %= n_slots_;
+    write_slot_id_ = write_slot_id_ % n_slots_;
 }
 
 template<class T>
@@ -99,7 +99,7 @@ void FastQueue<T>::release()
     }
 
     read_slot_id_++;
-    read_slot_id_ %= n_slots_;
+    read_slot_id_ = read_slot_id_ % n_slots_;
 }
 
 template class FastQueue<BufferBinaryBlock>;

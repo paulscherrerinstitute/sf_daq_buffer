@@ -16,10 +16,10 @@ using namespace stream_config;
 
 ZmqLiveReceiver::ZmqLiveReceiver(
         const size_t n_modules,
-        void *ctx,
+        void* ctx,
         const std::string &ipc_prefix) :
             n_modules_(n_modules),
-            ctx_(ctx_),
+            ctx_(ctx),
             ipc_prefix_(ipc_prefix),
             sockets_(n_modules)
 {
