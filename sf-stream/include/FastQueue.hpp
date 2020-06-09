@@ -12,8 +12,8 @@ class FastQueue {
     char* buffer_;
     std::atomic_int* buffer_status_;
 
-    std::atomic_uint16_t write_slot_id_;
-    std::atomic_uint16_t read_slot_id_;
+    std::atomic_int write_slot_id_;
+    std::atomic_int read_slot_id_;
 
 public:
 

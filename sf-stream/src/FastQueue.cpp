@@ -15,7 +15,6 @@ FastQueue<T>::FastQueue(
     buffer_ = new char[slot_n_bytes_ * n_slots_];
     buffer_status_ = new atomic_int[n_slots];
 
-    // TODO: Are atomic variables initialized?
     for (size_t i=0; i < n_slots_; i++) {
         buffer_status_[i] = 0;
     }
