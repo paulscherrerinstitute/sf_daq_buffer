@@ -46,7 +46,11 @@ void LiveRecvModule::receive_thread()
             auto meta = queue_.get_metadata_buffer(slot_id);
             auto data = queue_.get_data_buffer(slot_id);
 
-            receiver_.get_next_image(meta, data);
+            auto n_lost_pulses = receiver_.get_next_image(meta, data);
+
+            if (n_lost_pulses > 0) {
+                cout << "sf_stream:sync_lost_pulses " << n_lost_pulses << endl;
+            }
 
             queue_.commit();
         }
