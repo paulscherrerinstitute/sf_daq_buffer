@@ -83,16 +83,24 @@ int main (int argc, char *argv[])
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
     int pulse_id_step = atoi(argv[6]);
 
+    // Align start (up) and stop(down) pulse_id with pulse_id_step.
+    if (start_pulse_id % pulse_id_step != 0) {
+        start_pulse_id += pulse_id_step - (start_pulse_id % pulse_id_step);
+    }
+    if (stop_pulse_id % pulse_id_step != 0) {
+        stop_pulse_id -= (start_pulse_id % pulse_id_step);
+    }
+
     uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
     uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
-
-    ImageAssembler image_assembler(n_modules);
 
     // Generate list of buffer blocks that need to be loaded.
     std::vector<uint64_t> buffer_blocks;
     for (uint64_t i_block=start_block; i_block <= stop_block; i_block++) {
         buffer_blocks.push_back(i_block);
     }
+
+    ImageAssembler image_assembler(n_modules);
 
     std::vector<std::thread> reading_threads(n_modules);
     for (size_t i_module=0; i_module<n_modules; i_module++) {
