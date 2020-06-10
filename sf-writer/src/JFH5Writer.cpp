@@ -29,7 +29,8 @@ JFH5Writer::JFH5Writer(const string& output_file,
         n_images_(get_n_pulses_in_range(start_pulse_id,
                                         stop_pulse_id,
                                         pulse_id_step)),
-        current_write_index_(0)
+        meta_write_index_(0),
+        data_write_index_(0)
 {
 
 //    bshuf_register_h5filter();
@@ -63,12 +64,12 @@ JFH5Writer::JFH5Writer(const string& output_file,
             H5::PredType::NATIVE_UINT16,
             image_dataspace);
 
-    auto n_pulses = stop_pulse_id_ - start_pulse_id_ + 1;
+    auto n_total_pulses = stop_pulse_id_ - start_pulse_id_ + 1;
 
-    b_pulse_id_ = new uint64_t[n_pulses];
-    b_frame_index_= new uint64_t[n_pulses];
-    b_daq_rec_ = new uint32_t[n_pulses];
-    b_is_good_frame_ = new uint8_t[n_pulses];
+    b_pulse_id_ = new uint64_t[n_total_pulses];
+    b_frame_index_= new uint64_t[n_total_pulses];
+    b_daq_rec_ = new uint32_t[n_total_pulses];
+    b_is_good_frame_ = new uint8_t[n_total_pulses];
 }
 
 JFH5Writer::~JFH5Writer()
@@ -91,15 +92,19 @@ size_t JFH5Writer::get_n_pulses_in_range(
     }
 
     if (100 % pulse_id_step != 0) {
-        throw runtime_error("100 is not divisible by the pulse_id step.");
+        throw runtime_error("100 is not divisible by the pulse_id_step.");
     }
 
-    size_t n_pulses = 0;
-    if (start_pulse_id % pulse_id_step == 0) {
-        n_pulses++;
+    if (start_pulse_id % pulse_id_step != 0) {
+        throw runtime_error("start_pulse_id not divisible by pulse_id_step.");
     }
 
-    n_pulses += stop_pulse_id / pulse_id_step;
+    if (stop_pulse_id % pulse_id_step != 0) {
+        throw runtime_error("stop_pulse_id not divisible by pulse_id_step.");
+    }
+
+    size_t n_pulses = 1;
+    n_pulses += (stop_pulse_id / pulse_id_step);
     n_pulses -= start_pulse_id / pulse_id_step;
 
     if (n_pulses == 0) {
@@ -123,40 +128,30 @@ void JFH5Writer::close_file()
     hsize_t f_m_dims[] = {n_images_, 1};
     H5::DataSpace f_m_space(2, f_m_dims);
 
+    // TODO: Setup block and stride.
+
     auto pulse_id_dataset = file_.createDataSet(
-            "pulse_id",
-            H5::PredType::NATIVE_UINT64,
-            f_m_space);
+            "pulse_id", H5::PredType::NATIVE_UINT64, f_m_space);
     pulse_id_dataset.write(
-            b_pulse_id_, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
+            b_pulse_id_, H5::PredType::NATIVE_UINT64, b_m_space, f_m_space);
     pulse_id_dataset.close();
 
     auto frame_index_dataset = file_.createDataSet(
-            "frame_index",
-            H5::PredType::NATIVE_UINT64,
-            f_m_space);
+            "frame_index", H5::PredType::NATIVE_UINT64, f_m_space);
     frame_index_dataset.write(
-            b_frame_index_, H5::PredType::NATIVE_UINT64,
-            b_m_space, f_m_space);
+            b_frame_index_, H5::PredType::NATIVE_UINT64, b_m_space, f_m_space);
     frame_index_dataset.close();
 
     auto daq_rec_dataset = file_.createDataSet(
-            "daq_rec",
-            H5::PredType::NATIVE_UINT32,
-            f_m_space);
+            "daq_rec", H5::PredType::NATIVE_UINT32, f_m_space);
     daq_rec_dataset.write(
-            b_daq_rec_, H5::PredType::NATIVE_UINT32,
-            b_m_space, f_m_space);
+            b_daq_rec_, H5::PredType::NATIVE_UINT32, b_m_space, f_m_space);
     daq_rec_dataset.close();
 
     auto is_good_frame_dataset = file_.createDataSet(
-            "is_good_frame",
-            H5::PredType::NATIVE_UINT8,
-            f_m_space);
+            "is_good_frame", H5::PredType::NATIVE_UINT8, f_m_space);
     is_good_frame_dataset.write(
-            b_is_good_frame_, H5::PredType::NATIVE_UINT8,
-            b_m_space, f_m_space);
+            b_is_good_frame_, H5::PredType::NATIVE_UINT8, b_m_space, f_m_space);
     is_good_frame_dataset.close();
 
     file_.close();
@@ -183,38 +178,33 @@ void JFH5Writer::write(
         throw runtime_error("Received unexpected block for stop_pulse_id.");
     }
 
-//    for (uint64_t i_pulse=0; i_pulse < n_images_to_copy; i_pulse++) {
-//        auto pulse_index_in_block = i_pulse + n_images_offset;
+//    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    H5::DataSpace b_i_space(3, b_i_dims);
+//    hsize_t b_i_count[] = {n_images_to_copy,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    hsize_t b_i_start[] = {n_images_offset, 0, 0};
+//    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
 //
-//    }
-
-    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace b_i_space(3, b_i_dims);
-    hsize_t b_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t b_i_start[] = {n_images_offset, 0, 0};
-    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
-
-    hsize_t f_i_dims[3] = {n_images_,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    H5::DataSpace f_i_space(3, f_i_dims);
-    hsize_t f_i_count[] = {n_images_to_copy,
-                           MODULE_Y_SIZE * n_modules_,
-                           MODULE_X_SIZE};
-    hsize_t f_i_start[] = {current_write_index_, 0, 0};
-    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-
-    image_dataset_.write(
-            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
+//    hsize_t f_i_dims[3] = {n_images_,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    H5::DataSpace f_i_space(3, f_i_dims);
+//    hsize_t f_i_count[] = {n_images_to_copy,
+//                           MODULE_Y_SIZE * n_modules_,
+//                           MODULE_X_SIZE};
+//    hsize_t f_i_start[] = {current_write_index_, 0, 0};
+//    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
+//
+//    image_dataset_.write(
+//            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
 
 
     // pulse_id
     {
-        auto b_current_ptr = b_pulse_id_ + current_write_index_;
+        auto b_current_ptr = b_pulse_id_ + meta_write_index_;
         memcpy(b_current_ptr,
                &(metadata->pulse_id[n_images_offset]),
                sizeof(uint64_t) * n_images_to_copy);
@@ -222,7 +212,7 @@ void JFH5Writer::write(
 
     // frame_index
     {
-        auto b_current_ptr = b_frame_index_ + current_write_index_;
+        auto b_current_ptr = b_frame_index_ + meta_write_index_;
         memcpy(b_current_ptr,
                &(metadata->frame_index[n_images_offset]),
                sizeof(uint64_t) * n_images_to_copy);
@@ -230,7 +220,7 @@ void JFH5Writer::write(
 
     // daq_rec
     {
-        auto b_current_ptr = b_daq_rec_ + current_write_index_;
+        auto b_current_ptr = b_daq_rec_ + meta_write_index_;
         memcpy(b_current_ptr,
                &(metadata->daq_rec[n_images_offset]),
                sizeof(uint32_t) * n_images_to_copy);
@@ -238,11 +228,11 @@ void JFH5Writer::write(
 
     // is_good_frame
     {
-        auto b_current_ptr = b_is_good_frame_ + current_write_index_;
+        auto b_current_ptr = b_is_good_frame_ + meta_write_index_;
         memcpy(b_current_ptr,
                &(metadata->is_good_image[n_images_offset]),
                sizeof(uint8_t) * n_images_to_copy);
     }
 
-    current_write_index_ += n_images_to_copy;
+    meta_write_index_ += n_images_to_copy;
 }

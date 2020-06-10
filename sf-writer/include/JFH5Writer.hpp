@@ -14,7 +14,8 @@ class JFH5Writer {
     const uint64_t stop_pulse_id_;
     const int pulse_id_step_;
     const size_t n_images_;
-    size_t current_write_index_;
+    size_t meta_write_index_;
+    size_t data_write_index_;
 
     H5::H5File file_;
     H5::DataSet image_dataset_;
