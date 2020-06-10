@@ -136,3 +136,22 @@ TEST(JFH5Writer, test_writing_with_step)
 {
     // TODO: Implement this test.
 }
+
+TEST(JFH5Writer, test_exceptions)
+{
+    // Should be ok.
+    ASSERT_NO_THROW(JFH5Writer("ignore.h5", 1, 1234, 1234, 1));
+    // Should be ok.
+    ASSERT_NO_THROW(JFH5Writer("ignore.h5", 1, 1234, 4567, 1));
+    // Should be ok.
+    ASSERT_NO_THROW(JFH5Writer("ignore.h5", 1, 4, 4, 4));
+
+    // stop smaller than start.
+    ASSERT_THROW(JFH5Writer("ignore.h5", 1, 1234, 1233, 1), runtime_error);
+    // step is not valid for 100Hz.
+    ASSERT_THROW(JFH5Writer("ignore.h5", 1, 1234, 1234, 3), runtime_error);
+    // start not divisible by step.
+    ASSERT_THROW(JFH5Writer("ignore.h5", 1, 10, 10, 4), runtime_error);
+    // stop not divisible by step
+    ASSERT_THROW(JFH5Writer("ignore.h5", 1, 8, 10, 4), runtime_error);
+}
