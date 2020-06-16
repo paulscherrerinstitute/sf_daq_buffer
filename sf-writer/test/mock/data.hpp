@@ -6,10 +6,9 @@
 
 #include "buffer_config.hpp"
 
-auto get_test_buffer_block(
+auto get_test_buffer_block_metadata(
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id,
-        const size_t n_modules,
         const int pulse_id_step)
 {
     using namespace std;
@@ -19,15 +18,28 @@ auto get_test_buffer_block(
     metadata->block_start_pulse_id = start_pulse_id;
     metadata->block_stop_pulse_id = start_pulse_id + BUFFER_BLOCK_SIZE - 1;
 
-    for (uint64_t pulse_id=start_pulse_id;
-         pulse_id<=stop_pulse_id;
+    for (uint64_t pulse_id = start_pulse_id;
+         pulse_id <= stop_pulse_id;
          pulse_id++) {
+
+        if (pulse_id % pulse_id_step != 0) {
+            metadata->is_good_image[pulse_id] = 0;
+            continue;
+        }
 
         metadata->pulse_id[pulse_id] = pulse_id;
         metadata->frame_index[pulse_id] = pulse_id + 10;
         metadata->daq_rec[pulse_id] = pulse_id + 100;
         metadata->is_good_image[pulse_id] = 1;
     }
+
+    return metadata;
+}
+
+auto get_test_buffer_block_data(const size_t n_modules)
+{
+    using namespace std;
+    using namespace buffer_config;
 
     auto image_buffer = make_unique<uint16_t[]>(
             MODULE_N_PIXELS * n_modules * BUFFER_BLOCK_SIZE);
@@ -43,10 +55,7 @@ auto get_test_buffer_block(
         }
     }
 
-    pair<shared_ptr<ImageMetadataBlock>, unique_ptr<uint16_t[]>> value(
-            metadata, move(image_buffer));
-
-    return value;
+    return image_buffer;
 }
 
 
