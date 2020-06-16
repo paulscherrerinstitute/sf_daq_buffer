@@ -6,7 +6,7 @@
 
 #include "buffer_config.hpp"
 
-auto get_test_buffer_block_metadata(
+auto get_test_block_metadata(
         const uint64_t start_pulse_id,
         const uint64_t stop_pulse_id,
         const int pulse_id_step)
@@ -36,7 +36,7 @@ auto get_test_buffer_block_metadata(
     return metadata;
 }
 
-auto get_test_buffer_block_data(const size_t n_modules)
+auto get_test_block_data(const size_t n_modules)
 {
     using namespace std;
     using namespace buffer_config;
