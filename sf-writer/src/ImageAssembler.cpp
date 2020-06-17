@@ -131,6 +131,7 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
 
         auto is_pulse_init = false;
         image_is_good_frame[i_pulse] = 1;
+        image_pulse_id[i_pulse] = 0;
 
         for (size_t i_module=0; i_module < n_modules_; i_module++) {
 
