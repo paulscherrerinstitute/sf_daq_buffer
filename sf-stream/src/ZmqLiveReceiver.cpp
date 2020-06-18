@@ -98,7 +98,9 @@ uint64_t ZmqLiveReceiver::align_modules(ModuleFrameBuffer *meta, char *data)
     uint64_t min_pulse_id = numeric_limits<uint64_t>::max();
 
     // First pass - determine current min and max pulse_id.
-    for (auto& module_meta : meta->module) {
+    for (size_t i_module = 0; i_module < n_modules_; i_module++) {
+        auto& module_meta = meta->module[i_module];
+
         min_pulse_id = min(min_pulse_id, module_meta.pulse_id);
         max_pulse_id = max(max_pulse_id, module_meta.pulse_id);
     }
@@ -111,7 +113,9 @@ uint64_t ZmqLiveReceiver::align_modules(ModuleFrameBuffer *meta, char *data)
         err_msg << " PULSE_OFFSET_LIMIT exceeded.";
         err_msg << " Modules out of sync for " << max_diff << " pulses.";
 
-        for (auto& module_meta : meta->module) {
+        for (size_t i_module = 0; i_module < n_modules_; i_module++) {
+            auto& module_meta = meta->module[i_module];
+
             err_msg << " (" << module_meta.module_id << ", ";
             err_msg << module_meta.pulse_id << "),";
         }
