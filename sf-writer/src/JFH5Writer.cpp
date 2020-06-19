@@ -61,6 +61,9 @@ JFH5Writer::JFH5Writer(const string& output_file,
 //            2,
 //            &(compression_prop[0]));
 
+    file_.createGroup("/data");
+    file_.createGroup("/data/" + detector_name_);
+
     image_dataset_ = file_.createDataSet(
             "/data/" + detector_name_ + "/data",
             H5::PredType::NATIVE_UINT16,
