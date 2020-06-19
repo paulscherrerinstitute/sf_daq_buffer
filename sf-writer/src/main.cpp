@@ -2,6 +2,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <vector>
 
 #include "date.h"
 #include "zmq.h"
