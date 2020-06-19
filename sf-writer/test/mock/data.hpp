@@ -15,22 +15,32 @@ auto get_test_block_metadata(
     using namespace buffer_config;
 
     auto metadata = make_shared<ImageMetadataBlock>();
-    metadata->block_start_pulse_id = start_pulse_id;
-    metadata->block_stop_pulse_id = start_pulse_id + BUFFER_BLOCK_SIZE - 1;
+
+    uint64_t block_id = start_pulse_id / BUFFER_BLOCK_SIZE;
+
+    metadata->block_start_pulse_id = block_id * BUFFER_BLOCK_SIZE;
+    metadata->block_stop_pulse_id =
+            metadata->block_start_pulse_id + BUFFER_BLOCK_SIZE - 1;
+
+    if (metadata->block_stop_pulse_id < stop_pulse_id) {
+        throw runtime_error("stop_pulse_id in next block");
+    }
+
+    auto offset = start_pulse_id - metadata->block_start_pulse_id;
 
     for (uint64_t pulse_id = start_pulse_id;
          pulse_id <= stop_pulse_id;
-         pulse_id++) {
+         pulse_id++, offset++) {
 
         if (pulse_id % pulse_id_step != 0) {
-            metadata->is_good_image[pulse_id] = 0;
+            metadata->is_good_image[offset] = 0;
             continue;
         }
 
-        metadata->pulse_id[pulse_id] = pulse_id;
-        metadata->frame_index[pulse_id] = pulse_id + 10;
-        metadata->daq_rec[pulse_id] = pulse_id + 100;
-        metadata->is_good_image[pulse_id] = 1;
+        metadata->pulse_id[offset] = pulse_id;
+        metadata->frame_index[offset] = pulse_id + 10;
+        metadata->daq_rec[offset] = pulse_id + 100;
+        metadata->is_good_image[offset] = 1;
     }
 
     return metadata;
