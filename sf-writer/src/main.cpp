@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
                 ref(image_assembler));
     }
 
-    JFH5Writer writer(output_file, n_modules,
+    JFH5Writer writer(output_file, device, n_modules,
             start_pulse_id, stop_pulse_id, pulse_id_step);
 
     for (uint64_t block_id:buffer_blocks) {
