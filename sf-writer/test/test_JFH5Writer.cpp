@@ -158,7 +158,7 @@ void test_writing_with_step(
     // The writer closes the file on destruction.
     {
         JFH5Writer writer(
-                "ignore.h5", "detector",
+                "ignore.h5", "/path/to/detector",
                 n_modules, start_pulse_id, stop_pulse_id, step);
         writer.write(meta.get(), (char*)(&data[0]));
     }
