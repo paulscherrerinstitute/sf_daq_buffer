@@ -32,12 +32,13 @@ class JFH5Writer {
                                  const int pulse_id_step);
 
     void write_metadata();
+    std::string get_device_name(const std::string& device);
 
     void close_file();
 
 public:
     JFH5Writer(const std::string& output_file,
-               const std::string& detector_name,
+               const std::string& device,
                const size_t n_modules,
                const uint64_t start_pulse_id,
                const uint64_t stop_pulse_id,

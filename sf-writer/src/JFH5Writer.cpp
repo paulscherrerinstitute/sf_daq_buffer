@@ -18,12 +18,12 @@ using namespace writer_config;
 using namespace buffer_config;
 
 JFH5Writer::JFH5Writer(const string& output_file,
-                       const string& detector_name,
+                       const string& device,
                        const size_t n_modules,
                        const uint64_t start_pulse_id,
                        const uint64_t stop_pulse_id,
                        const size_t pulse_id_step) :
-        detector_name_(detector_name),
+        detector_name_(get_device_name(device)),
         n_modules_(n_modules),
         start_pulse_id_(start_pulse_id),
         stop_pulse_id_(stop_pulse_id),
@@ -73,6 +73,16 @@ JFH5Writer::JFH5Writer(const string& output_file,
     b_frame_index_= new uint64_t[n_total_pulses_];
     b_daq_rec_ = new uint32_t[n_total_pulses_];
     b_is_good_frame_ = new uint8_t[n_total_pulses_];
+}
+
+std::string JFH5Writer::get_device_name(const std::string& device)
+{
+    size_t last_separator;
+    if ((last_separator = device.rfind("/")) == string::npos) {
+        return device;
+    }
+
+    return device.substr(last_separator+1);
 }
 
 JFH5Writer::~JFH5Writer()
