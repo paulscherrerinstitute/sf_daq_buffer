@@ -9,6 +9,7 @@
 
 class JFH5Writer {
 
+    const std::string detector_name_;
     const size_t n_modules_;
     const uint64_t start_pulse_id_;
     const uint64_t stop_pulse_id_;
@@ -32,6 +33,7 @@ class JFH5Writer {
 
 public:
     JFH5Writer(const std::string& output_file,
+               const std::string& detector_name,
                const size_t n_modules,
                const uint64_t start_pulse_id,
                const uint64_t stop_pulse_id,
