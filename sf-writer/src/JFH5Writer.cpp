@@ -31,6 +31,7 @@ JFH5Writer::JFH5Writer(const string& output_file,
         n_images_(get_n_pulses_in_range(start_pulse_id,
                                         stop_pulse_id,
                                         pulse_id_step)),
+        n_total_pulses_(stop_pulse_id_ - start_pulse_id_ + 1),
         meta_write_index_(0),
         data_write_index_(0)
 {
@@ -69,12 +70,10 @@ JFH5Writer::JFH5Writer(const string& output_file,
             H5::PredType::NATIVE_UINT16,
             image_dataspace);
 
-    auto n_total_pulses = stop_pulse_id_ - start_pulse_id_ + 1;
-
-    b_pulse_id_ = new uint64_t[n_total_pulses];
-    b_frame_index_= new uint64_t[n_total_pulses];
-    b_daq_rec_ = new uint32_t[n_total_pulses];
-    b_is_good_frame_ = new uint8_t[n_total_pulses];
+    b_pulse_id_ = new uint64_t[n_total_pulses_];
+    b_frame_index_= new uint64_t[n_total_pulses_];
+    b_daq_rec_ = new uint32_t[n_total_pulses_];
+    b_is_good_frame_ = new uint8_t[n_total_pulses_];
 }
 
 JFH5Writer::~JFH5Writer()
@@ -119,14 +118,8 @@ size_t JFH5Writer::get_n_pulses_in_range(
     return n_pulses;
 }
 
-void JFH5Writer::close_file()
+void JFH5Writer::write_metadata()
 {
-    if (file_.getId() == -1) {
-        return;
-    }
-
-    image_dataset_.close();
-
     hsize_t b_m_dims[2] = {n_images_, 1};
     H5::DataSpace b_m_space (2, b_m_dims);
 
@@ -162,6 +155,17 @@ void JFH5Writer::close_file()
     is_good_frame_dataset.write(
             b_is_good_frame_, H5::PredType::NATIVE_UINT8, b_m_space, f_m_space);
     is_good_frame_dataset.close();
+}
+
+void JFH5Writer::close_file()
+{
+    if (file_.getId() == -1) {
+        return;
+    }
+
+    image_dataset_.close();
+
+    write_metadata();
 
     file_.close();
 }

@@ -15,6 +15,7 @@ class JFH5Writer {
     const uint64_t stop_pulse_id_;
     const int pulse_id_step_;
     const size_t n_images_;
+    const size_t n_total_pulses_;
     size_t meta_write_index_;
     size_t data_write_index_;
 
@@ -29,6 +30,9 @@ class JFH5Writer {
     size_t get_n_pulses_in_range(const uint64_t start_pulse_id,
                                  const uint64_t stop_pulse_id,
                                  const int pulse_id_step);
+
+    void write_metadata();
+
     void close_file();
 
 public:
