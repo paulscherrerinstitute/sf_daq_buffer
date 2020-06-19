@@ -13,7 +13,7 @@ class JFH5Writer {
     const size_t n_modules_;
     const uint64_t start_pulse_id_;
     const uint64_t stop_pulse_id_;
-    const int pulse_id_step_;
+    const size_t pulse_id_step_;
     const size_t n_images_;
     const size_t n_total_pulses_;
     size_t meta_write_index_;
@@ -41,7 +41,7 @@ public:
                const size_t n_modules,
                const uint64_t start_pulse_id,
                const uint64_t stop_pulse_id,
-               const int pulse_id_step);
+               const size_t pulse_id_step);
     ~JFH5Writer();
     void write(const ImageMetadataBlock* metadata, const char* data);
 };
