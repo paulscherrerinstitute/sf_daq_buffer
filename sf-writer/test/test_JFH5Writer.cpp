@@ -139,12 +139,21 @@ TEST(JFH5Writer, test_writing_with_step)
     size_t n_modules = 2;
     uint64_t start_pulse_id = 500;
     uint64_t stop_pulse_id = 599;
-    auto n_images = stop_pulse_id - start_pulse_id + 1;
     // 50Hz test.
+    auto n_images = 50;
     int step = 2;
 
     auto meta = get_test_block_metadata(start_pulse_id, stop_pulse_id, step);
     auto data = get_test_block_data(n_modules);
+
+    // Verify the metadata has the layout we want to test (50Hz).
+    for (size_t i_pulse=0; i_pulse<BUFFER_BLOCK_SIZE; i_pulse++) {
+        if (i_pulse % step == 0) {
+            ASSERT_EQ(meta->pulse_id[i_pulse], 500 + i_pulse);
+        } else {
+            ASSERT_EQ(meta->pulse_id[i_pulse], 0);
+        }
+    }
 
     // The writer closes the file on destruction.
     {
