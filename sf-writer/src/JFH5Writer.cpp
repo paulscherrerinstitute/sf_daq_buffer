@@ -235,13 +235,15 @@ void JFH5Writer::write(
         }
 
         hsize_t offset[] = {data_write_index_, 0, 0};
+        size_t data_offset = i_image * MODULE_N_BYTES * n_modules_;
+
         H5DOwrite_chunk(
                 image_dataset_.getId(),
                 H5P_DEFAULT,
                 0,
                 offset,
                 MODULE_N_BYTES * n_modules_,
-                data);
+                data + data_offset);
 
         data_write_index_++;
     }
