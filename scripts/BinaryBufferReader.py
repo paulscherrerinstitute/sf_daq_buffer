@@ -30,7 +30,7 @@ class BinaryBufferReader(object):
     def read_pulse_id(self, pulse_id):
 
         index_in_file = get_file_frame_index(pulse_id)
-        n_bytes_offset = index_in_file * sizeof(BufferBinaryFormat)
+        n_bytes_offset = int(index_in_file * sizeof(BufferBinaryFormat))
         n_bytes_to_read = sizeof(BufferBinaryFormat)
 
         metadata = {"pulse_id": 0,
