@@ -19,7 +19,7 @@ class BufferBinaryFormat(Structure):
                 ("daq_rec", c_uint64),
                 ("n_recv_packets", c_uint64),
                 ("module_id", c_uint64),
-                ("data", c_uint16 * MODULE_N_PIXELS)]
+                ("data", c_byte * MODULE_N_BYTES)]
 
 
 class BinaryBufferReader(object):
@@ -37,8 +37,10 @@ class BinaryBufferReader(object):
                     "frame_index": 0,
                     "daq_rec": 0,
                     "is_good_frame": True}
-        data = numpy.zeros(shape=[self.n_modules*MODULE_Y_SIZE*MODULE_X_SIZE],
+
+        data = numpy.zeros(shape=[self.n_modules * MODULE_N_BYTES],
                            dtype="byte")
+
         metadata_init = False
 
         for i_module in range(self.n_modules):
@@ -56,7 +58,7 @@ class BinaryBufferReader(object):
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(
                     input_file.read(n_bytes_to_read))
 
-            if frame_buffer.FORMAT_MARKER == 0xBE:
+            if frame_buffer.FORMAT_MARKER == b'\xBE':
                 is_good_frame = frame_buffer.n_recv_packets == 128
 
                 if is_good_frame:
@@ -69,12 +71,24 @@ class BinaryBufferReader(object):
 
                     if metadata["is_good_frame"]:
                         if metadata["pulse_id"] != frame_buffer.pulse_id:
+                            print("pulse_id mismatch in module", i_module,
+                                  "expected", metadata["pulse_id"],
+                                  "got", frame_buffer.pulse_id)
+
                             metadata["is_good_frame"] = False
 
                         if metadata["frame_index"] != frame_buffer.frame_index:
+                            print("frame_index mismatch in module", i_module,
+                                  "expected", metadata["frame_index"],
+                                  "got", frame_buffer.frame_index)
+
                             metadata["is_good_frame"] = False
 
                         if metadata["daq_rec"] != frame_buffer.daq_rec:
+                            print("daq_rec mismatch in module", i_module,
+                                  "expected", metadata["daq_rec"],
+                                  "got", frame_buffer.daq_rec)
+
                             metadata["is_good_frame"] = False
                 else:
                     metadata["is_good_frame"] = False
@@ -84,10 +98,7 @@ class BinaryBufferReader(object):
                 start_byte_image = MODULE_N_BYTES * i_module
                 stop_byte_image = start_byte_image + MODULE_N_BYTES
 
-                frame_data = numpy.frombuffer(frame_buffer.data,
-                                              count=MODULE_N_BYTES,
-                                              dtype="bytes")
-
+                frame_data = numpy.array(frame_buffer.data, dtype="bytes")
                 data[start_byte_image:stop_byte_image] = frame_data
 
             else:
