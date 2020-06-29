@@ -108,7 +108,8 @@ class BinaryBufferReader(object):
         if not metadata_init:
             metadata["is_good_frame"] = False
 
-        return metadata, data
+        data_shape = [self.n_modules * MODULE_Y_SIZE, MODULE_X_SIZE]
+        return metadata, data.astype(dtype="uint16").reshape(shape=data_shape)
 
 
 def get_file_frame_index(pulse_id):
