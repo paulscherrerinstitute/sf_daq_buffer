@@ -56,6 +56,8 @@ class BinaryBufferReader(object):
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(
                     input_file.read(n_bytes_to_read))
 
+            output_prefix = "[pulse_id %s module %d] " % (pulse_id, i_module)
+
             if frame_buffer.FORMAT_MARKER == b'\xBE':
                 is_good_frame = frame_buffer.n_recv_packets == 128
 
@@ -69,29 +71,30 @@ class BinaryBufferReader(object):
 
                     if metadata["is_good_frame"]:
                         if metadata["pulse_id"] != frame_buffer.pulse_id:
-                            print("pulse_id mismatch in module", i_module,
-                                  "expected", metadata["pulse_id"],
-                                  "got", frame_buffer.pulse_id)
+                            print(output_prefix,
+                                  "Mismatch pulse_id",
+                                  metadata["pulse_id"])
 
                             metadata["is_good_frame"] = False
 
                         if metadata["frame_index"] != frame_buffer.frame_index:
-                            print("frame_index mismatch in module", i_module,
-                                  "expected", metadata["frame_index"],
-                                  "got", frame_buffer.frame_index)
+                            print(output_prefix,
+                                  "Mismatch frame_index",
+                                  metadata["frame_index"])
 
                             metadata["is_good_frame"] = False
 
                         if metadata["daq_rec"] != frame_buffer.daq_rec:
-                            print("daq_rec mismatch in module", i_module,
-                                  "expected", metadata["daq_rec"],
-                                  "got", frame_buffer.daq_rec)
+                            print(output_prefix,
+                                  "Mismatch daq_rec",
+                                  metadata["daq_rec"])
 
                             metadata["is_good_frame"] = False
                 else:
                     metadata["is_good_frame"] = False
-                    print("Module", i_module,
-                          "n_lost_packets",  128-frame_buffer.n_recv_packets)
+                    print(output_prefix,
+                          "n_lost_packets",
+                          128-frame_buffer.n_recv_packets)
 
                 start_byte_image = MODULE_N_BYTES * i_module
                 stop_byte_image = start_byte_image + MODULE_N_BYTES
@@ -101,7 +104,7 @@ class BinaryBufferReader(object):
 
             else:
                 metadata["is_good_frame"] = False
-                print("No data for module", i_module, "at pulse_id", pulse_id)
+                print(output_prefix, "no data in buffer")
 
         if not metadata_init:
             metadata["is_good_frame"] = False
