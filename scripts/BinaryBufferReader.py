@@ -113,18 +113,13 @@ class BinaryBufferReader(object):
 
 
 def get_file_frame_index(pulse_id):
-    file_base = pulse_id // FILE_MOD
-    file_base *= FILE_MOD
-
+    file_base = int((pulse_id // FILE_MOD) * FILE_MOD)
     return pulse_id - file_base
 
 
 def get_filename(root_folder, device_name, pulse_id):
-    folder_base = pulse_id // FOLDER_MOD
-    folder_base *= FOLDER_MOD
-
-    file_base = pulse_id // FILE_MOD
-    file_base *= FILE_MOD
+    folder_base = int((pulse_id // FOLDER_MOD) * FOLDER_MOD)
+    file_base = int((pulse_id // FILE_MOD) * FILE_MOD)
 
     return "%s/%s/%s/%s%s" % (root_folder,
                               device_name,
