@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from .BinaryBufferReader import BinaryBufferReader
+from BinaryBufferReader import BinaryBufferReader
 
 import numpy
 import h5py
@@ -7,7 +7,7 @@ import h5py
 def main():
     parser = ArgumentParser(description='Verify final H5 file against buffer.')
 
-    parser.add_argument('h5_filename', type=int,
+    parser.add_argument('h5_filename', type=str,
                         help="Input file to verify.")
 
     parser.add_argument('--base_folder', type=str,
@@ -29,7 +29,7 @@ def main():
     input_daq_rec = file["/data/" + detector_name + "/daq_rec"]
     input_is_good_frame = file["/data/" + detector_name + "/is_good_frame"]
 
-    for i in len(input_pulse_id):
+    for i in range(input_pulse_id.shape[0]):
         pulse_id = input_pulse_id[i][0]
         frame_index = input_frame_index[i][0]
         daq_rec = input_daq_rec[i][0]
