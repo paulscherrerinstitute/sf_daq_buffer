@@ -109,7 +109,7 @@ class BinaryBufferReader(object):
             metadata["is_good_frame"] = False
 
         data_shape = [self.n_modules * MODULE_Y_SIZE, MODULE_X_SIZE]
-        return metadata, data.view("uint16").reshape(shape=data_shape)
+        return metadata, data.view("uint16").reshape(data_shape)
 
 
 def get_file_frame_index(pulse_id):
