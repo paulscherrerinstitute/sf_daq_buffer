@@ -1,4 +1,5 @@
 import numpy
+import logging
 from argparse import ArgumentParser
 from ctypes import *
 
@@ -9,6 +10,8 @@ MODULE_X_SIZE = 1024
 MODULE_Y_SIZE = 512
 MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE
 MODULE_N_BYTES = MODULE_N_PIXELS * 2
+
+_logger = logging.getLogger(__name__)
 
 
 class BufferBinaryFormat(Structure):
@@ -71,30 +74,26 @@ class BinaryBufferReader(object):
 
                     if metadata["is_good_frame"]:
                         if metadata["pulse_id"] != frame_buffer.pulse_id:
-                            print(output_prefix,
-                                  "Mismatch pulse_id",
-                                  metadata["pulse_id"])
+                            _logger.debug(output_prefix +
+                                          "Mismatch pulse_id " +
+                                          metadata["pulse_id"])
 
                             metadata["is_good_frame"] = False
 
                         if metadata["frame_index"] != frame_buffer.frame_index:
-                            print(output_prefix,
-                                  "Mismatch frame_index",
-                                  metadata["frame_index"])
-
                             metadata["is_good_frame"] = False
 
                         if metadata["daq_rec"] != frame_buffer.daq_rec:
-                            print(output_prefix,
-                                  "Mismatch daq_rec",
-                                  metadata["daq_rec"])
+                            _logger.debug(output_prefix +
+                                          "Mismatch daq_rec " +
+                                          metadata["daq_rec"])
 
                             metadata["is_good_frame"] = False
                 else:
                     metadata["is_good_frame"] = False
-                    print(output_prefix,
-                          "n_lost_packets",
-                          128-frame_buffer.n_recv_packets)
+                    _logger.debug(output_prefix +
+                                  "n_lost_packets " +
+                                  128 - frame_buffer.n_recv_packets)
 
                 start_byte_image = MODULE_N_BYTES * i_module
                 stop_byte_image = start_byte_image + MODULE_N_BYTES
@@ -104,7 +103,7 @@ class BinaryBufferReader(object):
 
             else:
                 metadata["is_good_frame"] = False
-                print(output_prefix, "no data in buffer")
+                _logger.debug(output_prefix + "no data in buffer")
 
         if not metadata_init:
             metadata["is_good_frame"] = False
