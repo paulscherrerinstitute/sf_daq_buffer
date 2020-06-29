@@ -51,8 +51,6 @@ class BinaryBufferReader(object):
                 device_name=device_name,
                 pulse_id=pulse_id)
 
-            print("Reading file", filename, "for module", i_module)
-
             with open(filename, 'rb') as input_file:
                 input_file.seek(n_bytes_offset)
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(
