@@ -111,9 +111,9 @@ ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
 
-## Warnings
+### Warnings
 
-### Zeromq
+#### Zeromq
 
 Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 
 message is not sent (the connection gets dropped before the message is in the buffer).
