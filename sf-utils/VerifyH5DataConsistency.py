@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from sf_utils.BinaryBufferReader import BinaryBufferReader
+from .BinaryBufferReader import BinaryBufferReader
 
 import numpy
 import h5py
