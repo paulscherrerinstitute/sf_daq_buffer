@@ -36,10 +36,12 @@ TEST(JFH5Writer, test_writing)
     auto meta = get_test_block_metadata(start_pulse_id, stop_pulse_id, 1);
     auto data = get_test_block_data(n_modules);
 
+    string detector_name = "detector";
+
     // The writer closes the file on destruction.
     {
         JFH5Writer writer(
-                "ignore.h5", "detector",
+                "ignore.h5", detector_name,
                 n_modules, start_pulse_id, stop_pulse_id, 1);
         writer.write(meta.get(), (char*)(&data[0]));
     }
@@ -77,6 +79,12 @@ TEST(JFH5Writer, test_writing)
             reader.openDataSet("/data/detector/is_good_frame");
     is_good_frame_dataset.read(
             &is_good_frame_data[0], H5::PredType::NATIVE_UINT8);
+
+    auto name_dataset = reader.openDataSet("/general/detector_name");
+    string read_detector_name;
+    name_dataset.read(read_detector_name, name_dataset.getDataType());
+
+    ASSERT_EQ(detector_name, read_detector_name);
 
     for (uint64_t pulse_id=start_pulse_id;
          pulse_id<=stop_pulse_id;
