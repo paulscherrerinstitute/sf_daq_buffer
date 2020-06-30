@@ -87,7 +87,6 @@ yum install devtoolset-9
 yum install cmake3
 yum install zeromq-devel
 yum install hdf5-devel
-yum install jsoncpp-devel
 ```
 
 Step by step procedure to build the repo:
@@ -109,7 +108,6 @@ Example:
 ```bash
 ln -s "$(pwd)""/""sf_buffer" /usr/bin/sf_buffer
 ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
-ln -s "$(pwd)""/""sf_replay" /usr/bin/sf_replay
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
 
@@ -125,6 +123,9 @@ Please install a later version:
 ```bash
 cd /etc/yum.repos.d/
 wget https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/RHEL_7/network:messaging:zeromq:release-stable.repo
+yum remove zeromq
+yum remove openpgm
+yum install libsodium-devel
 yum install zeromq-devel
 ```
 
