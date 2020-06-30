@@ -1,0 +1,10 @@
+[Unit]
+Description=All UDP-buffer instances of JF02
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF02-buffer-worker.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

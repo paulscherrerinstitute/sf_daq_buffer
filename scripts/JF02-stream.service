@@ -1,0 +1,15 @@
+[Unit]
+Description=stream service (to streamvis and live analysis) of JF02
+
+[Service]
+PermissionsStartOnly=true
+Type=idle
+User=root
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF02-stream.sh
+TimeoutStartSec=10
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

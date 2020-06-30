@@ -1,0 +1,16 @@
+[Unit]
+Description=JF06 UDP2buffer worker instance as a service, instance %i
+Requires=JF06-buffer.service
+Before=JF06-buffer.service
+BindsTo=JF06-buffer.service
+
+[Service]
+PermissionsStartOnly=true
+Type=idle
+User=root
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF06-buffer-worker.sh %i
+TimeoutStartSec=10
+RestartSec=10
+
+[Install]
+WantedBy=JF06-buffer.service
