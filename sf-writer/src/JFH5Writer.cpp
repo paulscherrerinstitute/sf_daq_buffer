@@ -42,6 +42,15 @@ JFH5Writer::JFH5Writer(const string& output_file,
     file_.createGroup("/data");
     file_.createGroup("/data/" + detector_name_);
 
+    H5::DataSpace att_space(H5S_SCALAR);
+    H5::DataType data_type = H5::StrType(0, H5T_VARIABLE);
+
+    file_.createGroup("/general");
+    auto detector_dataset = file_.createDataSet(
+            "/general/detector_name", data_type ,att_space);
+
+    detector_dataset.write(detector_name_, data_type);
+
     hsize_t image_dataset_dims[3] =
             {n_images_, n_modules * MODULE_Y_SIZE, MODULE_X_SIZE};
 
