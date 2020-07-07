@@ -1,0 +1,10 @@
+[Unit]
+Description=All UDP-buffer instances of JF06(4M mode)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF06_4M-buffer-worker.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

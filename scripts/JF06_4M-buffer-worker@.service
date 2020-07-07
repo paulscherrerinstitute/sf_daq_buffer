@@ -1,0 +1,16 @@
+[Unit]
+Description=JF06(4M mode) UDP2buffer worker instance as a service, instance %i
+Requires=JF06_4M-buffer.service
+Before=JF06_4M-buffer.service
+BindsTo=JF06_4M-buffer.service
+
+[Service]
+PermissionsStartOnly=true
+Type=idle
+User=root
+ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF06_4M-buffer-worker.sh %i
+TimeoutStartSec=10
+RestartSec=10
+
+[Install]
+WantedBy=JF06_4M-buffer.service
