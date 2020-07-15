@@ -194,21 +194,25 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
         text_header = buffer.GetString();
     }
 
-    zmq_send(socket_live_,
-             text_header.c_str(),
-             text_header.size(),
-             ZMQ_SNDMORE | ZMQ_NOBLOCK);
+    // TODO: Ugly. Fix this flow control.
+    if (zmq_send(socket_live_,
+                 text_header.c_str(),
+                 text_header.size(),
+                 ZMQ_SNDMORE | ZMQ_NOBLOCK) != -1) {
 
-    if ( send_live_analysis == 0 ) {
-        zmq_send(socket_live_,
-                 (char*)data,
-                 buffer_config::MODULE_N_BYTES * config_.n_modules,
-                 0);
-    } else {
-        zmq_send(socket_live_,
-                 (char*)data_empty,
-                 8,
-                 0);
+        if ( send_live_analysis == 0 ) {
+            zmq_send(socket_live_,
+                     (char*)data,
+                     buffer_config::MODULE_N_BYTES * config_.n_modules,
+                     ZMQ_NOBLOCK);
+        } else {
+            zmq_send(socket_live_,
+                     (char*)data_empty,
+                     8,
+                     ZMQ_NOBLOCK);
+        }
     }
+
+
 }
 
