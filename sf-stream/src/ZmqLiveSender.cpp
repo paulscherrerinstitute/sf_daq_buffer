@@ -1,9 +1,11 @@
 #include "ZmqLiveSender.hpp"
+#include "stream_config.hpp"
 
 #include "zmq.h"
 #include <stdexcept>
 
 using namespace std;
+using namespace stream_config;
 
 LiveStreamConfig read_json_config(const std::string filename)
 {
@@ -31,14 +33,25 @@ ZmqLiveSender::ZmqLiveSender(
             config_(config)
 {
     // TODO: Set also LINGER and SNDHWM.
-
-    // 0mq sockets to streamvis and live analysis
     socket_streamvis_ = zmq_socket(ctx, ZMQ_PUB);
     if (zmq_bind(socket_streamvis_, config.streamvis_address.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
-    socket_live_ = zmq_socket(ctx, ZMQ_PUB);
+    socket_live_ = zmq_socket(ctx, ZMQ_PUSH);
+
+    const int sndhwm = PROCESSING_ZMQ_SNDHWM;
+    if (zmq_setsockopt(
+            socket_live_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    const int linger = 0;
+    if (zmq_setsockopt(
+            socket_live_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
     if (zmq_bind(socket_live_, config.live_analysis_address.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
@@ -184,7 +197,7 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     zmq_send(socket_live_,
              text_header.c_str(),
              text_header.size(),
-             ZMQ_SNDMORE);
+             ZMQ_SNDMORE | ZMQ_NOBLOCK);
 
     if ( send_live_analysis == 0 ) {
         zmq_send(socket_live_,

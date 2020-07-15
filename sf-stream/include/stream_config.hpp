@@ -8,4 +8,6 @@ namespace stream_config
     const int STREAM_FASTQUEUE_SLOTS = 5;
     // If the modules are offset more than 1000 pulses, crush.
     const uint64_t PULSE_OFFSET_LIMIT = 1000;
+    // SNDHWM for live processing socket.
+    const int PROCESSING_ZMQ_SNDHWM = 10;
 }
