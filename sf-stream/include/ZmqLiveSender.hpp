@@ -20,6 +20,7 @@ struct LiveStreamConfig {
     const std::string GAIN_FILENAME;
     const std::string DETECTOR_NAME;
     const int n_modules;
+    const std::string pulse_address;
 };
 
 LiveStreamConfig read_json_config(const std::string filename);
@@ -30,6 +31,7 @@ class ZmqLiveSender {
 
     void* socket_streamvis_;
     void* socket_live_;
+    void* socket_pulse_;
 
 public:
     ZmqLiveSender(void* ctx,

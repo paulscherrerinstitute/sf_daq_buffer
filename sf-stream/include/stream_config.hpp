@@ -10,4 +10,6 @@ namespace stream_config
     const uint64_t PULSE_OFFSET_LIMIT = 1000;
     // SNDHWM for live processing socket.
     const int PROCESSING_ZMQ_SNDHWM = 10;
+    // Keep the last second of pulses in the buffer.
+    const int PULSE_ZMQ_SNDHWM = 100;
 }

@@ -22,7 +22,8 @@ LiveStreamConfig read_json_config(const std::string filename)
             config_parameters["pedestal_file"].GetString(),
             config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
-            config_parameters["n_modules"].GetInt()
+            config_parameters["n_modules"].GetInt(),
+            "tcp://127.0.0.1:51234"
     };
 }
 
@@ -34,27 +35,51 @@ ZmqLiveSender::ZmqLiveSender(
 {
     // TODO: Set also LINGER and SNDHWM.
     socket_streamvis_ = zmq_socket(ctx, ZMQ_PUB);
+
     if (zmq_bind(socket_streamvis_, config.streamvis_address.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 
-    socket_live_ = zmq_socket(ctx, ZMQ_PUSH);
+    {
+        socket_live_ = zmq_socket(ctx, ZMQ_PUSH);
 
-    const int sndhwm = PROCESSING_ZMQ_SNDHWM;
-    if (zmq_setsockopt(
-            socket_live_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
+        const int sndhwm = PROCESSING_ZMQ_SNDHWM;
+        if (zmq_setsockopt(
+                socket_live_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
+
+        const int linger = 0;
+        if (zmq_setsockopt(
+                socket_live_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
+
+        if (zmq_bind(socket_live_, config.live_analysis_address.c_str()) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
     }
 
-    const int linger = 0;
-    if (zmq_setsockopt(
-            socket_live_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
+    {
+        socket_pulse_ = zmq_socket(ctx, ZMQ_PUB);
+
+        if (zmq_bind(socket_pulse_, config.pulse_address.c_str()) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
+
+        const int sndhwm = PULSE_ZMQ_SNDHWM;
+        if (zmq_setsockopt(
+                socket_pulse_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
+
+        const int linger = 0;
+        if (zmq_setsockopt(
+                socket_pulse_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+            throw runtime_error(zmq_strerror(errno));
+        }
     }
 
-    if (zmq_bind(socket_live_, config.live_analysis_address.c_str()) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
 }
 
 ZmqLiveSender::~ZmqLiveSender()
@@ -94,6 +119,10 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
 
             if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
         }
+    }
+
+    if(zmq_send(socket_pulse_, &pulse_id, sizeof(pulse_id), 0) == -1) {
+        throw runtime_error(zmq_strerror(errno));
     }
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
