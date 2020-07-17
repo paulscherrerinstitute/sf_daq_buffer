@@ -7,6 +7,9 @@
 
 class BufferBinaryWriter {
 
+    const size_t MAX_FILE_BYTES =
+            buffer_config::FILE_MOD * sizeof(BufferBinaryFormat);
+
     const std::string root_folder_;
     const std::string device_name_;
     std::string latest_filename_;

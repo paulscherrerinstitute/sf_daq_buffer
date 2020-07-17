@@ -98,6 +98,44 @@ void BufferBinaryWriter::open_file(const std::string& filename)
         throw runtime_error(err_msg.str());
     }
 
+    // TODO: Remove context if test successful.
+
+    /** Setting the buffer file size in advance to try to lower the number of
+        metadata updates on GPFS. */
+    {
+        if (lseek(output_file_fd_, MAX_FILE_BYTES, SEEK_SET) < 0) {
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[BufferBinaryWriter::open_file]";
+            err_msg << " Error while lseek on end of file ";
+            err_msg << current_output_filename_;
+            err_msg << " for MAX_FILE_BYTES ";
+            err_msg << MAX_FILE_BYTES << ": ";
+            err_msg << strerror(errno) << endl;
+
+            throw runtime_error(err_msg.str());
+        }
+
+        const uint8_t mark = 255;
+        if(::write(output_file_fd_, &mark, sizeof(mark)) != sizeof(mark)) {
+            stringstream err_msg;
+
+            using namespace date;
+            using namespace chrono;
+            err_msg << "[" << system_clock::now() << "]";
+            err_msg << "[BufferBinaryWriter::open_file]";
+            err_msg << " Error while writing to file ";
+            err_msg << current_output_filename_ << ": ";
+            err_msg << strerror(errno) << endl;
+
+            throw runtime_error(err_msg.str());
+        }
+    }
+
+
     current_output_filename_ = filename;
 }
 
