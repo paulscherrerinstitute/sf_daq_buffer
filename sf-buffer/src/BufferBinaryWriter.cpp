@@ -50,7 +50,7 @@ void BufferBinaryWriter::write(
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[BinaryWriter::write]";
+        err_msg << "[BufferBinaryWriter::write]";
         err_msg << " Error while lseek on file ";
         err_msg << current_output_filename_;
         err_msg << " for n_bytes_offset ";
@@ -67,7 +67,7 @@ void BufferBinaryWriter::write(
         using namespace date;
         using namespace chrono;
         err_msg << "[" << system_clock::now() << "]";
-        err_msg << "[BinaryWriter::write]";
+        err_msg << "[BufferBinaryWriter::write]";
         err_msg << " Error while writing to file ";
         err_msg << current_output_filename_ << ": ";
         err_msg << strerror(errno) << endl;
@@ -148,7 +148,7 @@ void BufferBinaryWriter::close_current_file()
             using namespace date;
             using namespace chrono;
             err_msg << "[" << system_clock::now() << "]";
-            err_msg << "[BinaryWriter::close_current_file]";
+            err_msg << "[BufferBinaryWriter::close_current_file]";
             err_msg << " Error while closing file ";
             err_msg << current_output_filename_ << ": ";
             err_msg << strerror(errno) << endl;
