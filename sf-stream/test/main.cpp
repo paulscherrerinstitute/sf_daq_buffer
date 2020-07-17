@@ -1,6 +1,4 @@
 #include "gtest/gtest.h"
-#include "test_LiveRecvModule.cpp"
-#include "test_FastQueue.cpp"
 
 using namespace std;
 

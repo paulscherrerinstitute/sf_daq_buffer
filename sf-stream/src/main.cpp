@@ -4,10 +4,10 @@
 #include <cstring>
 #include <zmq.h>
 
-#include "LiveRecvModule.hpp"
 #include "buffer_config.hpp"
 #include "stream_config.hpp"
 #include "ZmqLiveSender.hpp"
+#include "ZmqLiveReceiver.hpp"
 
 using namespace std;
 using namespace chrono;
