@@ -163,10 +163,13 @@ void test_writing_with_step(
         }
     }
 
+    string path_root = "/path/to/";
+    string expected_detector_name = "detector";
+
     // The writer closes the file on destruction.
     {
         JFH5Writer writer(
-                "ignore.h5", "/path/to/detector",
+                "ignore.h5", path_root + expected_detector_name,
                 n_modules, start_pulse_id, stop_pulse_id, step);
         writer.write(meta.get(), (char*)(&data[0]));
     }
@@ -211,6 +214,12 @@ void test_writing_with_step(
     ASSERT_EQ(dims[0], n_images);
     ASSERT_EQ(dims[1], 1);
 
+    auto name_dataset = reader.openDataSet("/general/detector_name");
+    string read_detector_name;
+    name_dataset.read(read_detector_name, name_dataset.getDataType());
+
+    ASSERT_EQ(expected_detector_name, read_detector_name);
+
     uint64_t i_pulse = 0;
     for (uint64_t pulse_id=start_pulse_id;
          pulse_id<=stop_pulse_id;
@@ -231,6 +240,7 @@ void test_writing_with_step(
 
 TEST(JFH5Writer, test_writing_with_step)
 {
+    // TODO: Write with any number of steps.
     // 100Hz
     test_writing_with_step(500, 599, 1);
     // 50Hz
