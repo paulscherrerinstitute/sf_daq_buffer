@@ -103,6 +103,7 @@ void BufferBinaryWriter::open_file(const std::string& filename)
     /** Setting the buffer file size in advance to try to lower the number of
         metadata updates on GPFS. */
     {
+        // TODO: Try instead to use fallocate.
         if (lseek(output_file_fd_, MAX_FILE_BYTES, SEEK_SET) < 0) {
             stringstream err_msg;
 
