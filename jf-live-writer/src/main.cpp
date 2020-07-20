@@ -19,13 +19,13 @@ using namespace writer_config;
 using namespace buffer_config;
 
 void read_buffer(
-        const string device,
-        const string channel_name,
+        const string detector_folder,
+        const string module_name,
         const int i_module,
         const vector<uint64_t>& buffer_blocks,
         ImageAssembler& image_assembler)
 {
-    BufferBinaryReader block_reader(device, channel_name);
+    BufferBinaryReader block_reader(detector_folder, module_name);
     auto block_buffer = new BufferBinaryBlock();
 
     for (uint64_t block_id:buffer_blocks) {
@@ -63,11 +63,11 @@ int main (int argc, char *argv[])
 {
     if (argc != 7) {
         cout << endl;
-        cout << "Usage: sf_writer [output_file] [device] [n_modules]";
+        cout << "Usage: sf_writer [output_file] [detector_folder] [n_modules]";
         cout << " [start_pulse_id] [stop_pulse_id] [pulse_id_step]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
-        cout << "\tdevice: Name of detector." << endl;
+        cout << "\tdetector_folder: Absolute path to detector buffer." << endl;
         cout << "\tn_modules: number of modules" << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
         cout << "\tstop_pulse_id: Stop pulse_id of retrieval." << endl;
@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
     }
 
     string output_file = string(argv[1]);
-    const string device = string(argv[2]);
+    const string detector_folder = string(argv[2]);
     size_t n_modules = atoi(argv[3]);
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
@@ -107,22 +107,22 @@ int main (int argc, char *argv[])
     for (size_t i_module=0; i_module<n_modules; i_module++) {
 
         // TODO: Very ugly. Fix.
-        string channel_name = "M";
+        string module_name = "M";
         if (i_module < 10) {
-            channel_name += "0";
+            module_name += "0";
         }
-        channel_name += to_string(i_module);
+        module_name += to_string(i_module);
 
         reading_threads.emplace_back(
                 read_buffer,
-                device,
-                channel_name,
+                detector_folder,
+                module_name,
                 i_module,
                 ref(buffer_blocks),
                 ref(image_assembler));
     }
 
-    JFH5Writer writer(output_file, device, n_modules,
+    JFH5Writer writer(output_file, detector_folder, n_modules,
                       start_pulse_id, stop_pulse_id, pulse_id_step);
 
     for (uint64_t block_id:buffer_blocks) {

@@ -5,11 +5,11 @@
 
 TEST(BinaryWriter, basic_interaction)
 {
-    auto root_folder = ".";
-    auto device_name = "test_device";
+    auto detector_folder = ".";
+    auto module_name = "test_device";
     uint64_t pulse_id = 5;
 
-    BufferBinaryWriter writer(device_name, root_folder);
+    BufferBinaryWriter writer(module_name, detector_folder);
 
     BufferBinaryFormat frame_data;
     frame_data.metadata.pulse_id = 1;
@@ -20,7 +20,7 @@ TEST(BinaryWriter, basic_interaction)
     writer.write(5, &frame_data);
 
     auto output_filename =
-            BufferUtils::get_filename(root_folder, device_name, pulse_id);
+            BufferUtils::get_filename(detector_folder, module_name, pulse_id);
 
     auto read_fd = open(output_filename.c_str(), O_RDONLY);
     ASSERT_NE(read_fd, -1);
@@ -42,11 +42,11 @@ TEST(BinaryWriter, basic_interaction)
 
 TEST(BinaryWriter, test_format_marker)
 {
-    auto root_folder = ".";
-    auto device_name = "test_device";
+    auto detector_folder = ".";
+    auto module_name = "M0";
     uint64_t pulse_id = 5;
 
-    BufferBinaryWriter writer(device_name, root_folder);
+    BufferBinaryWriter writer(module_name, detector_folder);
 
     BufferBinaryFormat frame_data;
     frame_data.metadata.pulse_id = 1;
@@ -57,7 +57,7 @@ TEST(BinaryWriter, test_format_marker)
     writer.write(5, &frame_data);
 
     auto output_filename =
-            BufferUtils::get_filename(root_folder, device_name, pulse_id);
+            BufferUtils::get_filename(detector_folder, module_name, pulse_id);
 
     auto read_fd = open(output_filename.c_str(), O_RDONLY);
     ASSERT_NE(read_fd, -1);

@@ -14,12 +14,12 @@ using namespace writer_config;
 using namespace buffer_config;
 
 BufferBinaryReader::BufferBinaryReader(
-        const std::string &root_folder,
-        const std::string &device_name) :
-            root_folder_(root_folder),
-            device_name_(device_name),
-            current_input_file_(""),
-            input_file_fd_(-1)
+        const std::string &detector_folder,
+        const std::string &module_name) :
+        detector_folder_(detector_folder),
+        module_name_(module_name),
+        current_input_file_(""),
+        input_file_fd_(-1)
 {}
 
 BufferBinaryReader::~BufferBinaryReader()
@@ -32,7 +32,7 @@ void BufferBinaryReader::get_block(
 {
     uint64_t block_start_pulse_id = block_id * BUFFER_BLOCK_SIZE;
     auto current_block_file = BufferUtils::get_filename(
-            root_folder_, device_name_, block_start_pulse_id);
+            detector_folder_, module_name_, block_start_pulse_id);
 
     if (current_block_file != current_input_file_)  {
         open_file(current_block_file);

@@ -7,8 +7,8 @@
 namespace BufferUtils
 {
     std::string get_filename(
-            std::string root_folder,
-            std::string device_name,
+            std::string detector_folder,
+            std::string module_name,
             uint64_t pulse_id);
 
     std::size_t get_file_frame_index(uint64_t pulse_id);

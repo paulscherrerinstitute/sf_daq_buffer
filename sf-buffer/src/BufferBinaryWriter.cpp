@@ -13,11 +13,11 @@
 using namespace std;
 
 BufferBinaryWriter::BufferBinaryWriter(
-        const string& root_folder,
-        const string& device_name):
-        root_folder_(root_folder),
-        device_name_(device_name),
-        latest_filename_(root_folder + "/" + device_name + "/LATEST"),
+        const string& detector_folder,
+        const string& module_name):
+        detector_folder_(detector_folder),
+        module_name_(module_name),
+        latest_filename_(detector_folder + "/" + module_name + "/LATEST"),
         current_output_filename_(""),
         output_file_fd_(-1)
 {
@@ -33,7 +33,7 @@ void BufferBinaryWriter::write(
         const BufferBinaryFormat* buffer)
 {
     auto current_frame_file =
-            BufferUtils::get_filename(root_folder_, device_name_, pulse_id);
+            BufferUtils::get_filename(detector_folder_, module_name_, pulse_id);
 
     if (current_frame_file != current_output_filename_) {
         open_file(current_frame_file);

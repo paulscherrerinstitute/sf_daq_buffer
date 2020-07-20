@@ -6,21 +6,21 @@
 using namespace std;
 
 string BufferUtils::get_filename(
-        std::string root_folder,
-        std::string device_name,
+        std::string detector_folder,
+        std::string module_name,
         uint64_t pulse_id)
 {
-    uint64_t folder_base = pulse_id / buffer_config::FOLDER_MOD;
-    folder_base *= buffer_config::FOLDER_MOD;
+    uint64_t data_folder = pulse_id / buffer_config::FOLDER_MOD;
+    data_folder *= buffer_config::FOLDER_MOD;
 
-    uint64_t file_base = pulse_id / buffer_config::FILE_MOD;
-    file_base *= buffer_config::FILE_MOD;
+    uint64_t data_file = pulse_id / buffer_config::FILE_MOD;
+    data_file *= buffer_config::FILE_MOD;
 
     stringstream folder;
-    folder << root_folder << "/";
-    folder << device_name << "/";
-    folder << folder_base << "/";
-    folder << file_base << buffer_config::FILE_EXTENSION;
+    folder << detector_folder << "/";
+    folder << module_name << "/";
+    folder << data_folder << "/";
+    folder << data_file << buffer_config::FILE_EXTENSION;
 
     return folder.str();
 }

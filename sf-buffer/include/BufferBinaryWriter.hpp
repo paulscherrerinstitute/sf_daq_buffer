@@ -10,8 +10,8 @@ class BufferBinaryWriter {
     const size_t MAX_FILE_BYTES =
             buffer_config::FILE_MOD * sizeof(BufferBinaryFormat);
 
-    const std::string root_folder_;
-    const std::string device_name_;
+    const std::string detector_folder_;
+    const std::string module_name_;
     std::string latest_filename_;
 
     std::string current_output_filename_;
@@ -23,8 +23,8 @@ class BufferBinaryWriter {
 
 public:
     BufferBinaryWriter(
-            const std::string& root_folder,
-            const std::string& device_name);
+            const std::string& detector_folder,
+            const std::string& module_name);
 
     virtual ~BufferBinaryWriter();
 

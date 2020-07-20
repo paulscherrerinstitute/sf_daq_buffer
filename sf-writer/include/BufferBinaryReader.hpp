@@ -6,8 +6,8 @@
 
 class BufferBinaryReader {
 
-    const std::string root_folder_;
-    const std::string device_name_;
+    const std::string detector_folder_;
+    const std::string module_name_;
 
     std::string current_input_file_;
     int input_file_fd_;
@@ -16,8 +16,8 @@ class BufferBinaryReader {
     void close_current_file();
 
 public:
-    BufferBinaryReader(const std::string &root_folder,
-                       const std::string &device_name);
+    BufferBinaryReader(const std::string &detector_folder,
+                       const std::string &module_name);
 
     ~BufferBinaryReader();
 
