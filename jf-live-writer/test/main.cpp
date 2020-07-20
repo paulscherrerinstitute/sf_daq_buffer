@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include "test_BinaryReader.cpp"
+
 using namespace std;
 
 int main(int argc, char **argv) {
