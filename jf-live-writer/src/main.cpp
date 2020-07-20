@@ -11,7 +11,7 @@
 #include "bitshuffle/bitshuffle.h"
 #include "JFH5Writer.hpp"
 #include "ImageAssembler.hpp"
-#include "BufferBinaryReader.hpp"
+#include "BinaryReader.hpp"
 
 using namespace std;
 using namespace chrono;
@@ -22,21 +22,21 @@ void read_buffer(
         const string detector_folder,
         const string module_name,
         const int i_module,
-        const vector<uint64_t>& buffer_blocks,
+        const vector<uint64_t>& pulse_ids_to_write,
         ImageAssembler& image_assembler)
 {
-    BufferBinaryReader block_reader(detector_folder, module_name);
-    auto block_buffer = new BufferBinaryBlock();
+    BinaryReader reader(detector_folder, module_name);
+    auto frame_buffer = new BufferBinaryFormat();
 
-    for (uint64_t block_id:buffer_blocks) {
+    for (uint64_t pulse_id:pulse_ids_to_write) {
 
-        while(!image_assembler.is_slot_free(block_id)) {
+        while(!image_assembler.is_slot_free(pulse_id)) {
             this_thread::sleep_for(chrono::milliseconds(ASSEMBLER_RETRY_MS));
         }
 
         auto start_time = steady_clock::now();
 
-        block_reader.get_block(block_id, block_buffer);
+        reader.get_frame(pulse_id, frame_buffer);
 
         auto end_time = steady_clock::now();
         uint64_t read_us_duration = duration_cast<microseconds>(
@@ -44,7 +44,7 @@ void read_buffer(
 
         start_time = steady_clock::now();
 
-        image_assembler.process(block_id, i_module, block_buffer);
+        image_assembler.process(pulse_id, i_module, frame_buffer);
 
         end_time = steady_clock::now();
         uint64_t compose_us_duration = duration_cast<microseconds>(
@@ -56,7 +56,7 @@ void read_buffer(
         cout << compose_us_duration / BUFFER_BLOCK_SIZE << endl;
     }
 
-    delete block_buffer;
+    delete frame_buffer;
 }
 
 int main (int argc, char *argv[])
@@ -84,21 +84,11 @@ int main (int argc, char *argv[])
     uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
     int pulse_id_step = atoi(argv[6]);
 
-    // Align start (up) and stop(down) pulse_id with pulse_id_step.
-    if (start_pulse_id % pulse_id_step != 0) {
-        start_pulse_id += pulse_id_step - (start_pulse_id % pulse_id_step);
-    }
-    if (stop_pulse_id % pulse_id_step != 0) {
-        stop_pulse_id -= (start_pulse_id % pulse_id_step);
-    }
-
-    uint64_t start_block = start_pulse_id / BUFFER_BLOCK_SIZE;
-    uint64_t stop_block = stop_pulse_id / BUFFER_BLOCK_SIZE;
-
-    // Generate list of buffer blocks that need to be loaded.
-    std::vector<uint64_t> buffer_blocks;
-    for (uint64_t i_block=start_block; i_block <= stop_block; i_block++) {
-        buffer_blocks.push_back(i_block);
+    std::vector<uint64_t> pulse_ids_to_write;
+    for (uint64_t curr_pulse_id=start_pulse_id;
+         curr_pulse_id <= stop_pulse_id;
+         curr_pulse_id+= pulse_id_step) {
+        pulse_ids_to_write.push_back(curr_pulse_id);
     }
 
     ImageAssembler image_assembler(n_modules);
@@ -118,21 +108,21 @@ int main (int argc, char *argv[])
                 detector_folder,
                 module_name,
                 i_module,
-                ref(buffer_blocks),
+                ref(pulse_ids_to_write),
                 ref(image_assembler));
     }
 
     JFH5Writer writer(output_file, detector_folder, n_modules,
                       start_pulse_id, stop_pulse_id, pulse_id_step);
 
-    for (uint64_t block_id:buffer_blocks) {
+    for (uint64_t pulse_id:pulse_ids_to_write) {
 
-        while(!image_assembler.is_slot_full(block_id)) {
+        while(!image_assembler.is_slot_full(pulse_id)) {
             this_thread::sleep_for(chrono::milliseconds(ASSEMBLER_RETRY_MS));
         }
 
-        auto metadata = image_assembler.get_metadata_buffer(block_id);
-        auto data = image_assembler.get_data_buffer(block_id);
+        auto metadata = image_assembler.get_metadata_buffer(pulse_id);
+        auto data = image_assembler.get_data_buffer(pulse_id);
 
         auto start_time = steady_clock::now();
 
@@ -142,7 +132,7 @@ int main (int argc, char *argv[])
         auto write_us_duration = duration_cast<microseconds>(
                 end_time-start_time).count();
 
-        image_assembler.free_slot(block_id);
+        image_assembler.free_slot(pulse_id);
 
         cout << "sf_writer:avg_write_us ";
         cout << write_us_duration / BUFFER_BLOCK_SIZE << endl;
