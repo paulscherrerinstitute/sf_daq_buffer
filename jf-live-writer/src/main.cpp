@@ -4,26 +4,25 @@
 #include <chrono>
 #include <vector>
 
-#include "date.h"
 #include "zmq.h"
-#include "writer_config.hpp"
+#include "live_writer_config.hpp"
 #include "buffer_config.hpp"
 #include "bitshuffle/bitshuffle.h"
-#include "JFH5Writer.hpp"
-#include "ImageAssembler.hpp"
+#include "JFH5LiveWriter.hpp"
+#include "LiveImageAssembler.hpp"
 #include "BinaryReader.hpp"
 
 using namespace std;
 using namespace chrono;
-using namespace writer_config;
 using namespace buffer_config;
+using namespace live_writer_config;
 
 void read_buffer(
         const string detector_folder,
         const string module_name,
         const int i_module,
         const vector<uint64_t>& pulse_ids_to_write,
-        ImageAssembler& image_assembler)
+        LiveImageAssembler& image_assembler)
 {
     BinaryReader reader(detector_folder, module_name);
     auto frame_buffer = new BufferBinaryFormat();
@@ -64,13 +63,13 @@ int main (int argc, char *argv[])
     if (argc != 7) {
         cout << endl;
         cout << "Usage: sf_writer [output_file] [detector_folder] [n_modules]";
-        cout << " [start_pulse_id] [stop_pulse_id] [pulse_id_step]";
+        cout << " [start_pulse_id] [n_pulses] [pulse_id_step]";
         cout << endl;
         cout << "\toutput_file: Complete path to the output file." << endl;
         cout << "\tdetector_folder: Absolute path to detector buffer." << endl;
         cout << "\tn_modules: number of modules" << endl;
         cout << "\tstart_pulse_id: Start pulse_id of retrieval." << endl;
-        cout << "\tstop_pulse_id: Stop pulse_id of retrieval." << endl;
+        cout << "\tn_pulses: Number of pulses to write." << endl;
         cout << "\tpulse_id_step: 1==100Hz, 2==50hz, 4==25Hz.." << endl;
         cout << endl;
 
@@ -81,17 +80,18 @@ int main (int argc, char *argv[])
     const string detector_folder = string(argv[2]);
     size_t n_modules = atoi(argv[3]);
     uint64_t start_pulse_id = (uint64_t) atoll(argv[4]);
-    uint64_t stop_pulse_id = (uint64_t) atoll(argv[5]);
+    size_t n_pulses = (size_t) atoll(argv[5]);
     int pulse_id_step = atoi(argv[6]);
 
     std::vector<uint64_t> pulse_ids_to_write;
-    for (uint64_t curr_pulse_id=start_pulse_id;
-         curr_pulse_id <= stop_pulse_id;
-         curr_pulse_id+= pulse_id_step) {
-        pulse_ids_to_write.push_back(curr_pulse_id);
+
+    uint64_t i_pulse_id = start_pulse_id;
+    for (size_t i=0; i<n_pulses; i++) {
+        pulse_ids_to_write.push_back(i_pulse_id);
+        i_pulse_id += pulse_id_step;
     }
 
-    ImageAssembler image_assembler(n_modules);
+    LiveImageAssembler image_assembler(n_modules);
 
     std::vector<std::thread> reading_threads(n_modules);
     for (size_t i_module=0; i_module<n_modules; i_module++) {
@@ -112,8 +112,8 @@ int main (int argc, char *argv[])
                 ref(image_assembler));
     }
 
-    JFH5Writer writer(output_file, detector_folder, n_modules,
-                      start_pulse_id, stop_pulse_id, pulse_id_step);
+    JFH5LiveWriter writer(output_file, detector_folder, n_modules,
+                      start_pulse_id, n_pulses, pulse_id_step);
 
     for (uint64_t pulse_id:pulse_ids_to_write) {
 
