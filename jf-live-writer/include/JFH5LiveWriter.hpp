@@ -16,10 +16,8 @@ class JFH5LiveWriter {
 
     const std::string detector_name_;
     const size_t n_modules_;
-
-    const uint64_t start_pulse_id_;
     const size_t n_pulses_;
-    const size_t pulse_id_step_;
+
     size_t write_index_;
 
     H5::H5File file_;
@@ -43,9 +41,7 @@ public:
     JFH5LiveWriter(const std::string& output_file,
                    const std::string& detector_folder,
                    const size_t n_modules,
-                   const uint64_t start_pulse_id,
-                   const size_t n_pulses,
-                   const size_t pulse_id_step);
+                   const size_t n_pulses);
     ~JFH5LiveWriter();
     void write(const ImageMetadata* metadata, const char* data);
 };

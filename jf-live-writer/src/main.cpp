@@ -112,8 +112,7 @@ int main (int argc, char *argv[])
                 ref(image_assembler));
     }
 
-    JFH5LiveWriter writer(output_file, detector_folder, n_modules,
-                      start_pulse_id, n_pulses, pulse_id_step);
+    JFH5LiveWriter writer(output_file, detector_folder, n_modules, n_pulses);
 
     for (uint64_t pulse_id:pulse_ids_to_write) {
 

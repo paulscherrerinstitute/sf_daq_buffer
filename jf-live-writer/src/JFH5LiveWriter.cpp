@@ -12,14 +12,10 @@ using namespace buffer_config;
 JFH5LiveWriter::JFH5LiveWriter(const string& output_file,
                        const string& detector_folder,
                        const size_t n_modules,
-                       const uint64_t start_pulse_id,
-                       const size_t n_pulses,
-                       const size_t pulse_id_step) :
+                       const size_t n_pulses) :
         detector_name_(get_detector_name(detector_folder)),
         n_modules_(n_modules),
-        start_pulse_id_(start_pulse_id),
         n_pulses_(n_pulses),
-        pulse_id_step_(pulse_id_step),
         write_index_(0)
 {
     b_pulse_id_ = new uint64_t[n_pulses_];
@@ -123,7 +119,6 @@ void JFH5LiveWriter::close_file()
 
 void JFH5LiveWriter::write(const ImageMetadata* metadata, const char* data)
 {
-
     hsize_t offset[] = {write_index_, 0, 0};
 
     H5DOwrite_chunk(image_dataset_.getId(), H5P_DEFAULT, 0,
