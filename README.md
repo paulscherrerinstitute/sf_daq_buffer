@@ -138,3 +138,5 @@ terminology definitions should be followed:
 - image (data of the assembled image)
 - start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
 inclusive range (both start and stop pulse_id are included) of pulses.
+- detector_folder (root folder of the buffer for a specific detector on disk)
+- module_name (name of one module inside the detector_folder)
