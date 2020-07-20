@@ -138,6 +138,7 @@ terminology definitions should be followed:
 - image (data of the assembled image)
 - start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
 inclusive range (both start and stop pulse_id are included) of pulses.
+- pulse_id_step (how many pulses to skip between images).
 - detector_folder (root folder of the buffer for a specific detector on disk)
 - module_name (name of one module inside the detector_folder)
 - data_folder (folder where we group more buffer files based on pulse_id range)
@@ -165,3 +166,41 @@ FOLDER_MOD == 100000 means that each data_folder will contain data for 100000
 pulses, while FILE_MOD == 1000 means that each file inside the data_folder 
 will contain 1000 pulses. The total number of data_files in each data_folder 
 will therefore be **FILE\_MOD / FOLDER\_MOD = 100**.
+
+## Data request ranges
+
+Data request ranges are composed of:
+
+- start_pulse_id (first pulse_id to be included in the file)
+- stop_pulse_id (last pulse_id to be included in the file)
+- pulse_id_step (how many pulses to skip between images.)
+
+pulse_id_step can be used to write data at different frequencies:
+
+- pulse_id_step == 1 (100Hz, write very pulse_id)
+- pulse_id_step == 2 (50hz, write every second pulse)
+- pulse_id_step == 10 (10Hz, write every 10th pulse)
+
+The next pulse_id to be written is calculated internally as:
+
+```c++
+auto next_pulse_id = currnet_pulse_id + pulse_id_step;
+```
+
+The loop criteria for writing is:
+
+```c++
+for (
+        auto curr_pulse_id = start_pulse_id; 
+        curr_pulse_id <= stop_pulse_id;
+        curr_pulse_id += pulse_id_step
+) {
+    // Write curr_pulse_id to output file.
+}
+```
+
+**Warning**
+
+If your stop_pulse_id cannot be reached by adding step_pulse_id to 
+start_pulse_id (start_pulse_id + (n * pulse_id_step) != stop_pulse_id for any n)
+it will not be included in the final file.
