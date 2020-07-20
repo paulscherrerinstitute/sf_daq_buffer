@@ -6,20 +6,18 @@
 #include <fcntl.h>
 
 #include "BufferUtils.hpp"
-#include "writer_config.hpp"
 #include "buffer_config.hpp"
 
 using namespace std;
-using namespace writer_config;
 using namespace buffer_config;
 
 BinaryReader::BinaryReader(
-        const std::string &root_folder,
-        const std::string &device_name) :
-            root_folder_(root_folder),
-            device_name_(device_name),
-            current_input_file_(""),
-            input_file_fd_(-1)
+        const std::string &detector_folder,
+        const std::string &module_name) :
+        detector_folder_(detector_folder),
+        module_name_(module_name),
+        current_input_file_(""),
+        input_file_fd_(-1)
 {}
 
 BinaryReader::~BinaryReader()
@@ -32,7 +30,7 @@ void BinaryReader::get_frame(
 {
 
     auto current_frame_file = BufferUtils::get_filename(
-            root_folder_, device_name_, pulse_id);
+            detector_folder_, module_name_, pulse_id);
 
     if (current_frame_file != current_input_file_)  {
         open_file(current_frame_file);
