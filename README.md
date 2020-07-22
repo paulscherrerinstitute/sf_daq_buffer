@@ -4,6 +4,10 @@ Overview of current architecture and component interaction.
 
 ![Overview image](docs/sf_daq_buffer-overview.jpg)
 
+Documentation of individual components:
+
+- [sf-buffer](sf-buffer/README.md) (Receive UDP and write buffer files)
+
 ## Useful links
 
 ### Architecture
