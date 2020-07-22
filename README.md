@@ -167,6 +167,16 @@ pulses, while FILE_MOD == 1000 means that each file inside the data_folder
 will contain 1000 pulses. The total number of data_files in each data_folder 
 will therefore be **FILE\_MOD / FOLDER\_MOD = 100**.
 
+### Analyzing the buffer
+In **sf-utils** there is a Python module that allows you to read directly the 
+buffer in order to debug it or to verify the consistency between the HDF5 file 
+and the received data.
+
+- VerifyH5DataConsistency.py checks the consistency between the H5 file and 
+buffer.
+- BinaryBufferReader.py reads the buffer and prints metadata. The class inside 
+can also be used in external scripts.
+
 ## Data request ranges
 
 Data request ranges are composed of:
