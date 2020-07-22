@@ -143,40 +143,6 @@ inclusive range (both start and stop pulse_id are included) of pulses.
 - module_name (name of one module inside the detector_folder)
 - data_folder (folder where we group more buffer files based on pulse_id range)
 
-
-## Data location in buffer
-
-The written by sf_buffer are saved to:
-
-[detector_folder]/[module_name]/[data_folder]/[data_file].bin
-
-- detector_folder should always be passed as an absolute path.
-- module_name is usually composed like "M00", "M01".
-- data_folder and data_file are automatically calculated based on the 
-current pulse_id, FOLDER_MOD and FILE_MOD attributes.
-
-```c++
-// FOLDER_MOD = 100000
-int data_folder = (pulse_id % FOLDER_MOD) * FOLDER_MOD; 
-// FILE_MOD = 1000
-int data_file = (pulse_id % FILE_MOD) * FILE_MOD; 
-```
-
-FOLDER_MOD == 100000 means that each data_folder will contain data for 100000
-pulses, while FILE_MOD == 1000 means that each file inside the data_folder 
-will contain 1000 pulses. The total number of data_files in each data_folder 
-will therefore be **FILE\_MOD / FOLDER\_MOD = 100**.
-
-### Analyzing the buffer
-In **sf-utils** there is a Python module that allows you to read directly the 
-buffer in order to debug it or to verify the consistency between the HDF5 file 
-and the received data.
-
-- VerifyH5DataConsistency.py checks the consistency between the H5 file and 
-buffer.
-- BinaryBufferReader.py reads the buffer and prints metadata. The class inside 
-can also be used in external scripts.
-
 ## Data request ranges
 
 Data request ranges are composed of:
