@@ -65,6 +65,15 @@ Frames are written one after another to a specific offset in the file. The
 offset is calculated based on the pulse_id, so each frame has a specific place 
 in the file and there is no need to have an index for frame retrieval.
 
+The offset where a specific pulse_id is written in a file is calculated:
+
+```c++
+// FILE_MOD = 1000
+uint64_t file_base = pulse_id / FILE_MOD;
+file_base *= FILE_MOD;
+size_t file_offset = file_base * sizeof(BufferBinaryFormat);
+```
+
 #### Folder structure
 
 The folder (as well as file) structure is deterministic in the sense that given 
