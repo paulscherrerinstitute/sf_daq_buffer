@@ -18,6 +18,8 @@ of concern only if the performance criteria are not met.
 
 ## Overview
 
+![image_buffer_overview](../docs/sf_daq_buffer-overview-buffer.jpg)
+
 ### UDP receiving
 
 ### File writing
