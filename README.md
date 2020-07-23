@@ -35,7 +35,10 @@ Documentation of individual components:
     - Write unit tests.
 
 ## Scope
-Scope of the project:
+
+The scope should be as limited as possible and we should abstain from 
+implementing additional features. We isolated the core functionality this buffer 
+needs as the following:
 
 - Receiving and assembling detector data.
 - Writing detector data to HDF5 files.
