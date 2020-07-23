@@ -6,7 +6,7 @@ Overview of current architecture and component interaction.
 
 Documentation of individual components:
 
-- [sf-buffer](sf-buffer/README.md) (Receive UDP and write buffer files)
+- [sf-buffer](tree/master/sf-buffer) (Receive UDP and write buffer files)
 
 ## Useful links
 
