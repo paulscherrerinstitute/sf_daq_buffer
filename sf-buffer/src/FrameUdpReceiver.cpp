@@ -64,6 +64,7 @@ inline uint64_t FrameUdpReceiver::process_packets(
             init_frame(metadata, i_packet);
 
         // Happens if the last packet from the previous frame gets lost.
+        // In the jungfrau_packet, pulse_id is called bunchid.
         } else if (metadata.pulse_id != packet_buffer_[i_packet].bunchid) {
             packet_buffer_loaded_ = true;
             // Continue on this packet.
