@@ -116,7 +116,7 @@ pulses, while FILE_MOD == 1000 means that each file inside the data_folder
 will contain 1000 pulses. The total number of data_files in each data_folder 
 will therefore be **FILE\_MOD / FOLDER\_MOD = 100**.
 
-### Analyzing the buffer
+#### Analyzing the buffer on disk
 In **sf-utils** there is a Python module that allows you to read directly the 
 buffer in order to debug it or to verify the consistency between the HDF5 file 
 and the received data.
@@ -128,5 +128,21 @@ can also be used in external scripts.
 
 ### ZMQ sending
 
+A copy of the data written to disk is also send via ZMQ to the sf-stream. This 
+is used to provide live viewing / processing capabilities. Each module data is 
+sent separately, and this is later assembled in the sf-stream.
 
+We use the PUB/SUB mechanism for distributing this data - we cannot control the 
+rate of the producer, and we would like to avoid distributed image assembly 
+if possible, so PUSH/PULL does not make sense in this case.
 
+We provide no guarantees on live data delivery, but in practice the number of 
+dropped or incomplete frames in currently negligible.
+
+The protocol is a serialization of the same data structures we use to 
+write on disk (no need for additional memory operations before sending out 
+data). It uses a 2 part multipart ZMQ message:
+
+- The first part is a serialization of the ModuleFrame struct (see above).
+- The second part is the data field in the BufferBinaryFormat struct (the frame
+data).
