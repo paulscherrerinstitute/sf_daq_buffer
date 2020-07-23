@@ -88,10 +88,10 @@ and reading from the buffer without building any indexes.
 
 The binary files written by sf_buffer are saved to:
 
-[detector_folder]/[module_name]/[data_folder]/[data_file].bin
+[detector_folder]/[module_folder]/[data_folder]/[data_file].bin
 
 - **detector\_folder** should always be passed as an absolute path.
-- **module\_name** is usually composed like "M00", "M01".
+- **module\_folder** is usually composed like "M00", "M01".
 - **data\_folder** and **data\_file** are automatically calculated based on the 
 current pulse_id, FOLDER_MOD and FILE_MOD attributes.
 
