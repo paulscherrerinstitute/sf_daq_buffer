@@ -24,10 +24,8 @@ of concern only if the performance criteria are not met.
 
 ### File writing
 
-Files are written to disk in "frame" bunches - each frame is first assembled 
-from multiple received packets, and then written to disk as a block. This is 
-the complete frame from one module (module assembly is done in the 
-writer).
+Files are written to disk in frames - one write to disk per frame. This gives 
+us a relaxed 10ms interval of 1 MB writes.
 
 #### File format
 
@@ -79,6 +77,9 @@ size_t file_base = pulse_id % FILE_MOD;
 size_t file_offset = file_base * sizeof(BufferBinaryFormat);
 ```
 
+We now know where to look for data inside the file, but we still don't know 
+inside which file to look. For this we need to discuss the folder structure.
+
 #### Folder structure
 
 The folder (as well as file) structure is deterministic in the sense that given 
@@ -90,10 +91,13 @@ The binary files written by sf_buffer are saved to:
 
 [detector_folder]/[module_folder]/[data_folder]/[data_file].bin
 
-- **detector\_folder** should always be passed as an absolute path.
-- **module\_folder** is usually composed like "M00", "M01".
+- **detector\_folder** should always be passed as an absolute path. This is the 
+container that holds all data related to a specific detector.
+- **module\_folder** is usually composed like "M00", "M01". It separates data 
+from different modules of one detector.
 - **data\_folder** and **data\_file** are automatically calculated based on the 
-current pulse_id, FOLDER_MOD and FILE_MOD attributes.
+current pulse_id, FOLDER_MOD and FILE_MOD attributes. This folders act as our 
+index for accessing data.
 
 ![folder_layout_image](../docs/sf_daq_buffer-FolderLayout.jpg)
 
@@ -103,6 +107,9 @@ int data_folder = (pulse_id % FOLDER_MOD) * FOLDER_MOD;
 // FILE_MOD = 1000
 int data_file = (pulse_id % FILE_MOD) * FILE_MOD; 
 ```
+
+The data_folder and data_file folders are named as the first pulse_id that 
+should be stored inside them.
 
 FOLDER_MOD == 100000 means that each data_folder will contain data for 100000
 pulses, while FILE_MOD == 1000 means that each file inside the data_folder 
