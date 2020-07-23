@@ -1,6 +1,13 @@
 # sf_daq_buffer
 
-Overview of current architecture and component interaction.
+The goal of the project is to provide a detector buffering and writing solution 
+that meets the needs of SwissFEL data taking. By dividing the problem into 
+small components (Microservice architecture) we hope to achieve better 
+maintainability and long term stability of the codebase. We try to make the 
+code as simple as possible and write unit tests extensively to facilitate 
+future changes.
+
+Overview of current architecture and component interaction:
 
 ![Overview image](docs/sf_daq_buffer-overview.jpg)
 
@@ -10,6 +17,33 @@ Documentation of individual components:
 - [sf-stream](sf-stream) (Live streaming of detector data)
 - [sf-writer](sf-writer) (Read from buffer and write H5)
 - [sf-utils](sf-utils) (Small utilities for debugging and testing)
+
+## Design goals
+
+- Simplest thing that works.
+    - Save time and iterate more quickly.
+    - Less moving parts, easier to debug.
+    - Avoid external libraries as much as possible.
+- Start optimizing only when things break.
+    - Many optimization possibilities, but not actually needed.
+    - Makes possible to refactor and change code faster.
+- Small debuggable and profileable processes.
+    - Needs to be able to run on your local machine in a debugger.
+    - Asses code performance without guessing.
+- As little dependency between processes as possible.
+    - Run only the process you want to test.
+    - Write unit tests.
+
+## Scope
+Scope of the project:
+
+- Receiving and assembling detector data.
+- Writing detector data to HDF5 files.
+- Live streaming detector data to external components.
+- Provide logs and analytics for each component.
+
+We focus on the service and storage layer (see overview picture). Everything 
+else is not part of this project and should be addresses elsewhere.
 
 ## Terminology
 
@@ -26,21 +60,6 @@ inclusive range (both start and stop pulse_id are included) of pulses.
 - module_folder (folder of one module inside the detector_folder)
 - data_folder (folder where we group more buffer files based on pulse_id range)
 - data_file (the files where the actual data is stored, inside data_folder)
-
-## Design goals
-
-- Simplest thing that works.
-    - Save time and iterate more quickly.
-    - Less moving parts, less problems.
-- Start optimizing only when things break.
-    - Many optimization possibilities, but not for now.
-    - Makes possible to test technologies faster.
-- Small debuggable and profileable processes.
-    - Needs to be able to run on your local machine in a debugger.
-    - Asses code performance without guessing.
-- As little dependency between processes as possible.
-    - Run only the process you want to test.
-    - Write unit tests.
 
 ## Build
 
