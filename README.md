@@ -47,15 +47,15 @@ else is not part of this project and should be addresses elsewhere.
 
 ## Terminology
 
-In order to unify the way we write code and talk about concept the following 
+In order to unify the way we write code and talk about concepts the following 
 terminology definitions should be followed:
 
 - frame (data from a single module)
 - image (assembled frames)
-- start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
+- start_pulse_id and stop_pulse_id is used to determine the 
 inclusive range (both start and stop pulse_id are included) of pulses.
 - pulse_id_step (how many pulses to skip between each image).
-- GPFS buffer (on GPFS detector buffering mechanism based on binary files)
+- GPFS buffer (detector buffering mechanism based on binary files on GPFS)
 - detector_folder (root folder of the buffer for a specific detector on disk)
 - module_folder (folder of one module inside the detector_folder)
 - data_folder (folder where we group more buffer files based on pulse_id range)
@@ -104,8 +104,8 @@ ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 
 Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 
 message is not sent (the connection gets dropped before the message is in the buffer).
-Since we use PUSH/PULL only in sf-stream at the moment, this is not critical anymore.
-But in the future we might use the PUSH/PULL mechanism, so updating to the latest 
+We are currently not using LINGER to extend our processes lifetime, so this is 
+not critical. But in the future this might change, so updating to the latest 
 version of ZMQ should help us prevent future bug hunting sessions.
 
 Please install a later version:
@@ -119,6 +119,10 @@ yum install zeromq-devel
 ```
 
 ## Useful links
+
+This is a collections of best links we came across so far during the development of 
+this project. They cover various topics somehow related to what we are trying to 
+achieve.
 
 ### Architecture
 - POSIX compliant write order test on GPFS
