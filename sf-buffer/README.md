@@ -20,7 +20,23 @@ of concern only if the performance criteria are not met.
 
 ![image_buffer_overview](../docs/sf_daq_buffer-overview-buffer.jpg)
 
+sf-buffer is a single threaded application (without counting the ZMQ IO threads)
+that does both receiving, assembling, writing and sending in the same thread.
+
 ### UDP receiving
+
+Each process listens to one udp port. Packets coming to this udp port are 
+assembled into frames. Frames (either complete or with missing packets) are 
+passed forward. The number of received packets is saved so we can later 
+(at image assembly time) determine if the frame is valid or not. At this point 
+we do no validation.
+
+We are currently using **recvmmsg** to minimize the number of switches to 
+kernel mode.
+
+We expect all packets to come in order or not come at all. Once we see the 
+package for the next pulse_id we can assume no more packages are coming for 
+the previous one, and send the assembled frame down the program.
 
 ### File writing
 
