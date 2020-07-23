@@ -70,9 +70,12 @@ in the file and there is no need to have an index for frame retrieval.
 The offset where a specific pulse_id is written in a file is calculated:
 
 ```c++
-// FILE_MOD = 1000
-uint64_t file_base = pulse_id / FILE_MOD;
-file_base *= FILE_MOD;
+// We save 1000 pulses in each file.
+const uint64_t FILE_MOD = 1000
+
+// Relative index of pulse_id inside file.
+size_t file_base = pulse_id % FILE_MOD;
+// Offset in bytes of relative index in file.
 size_t file_offset = file_base * sizeof(BufferBinaryFormat);
 ```
 
