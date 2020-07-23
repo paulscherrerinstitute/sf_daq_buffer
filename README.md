@@ -7,6 +7,97 @@ Overview of current architecture and component interaction.
 Documentation of individual components:
 
 - [sf-buffer](sf-buffer) (Receive UDP and write buffer files)
+- [sf-stream](sf-stream) (Live streaming of detector data)
+- [sf-writer](sf-writer) (Read from buffer and write H5)
+- [sf-utils](sf-utils) (Small utilities for debugging and testing)
+
+## Terminology
+
+In order to unify the way we write code and talk about concept the following 
+terminology definitions should be followed:
+
+- frame (data from a single module)
+- image (assembled frames)
+- start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
+inclusive range (both start and stop pulse_id are included) of pulses.
+- pulse_id_step (how many pulses to skip between each image).
+- GPFS buffer (on GPFS detector buffering mechanism based on binary files)
+- detector_folder (root folder of the buffer for a specific detector on disk)
+- module_folder (folder of one module inside the detector_folder)
+- data_folder (folder where we group more buffer files based on pulse_id range)
+- data_file (the files where the actual data is stored, inside data_folder)
+
+## Design goals
+
+- Simplest thing that works.
+    - Save time and iterate more quickly.
+    - Less moving parts, less problems.
+- Start optimizing only when things break.
+    - Many optimization possibilities, but not for now.
+    - Makes possible to test technologies faster.
+- Small debuggable and profileable processes.
+    - Needs to be able to run on your local machine in a debugger.
+    - Asses code performance without guessing.
+- As little dependency between processes as possible.
+    - Run only the process you want to test.
+    - Write unit tests.
+
+## Build
+
+To compile this repo you will need to install the following packages on RH7:
+- devtoolset-9
+- cmake3
+- zeromq-devel
+- hdf5-devel
+
+```bash
+yum install devtoolset-9
+yum install cmake3
+yum install zeromq-devel
+yum install hdf5-devel
+```
+
+Step by step procedure to build the repo:
+
+```bash
+scl enable devtoolset-9 bash
+git clone https://github.com/paulscherrerinstitute/sf_daq_buffer.git
+cd sf_daq_buffer
+mkdir build
+cd build/
+cmake3 ..
+make
+```
+
+It is recommended to create symbolic links to the executables you will be using 
+inside your PATH.
+
+Example:
+```bash
+ln -s "$(pwd)""/""sf_buffer" /usr/bin/sf_buffer
+ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
+ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
+```
+
+### Warnings
+
+#### Zeromq
+
+Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 
+message is not sent (the connection gets dropped before the message is in the buffer).
+Since we use PUSH/PULL only in sf-stream at the moment, this is not critical anymore.
+But in the future we might use the PUSH/PULL mechanism, so updating to the latest 
+version of ZMQ should help us prevent future bug hunting sessions.
+
+Please install a later version:
+```bash
+cd /etc/yum.repos.d/
+wget https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/RHEL_7/network:messaging:zeromq:release-stable.repo
+yum remove zeromq
+yum remove openpgm
+yum install libsodium-devel
+yum install zeromq-devel
+```
 
 ## Useful links
 
@@ -77,110 +168,3 @@ https://community.mellanox.com/s/article/raw-ethernet-programming--basic-introdu
 - Performance Tuning for Mellanox Adapters
 https://community.mellanox.com/s/article/performance-tuning-for-mellanox-adapters
 - UEFI Workload-based Performance and TuningGuide for HPE ProLiant Gen10 https://support.hpe.com/hpesc/public/docDisplay?docId=a00016408en_us
-
-## Build
-
-To compile this repo you will need to install the following packages on RH7:
-- devtoolset-9
-- cmake3
-- zeromq-devel
-- hdf5-devel
-
-```bash
-yum install devtoolset-9
-yum install cmake3
-yum install zeromq-devel
-yum install hdf5-devel
-```
-
-Step by step procedure to build the repo:
-
-```bash
-scl enable devtoolset-9 bash
-git clone https://github.com/paulscherrerinstitute/sf_daq_buffer.git
-cd sf_daq_buffer
-mkdir build
-cd build/
-cmake3 ..
-make
-```
-
-It is recommended to create symbolic links to the executables you will be using 
-inside your PATH.
-
-Example:
-```bash
-ln -s "$(pwd)""/""sf_buffer" /usr/bin/sf_buffer
-ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
-ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
-```
-
-### Warnings
-
-#### Zeromq
-
-Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 
-message is not sent (the connection gets dropped before the message is in the buffer).
-Since we use PUSH/PULL to modulate the sf_replay speed, this is a key functionality we are using.
-
-Please install a later version:
-```bash
-cd /etc/yum.repos.d/
-wget https://download.opensuse.org/repositories/network:messaging:zeromq:release-stable/RHEL_7/network:messaging:zeromq:release-stable.repo
-yum remove zeromq
-yum remove openpgm
-yum install libsodium-devel
-yum install zeromq-devel
-```
-
-## Terminology
-
-In order to unify the way we write code and talk about concept the following 
-terminology definitions should be followed:
-
-- frame (data from a single module)
-- image (data of the assembled image)
-- start_pulse_id and stop_pulse_id (not end_pulse_id) is used to determine the 
-inclusive range (both start and stop pulse_id are included) of pulses.
-- pulse_id_step (how many pulses to skip between images).
-- detector_folder (root folder of the buffer for a specific detector on disk)
-- module_name (name of one module inside the detector_folder)
-- data_folder (folder where we group more buffer files based on pulse_id range)
-
-## Data request ranges
-
-Data request ranges are composed of:
-
-- start_pulse_id (first pulse_id to be included in the file)
-- stop_pulse_id (last pulse_id to be included in the file)
-- pulse_id_step (how many pulses to skip between images.)
-
-pulse_id_step can be used to write data at different frequencies:
-
-- pulse_id_step == 1 (100Hz, write very pulse_id)
-- pulse_id_step == 2 (50hz, write every second pulse)
-- pulse_id_step == 10 (10Hz, write every 10th pulse)
-
-The next pulse_id to be written is calculated internally as:
-
-```c++
-auto next_pulse_id = currnet_pulse_id + pulse_id_step;
-```
-
-The loop criteria for writing is:
-
-```c++
-for (
-        auto curr_pulse_id = start_pulse_id; 
-        curr_pulse_id <= stop_pulse_id;
-        curr_pulse_id += pulse_id_step
-) {
-    // Write curr_pulse_id to output file.
-}
-```
-
-**Warning**
-
-If your stop_pulse_id cannot be reached by adding step_pulse_id to 
-start_pulse_id (start_pulse_id + (n * pulse_id_step) != stop_pulse_id for any n)
-it will not be included in the final file.
