@@ -4,7 +4,7 @@ if [ $# -lt 3 ]
 then
     echo "Usage :   $0 detector_name start_pulse_id end_pulse_id "
     echo "Example : $0 JF07T32V01    11709404000    11709405000  "
-    echo "Optional parameters:                                   output_file_name rate_multiplicator"
+    echo "Optional parameters:                                   output_file_name rate_multiplicator jf_conversion run_file raw_file"
     exit
 fi
 
@@ -12,6 +12,9 @@ DETECTOR=$1
 START_PULSE_ID=$2
 STOP_PULSE_ID=$3
 PULSE_ID_STEP=1 # by default assume 100Hz
+JF_CONVERSION=0 # by default don't call ju_export
+RUN_FILE=None
+RAW_FILE=None
 
 echo "Request to retrieve : $@ "
 echo "Started                 : "`date`
@@ -24,20 +27,49 @@ else
     OUTFILE=/gpfs/photonics/swissfel/buffer/test.${START_PULSE_ID}-${STOP_PULSE_ID}.h5
 fi
 
-if [ $# -eq 5 ]
+if [ $# -ge 5 ]
 then
     PULSE_ID_STEP=$5
 fi
 
+if [ $# -ge 6 ]
+then
+    JF_CONVERSION=$6
+    if [ $# -ge 7 ]
+    then
+        RUN_FILE=$7
+    fi
+    if [ $# -eq 8 ]
+    then
+        RAW_FILE=$8
+    fi
+fi
+
+
 case ${DETECTOR} in
 'JF01T03V01')
   NM=3
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF01.json
+  ;;
+'JF02T09V02')
+  NM=9
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF02.json
+  ;;
+'JF06T32V01')
+  NM=32
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06.json
+  ;;
+'JF06T08V01')
+  NM=8
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.json
   ;;
 'JF07T32V01')
   NM=32
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF07.json
   ;;
 'JF13T01V01')
   NM=1
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF13.json
   ;;
 *)
   NM=1
@@ -62,12 +94,47 @@ echo -n "Waited Time   : "
 echo $((date2-date1)) | awk '{print int($1/60)":"int($1%60)}' 
 echo "Started actual retrieve : "`date`
 
-taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
+if [ ${JF_CONVERSION} == 0 ]
+then
+    OUTFILE_RAW=${OUTFILE}
+else
+    if [ ${RAW_FILE} != "None" ]
+    then
+        OUTFILE_RAW=${RAW_FILE}
+        D1=`dirname ${OUTFILE_RAW}`
+        mkdir -p ${D1}
+    else
+        RUN_NUMBER=`basename ${RUN_FILE} | awk -F '.' '{print $1}'`
+        D1=`dirname ${RUN_FILE}`
+        D2=`dirname ${D1}`
+        OUTFILE_RAW=${D2}/.raw/${RUN_NUMBER}.${DETECTOR}.h5
+        mkdir -p ${D2}/.raw/
+    fi
+fi
+
+taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
 
 wait
+
+coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
 
 date3=$(date +%s)
 echo "Finished                : "`date`
 echo -n "Retrieve Time : "
 echo $((date3-date2)) | awk '{print int($1/60)":"int($1%60)}'
 
+if [ ${JF_CONVERSION} == 0 ]
+then
+    echo "File is written in raw format, no compression"
+else
+    echo "Will call compression/convertion ${OUTFILE_RAW} --> ${OUTFILE}"
+    export PATH=/home/dbe/miniconda3/bin:$PATH
+    source deactivate >/dev/null 2>&1
+    source activate conversion
+    taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE} 
+    python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE}
+    date4=$(date +%s)
+    echo "Finished                : "`date`
+    echo -n "Convertion Time : "
+    echo $((date4-date3)) | awk '{print int($1/60)":"int($1%60)}'
+fi
