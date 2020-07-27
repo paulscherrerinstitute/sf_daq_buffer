@@ -122,9 +122,9 @@ as our protocol to be compatible with currently available external components.
 
 We use following fields in the JSON header:
 
-|Name|Type|Fixed value|Comment|
-|---|---|---|---|---|
-|pulse_id|uint64|/|bunchid from detector header|
+| Name | Type | Fixed value | Comment |
+| --- | --- | --- | ------ |
+| pulse_id | uint64 |/|bunchid from detector header|
 |frame|uint64|/|frame_index from detector header|
 |is_good_frame|bool|/|true if all packets for this frame are present|
 |daq_rec|uint32|/|daqrec from detector header|
