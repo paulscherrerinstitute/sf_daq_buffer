@@ -144,6 +144,8 @@ to max 1 client (this client can have many processes, but it needs to be a
 single logical entity, since the images are evenly distributed to all 
 connected sockets).
 
+![image_full_stream](../docs/sf_daq_buffer-FullStream.jpg)
+
 The goal here is to provide a complete copy of the detector image stream 
 for purposes of online analysis. Given the large amount of data on this 
 stream only "pre-approved" applications that can handle the load should be 
@@ -155,6 +157,8 @@ This streams also runs at detector frequency for JSON headers (metadata), but
 it sends only part of the images in the stream. The rest of the images are 
 sent as empty buffers (the receiver needs to be aware of this behaviour, as 
 Array 1.0 alone does not define it).
+
+![image_reduced_stream](../docs/sf_daq_buffer-ReducedStream.jpg)
 
 This is the lightweight version of the image stream. Any number of clients 
 can connect to this stream (PUB/SUB) but no client can do load 
@@ -168,6 +172,8 @@ and can do with only a subset of images.
 This stream runs ar detector frequency in PUB/SUB mode. The only thing it 
 does is sends out the pulse_id (of the just received image) in uint64_t 
 format.
+
+![image_pulse_stream](../docs/sf_daq_buffer-PulseStream.jpg)
 
 This is also a "public interface" for anyone who wants to get the current 
 system pulse_id.
