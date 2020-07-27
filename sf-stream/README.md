@@ -122,20 +122,20 @@ as our protocol to be compatible with currently available external components.
 
 We use following fields in the JSON header:
 
-| Name | Type | Fixed value | Comment |
-| --- | --- | --- | ------ |
-| pulse_id | uint64 |/|bunchid from detector header|
-|frame|uint64|/|frame_index from detector header|
-|is_good_frame|bool|/|true if all packets for this frame are present|
-|daq_rec|uint32|/|daqrec from detector header|
-|pedestal_file|string|/|Path to pedestal file|
-|gain_file|string|/|Path to gain file|
-|number_frames_expected|int|/|Number of expected frames|
-|run_name|string|/|Name of the run|
-|detector_name|string|/|Name of the detector|
-|htype|string|"array-1.0"|Protocol identifier|
-|type|string|"uint16"|Data type for image|
-|shape|array of uint64|"uint16"|Shape of the image in stream|
+| Name | Type | Comment |
+| --- | --- | --- |
+| pulse_id | uint64 |bunchid from detector header|
+|frame|uint64|frame_index from detector header|
+|is_good_frame|bool|true if all packets for this frame are present|
+|daq_rec|uint32|daqrec from detector header|
+|pedestal_file|string|Path to pedestal file|
+|gain_file|string|Path to gain file|
+|number_frames_expected|int|Number of expected frames|
+|run_name|string|Name of the run|
+|detector_name|string|Name of the detector|
+|htype|string|Value: "array-1.0"|
+|type|string|Value: "uint16"|
+|shape|Array[uint64]|Shape of the image in stream|
 
 ### Full data full metadata stream
 
