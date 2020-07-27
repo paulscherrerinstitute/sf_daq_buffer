@@ -100,8 +100,74 @@ arrived.
 
 ## ZMQ sending
 
+We devide the ZMQ sending to 3 types of stream:
+
+- Data processing stream. This is basically the complete stream from 
+the detector with all metadata and data. It can be described as full data full
+metadata stream. Only 1 client at the time can be connected to this stream 
+(PUSH/PULL for load balancing).
+
+- Live viewing stream. This is a reduced data full metadata stream. We send 
+metadata for all frames, but data only for subset of them (10Hz, for example). 
+Any number of clients can connect to the 10Hz stream, because we use PUB/SUB 
+for this socket.
+
+- Pulse_id stream. This is a stream that sends out only the current pulse_id.
+It can be used to synchronize any external system with the current pulse_id 
+being recorded. Multiple clients can connect to this stream.
+
+In the data processing and live viewing stream we use 
+[Array 1.0](https://github.com/paulscherrerinstitute/htypes/blob/master/array-1.0.md)
+as our protocol to be compatible with currently available external components.
+
+We use following fields in the JSON header:
+
+|Name|Type|Fixed value|Comment|
+|---|---|---|---|---|
+|pulse_id|uint64|/|bunchid from detector header|
+|frame|uint64|/|frame_index from detector header|
+|is_good_frame|bool|/|true if all packets for this frame are present|
+|daq_rec|uint32|/|daqrec from detector header|
+|pedestal_file|string|/|Path to pedestal file|
+|gain_file|string|/|Path to gain file|
+|number_frames_expected|int|/|Number of expected frames|
+|run_name|string|/|Name of the run|
+|detector_name|string|/|Name of the detector|
+|htype|string|"array-1.0"|Protocol identifier|
+|type|string|"uint16"|Data type for image|
+|shape|array of uint64|"uint16"|Shape of the image in stream|
+
 ### Full data full metadata stream
+
+This stream runs at detector frequency and uses PUSH/PULL to distribute data 
+to max 1 client (this client can have many processes, but it needs to be a 
+single logical entity, since the images are evenly distributed to all 
+connected sockets).
+
+The goal here is to provide a complete copy of the detector image stream 
+for purposes of online analysis. Given the large amount of data on this 
+stream only "pre-approved" applications that can handle the load should be 
+attached here.
 
 ### Reduced data full metadata stream
 
+This streams also runs at detector frequency for JSON headers (metadata), but 
+it sends only part of the images in the stream. The rest of the images are 
+sent as empty buffers (the receiver needs to be aware of this behaviour, as 
+Array 1.0 alone does not define it).
+
+This is the lightweight version of the image stream. Any number of clients 
+can connect to this stream (PUB/SUB) but no client can do load 
+balancing automatically (it would require PUSH/PULL).
+
+This is a "public interface" for anyone who wants to get detector data live, 
+and can do with only a subset of images.
+
 ### Pulse_id stream
+
+This stream runs ar detector frequency in PUB/SUB mode. The only thing it 
+does is sends out the pulse_id (of the just received image) in uint64_t 
+format.
+
+This is also a "public interface" for anyone who wants to get the current 
+system pulse_id.
