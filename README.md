@@ -164,6 +164,11 @@ https://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync
 https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.2018.12.08a.pdf
 - Linux kernel profiling with perf
 https://perf.wiki.kernel.org/index.php/Tutorial
+- Introduction to parallel HDF5
+https://portal.hdfgroup.org/display/HDF5/Introduction+to+Parallel+HDF5
+- Introduction to Scientific I/O
+https://www.nersc.gov/users/training/online-tutorials/introduction-to-scientific-i-o/?show_all=1
+
 
 
 ### Linux configuration
