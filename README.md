@@ -202,3 +202,5 @@ https://community.mellanox.com/s/article/performance-tuning-for-mellanox-adapter
 https://support.hpe.com/hpesc/public/docDisplay?docId=a00016408en_us
 - Low Latency Performance Tuning for Red Hat Enterprise Linux 7
 https://access.redhat.com/sites/default/files/attachments/201501-perf-brief-low-latency-tuning-rhel7-v2.1.pdf
+- Understanding PCIe performance for end hostnetworking
+https://www.cl.cam.ac.uk/research/srg/netos/projects/pcie-bench/neugebauer2018understanding.pdf
