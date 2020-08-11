@@ -17,3 +17,4 @@ requirements:
   run:
     - python
     - data_api >=0.7.6
+    - pika
