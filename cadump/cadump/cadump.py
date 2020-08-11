@@ -1,4 +1,3 @@
-from bottle import route, run, request, abort
 import json
 
 import data_api
@@ -28,49 +27,14 @@ logger = logging.getLogger("logger")
 #         'output_file': '/bla/test.h5'}    # this is usually the full path
 # }
 
-channel_list = ["S10-CPCL-VM1MGC:LOAD"]  # specified channel is only for test purposes
-base_url = ""
 
-
-@route('/notify', method='PUT')
-def put_document():
-    data = request.body.read()
-    if not data:
-        abort(400, 'No data received')
-
-    try:
-        download_data(json.loads(data))
-    except Exception as e:
-        logger.exception("Download data failed")
-
-
-def download_data(config):
+def download_data(start_pulse, end_pulse, channels):
 
     logger.info("Dump data to hdf5 ...")
-
-    start_pulse = config["range"]["startPulseId"]
-    end_pulse = config["range"]["endPulseId"]
-
-    # Overwrite the channels list if specified in the request
-    channels = channel_list
-    if "channels" in config:
-        channels = config["channels"]
-
     logger.info("Retrieve data for channels: %s" % channels)
-
-    if "retrieval_url" in config:
-        new_base_url = config["retrieval_url"]
-    else:
-        new_base_url = base_url
 
     logger.info("Retrieve pulse-id / data mapping for pulse ids")
     start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
-
-    filename = config["parameters"]["output_file"]
-    if filename != "/dev/null":
-        new_filename = filename
-    else:
-        new_filename = None
 
     logger.info("Retrieving data for interval start: " + str(start_date) + " end: " + str(end_date) + " . From " + new_base_url)
     data = get_data(channels, start=start_date, end=end_date, base_url=new_base_url)
@@ -83,20 +47,6 @@ def download_data(config):
         if new_filename:
             logger.info("Persist data to hdf5 file")
             data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
-
-
-def read_channels(filename):
-    with open(filename) as f:
-        lines = f.readlines()
-
-    channels = []
-    for line in lines:
-        line = re.sub(r'\w*#.*', "", line)
-        line = line.strip()
-        if line:  # if not empty line
-            channels.append(line)  # remove all leading and trailing spaces
-
-    return channels
 
 
 def get_data(channel_list, start=None, end=None, base_url=None):
@@ -200,17 +150,6 @@ def main():
     parser.add_argument('--url', dest='url', default=None, help='base url to retrieve data from')
 
     args = parser.parse_args()
-    print(args.channel_list)
-
-    global channel_list
-    channel_list = read_channels(args.channel_list)
-    logger.info("Using channel list: " + " ".join(channel_list))
-
-    global base_url
-    base_url = args.url
-    logger.info("Using base url: " + str(base_url))
-
-    run(host='localhost', port=10200)
 
 
 if __name__ == '__main__':
