@@ -1,0 +1,19 @@
+package:
+  name: cadump
+  version: 0.0.12
+
+source:
+    path: ..
+
+build:
+  noarch: python
+  entry_points:
+    - cadump_server = cadump.cadump:main
+
+requirements:
+  build:
+    - python
+    - data_api >=0.7.6
+  run:
+    - python
+    - data_api >=0.7.6
