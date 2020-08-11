@@ -1,5 +1,8 @@
 # sf-writer
 
+sf-writer reads the binary buffer from disk, assembled the images and writes 
+them down in HDF5 format.
+
 ## Data request ranges
 
 Data request ranges are composed of:
