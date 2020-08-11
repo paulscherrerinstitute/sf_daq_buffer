@@ -184,8 +184,7 @@ QUEUE_NAME = "epics"
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(
-        description='Channel Access archiver dump to hdf5')
+    parser = argparse.ArgumentParser(description='Epics HDF5 writer')
     parser.add_argument('--broker_url', dest='broker_url',
                         default=BROKER_URL,
                         help='RabbitMQ broker URL')
