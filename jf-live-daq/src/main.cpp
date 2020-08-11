@@ -1,7 +1,23 @@
 #include <stdio.h>
 #include <mpi.h>
 
-int main(int argc, char** argv) {
+void receive()
+{
+
+}
+
+void assemble()
+{
+
+}
+
+void write()
+{
+
+}
+
+int main(int argc, char** argv)
+{
     // Initialize the MPI environment
     MPI_Init(NULL, NULL);
 
@@ -18,9 +34,15 @@ int main(int argc, char** argv) {
     int name_len;
     MPI_Get_processor_name(processor_name, &name_len);
 
-    // Print off a hello world message
-    printf("Hello world from processor %s, rank %d out of %d processors\n",
-           processor_name, world_rank, world_size);
+    const int n_modules = 16;
+
+    if (world_rank == 0) {
+        assemble();
+    } else if (world_rank <= n_modules) {
+        receive();
+    } else {
+        write();
+    }
 
     // Finalize the MPI environment.
     MPI_Finalize();
