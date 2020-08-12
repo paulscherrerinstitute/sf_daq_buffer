@@ -2,6 +2,7 @@ import datetime
 import time
 import logging
 import requests
+import data_api
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def write_epics_pvs(output_file, start_pulse_id, stop_pulse_id, metadata, epics_
 
     if data:
         logger.info("Persist data to hdf5 file")
-        data_api.to_hdf5(data, new_filename, overwrite=True, compression=None, shuffle=False)
+        data_api.to_hdf5(data, output_file, overwrite=True, compression=None, shuffle=False)
     else:
         logger.error("No data retrieved")
         open(output_file + "_NO_DATA", 'a').close()
