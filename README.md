@@ -170,6 +170,8 @@ https://portal.hdfgroup.org/display/HDF5/Introduction+to+Parallel+HDF5
 https://www.nersc.gov/users/training/online-tutorials/introduction-to-scientific-i-o/?show_all=1
 - Lecture 36: MPI, Hybrid Programming, and Shared Memory
 http://wgropp.cs.illinois.edu/courses/cs598-s15/lectures/lecture36.pdf
+- Ansi escape codes
+https://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
 
 
 ### Linux configuration
