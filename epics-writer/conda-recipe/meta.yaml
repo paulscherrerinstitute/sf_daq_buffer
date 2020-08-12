@@ -13,8 +13,8 @@ build:
 requirements:
   build:
     - python
-    - data_api >=0.7.6
   run:
     - python
     - data_api >=0.7.6
+    - requests
     - pika
