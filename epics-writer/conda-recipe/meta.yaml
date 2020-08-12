@@ -1,6 +1,6 @@
 package:
-  name: cadump
-  version: 0.0.12
+  name: epics-writer
+  version: 0.0.1
 
 source:
     path: ..
@@ -8,7 +8,7 @@ source:
 build:
   noarch: python
   entry_points:
-    - cadump_server = cadump.cadump:main
+    - epics-writer = epics_writer.start:main
 
 requirements:
   build:
