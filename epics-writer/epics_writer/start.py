@@ -1,6 +1,7 @@
 import json
-
 from pika import BlockingConnection, ConnectionParameters, BasicProperties
+
+from epics_writer import writer
 
 DEFAULT_BROKER_URL = "127.0.0.1"
 REQUEST_EXCHANGE = "request"
@@ -12,7 +13,7 @@ OUTPUT_FILE_SUFFIX = ".PVCHANNELS.h5"
 def update_status(channel, body, action, file, message=None):
     status_header = {
         "action": action,
-        "source": "epics-writer",
+        "source": "epics_writer",
         "routing_key": QUEUE_NAME,
         "file": file,
         "message": message
@@ -41,7 +42,11 @@ def on_message(channel, method_frame, header_frame, body):
 
         update_status(channel, body, "write_start", output_file)
 
-        # TODO: Call the actual writing.
+        writer.write_epics_pvs(output_file=output_file,
+                        start_pulse_id=start_pulse_id,
+                        stop_pulse_id=stop_pulse_id,
+                        metadata=metadata,
+                        epics_pvs=epics_pvs)
 
     except Exception as e:
         channel.basic_reject(delivery_tag=method_frame.delivery_tag,

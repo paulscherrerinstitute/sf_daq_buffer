@@ -1,12 +1,10 @@
-import data_api
-import data_api.client
+# import data_api
+# import data_api.client
 import requests
 import datetime
 import time
 
 import logging
-
-
 
 logger = logging.getLogger("logger")
 
@@ -26,28 +24,29 @@ logger = logging.getLogger("logger")
 #         'output_file': '/bla/test.h5'}    # this is usually the full path
 # }
 
+def write_epics_pvs(
+        output_file, start_pulse_id, stop_pulse_id, metadata, epics_pvs):
 
-def download_data(start_pulse, end_pulse, channels):
     logger.info("Dump data to hdf5 ...")
-    logger.info("Retrieve data for channels: %s" % channels)
+    logger.info("Retrieve data for channels: %s" % epics_pvs)
 
     logger.info("Retrieve pulse-id / data mapping for pulse ids")
-    start_date, end_date = get_pulse_id_date_mapping([start_pulse, end_pulse])
+    start_date, end_date = get_pulse_id_date_mapping([start_pulse_id, stop_pulse_id])
 
-    logger.info("Retrieving data for interval start: " + str(
-        start_date) + " end: " + str(end_date) + " . From " + new_base_url)
-    data = get_data(channels, start=start_date, end=end_date,
-                    base_url=new_base_url)
+    # logger.info("Retrieving data for interval start: " + str(
+    #     start_date) + " end: " + str(end_date) + " . From " + new_base_url)
+    # data = get_data(channels, start=start_date, end=end_date,
+    #                 base_url=new_base_url)
 
-    if len(data) < 1:
-        logger.error("No data retrieved")
-        open(new_filename + "_NO_DATA", 'a').close()
-
-    else:
-        if new_filename:
-            logger.info("Persist data to hdf5 file")
-            data_api.to_hdf5(data, new_filename, overwrite=True,
-                             compression=None, shuffle=False)
+    # if len(data) < 1:
+    #     logger.error("No data retrieved")
+    #     open(new_filename + "_NO_DATA", 'a').close()
+    #
+    # else:
+    #     if new_filename:
+    #         logger.info("Persist data to hdf5 file")
+    #         data_api.to_hdf5(data, new_filename, overwrite=True,
+    #                          compression=None, shuffle=False)
 
 
 def get_data(channel_list, start=None, end=None, base_url=None):
@@ -79,11 +78,11 @@ def get_data(channel_list, start=None, end=None, base_url=None):
         raise RuntimeError("Unable to retrieve data from server: ", response)
 
     logger.info("Data retieval is successful")
-
-    data = response.json()
-
-    return data_api.client._build_pandas_data_frame(data,
-                                                    index_field="globalDate")
+    #
+    # data = response.json()
+    #
+    # return data_api.client._build_pandas_data_frame(data,
+    #                                                 index_field="globalDate")
 
 
 def get_pulse_id_date_mapping(pulse_ids):
@@ -123,28 +122,28 @@ def get_pulse_id_date_mapping(pulse_ids):
                     logger.info("retrieval failed")
                     if c == 0:
                         ref_date = data[0]["data"][0]["globalDate"]
-                        ref_date = dateutil.parser.parse(ref_date)
-
-                        now_date = datetime.datetime.now()
-                        now_date = pytz.timezone('Europe/Zurich').localize(
-                            now_date)
-
-                        check_date = ref_date + datetime.timedelta(
-                            seconds=24)  # 20 seconds should be enough
-                        delta_date = check_date - now_date
-
-                        s = delta_date.seconds
-                        logger.info("retry in " + str(s) + " seconds ")
-                        if not s <= 0:
-                            time.sleep(s)
-                        continue
-
-                    raise RuntimeError('Unable to retrieve mapping')
-
-                date = data[0]["data"][0]["globalDate"]
-                date = dateutil.parser.parse(date)
-                dates.append(date)
-                break
+                #         ref_date = dateutil.parser.parse(ref_date)
+                #
+                #         now_date = datetime.datetime.now()
+                #         now_date = pytz.timezone('Europe/Zurich').localize(
+                #             now_date)
+                #
+                #         check_date = ref_date + datetime.timedelta(
+                #             seconds=24)  # 20 seconds should be enough
+                #         delta_date = check_date - now_date
+                #
+                #         s = delta_date.seconds
+                #         logger.info("retry in " + str(s) + " seconds ")
+                #         if not s <= 0:
+                #             time.sleep(s)
+                #         continue
+                #
+                #     raise RuntimeError('Unable to retrieve mapping')
+                #
+                # date = data[0]["data"][0]["globalDate"]
+                # date = dateutil.parser.parse(date)
+                # dates.append(date)
+                # break
 
         return dates
     except Exception:

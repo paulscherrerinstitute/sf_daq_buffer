@@ -1,5 +1,0 @@
-build
-__pycache__
-.idea
-.pytest_cache
-*.h5
