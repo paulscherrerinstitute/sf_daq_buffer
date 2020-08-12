@@ -1,7 +1,8 @@
 import json
 from pika import BlockingConnection, ConnectionParameters, BasicProperties
 
-from epics_writer import writer
+from epics_writer.writer import write_epics_pvs
+
 
 DEFAULT_BROKER_URL = "127.0.0.1"
 REQUEST_EXCHANGE = "request"
@@ -42,7 +43,7 @@ def on_message(channel, method_frame, header_frame, body):
 
         update_status(channel, body, "write_start", output_file)
 
-        writer.write_epics_pvs(output_file=output_file,
+        write_epics_pvs(output_file=output_file,
                         start_pulse_id=start_pulse_id,
                         stop_pulse_id=stop_pulse_id,
                         metadata=metadata,
