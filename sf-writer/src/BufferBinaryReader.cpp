@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cstring>
 #include <fcntl.h>
+#include <stdexcept>
 
 #include "BufferUtils.hpp"
 #include "writer_config.hpp"
