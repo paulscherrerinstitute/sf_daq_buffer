@@ -55,11 +55,11 @@ case ${DETECTOR} in
   NM=9
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF02.json
   ;;
-'JF06T32V01')
+'JF06T32V02')
   NM=32
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06.json
   ;;
-'JF06T08V01')
+'JF06T08V02')
   NM=8
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.json
   ;;
@@ -75,7 +75,8 @@ case ${DETECTOR} in
   NM=1
 esac
 
-coreAssociated="7,8,9,10,11,12,13,14"
+#coreAssociated="7,8,9,10,11,12,13,14"
+coreAssociated="9,10,11,12,13,14,15,16,17"
 
 touch /tmp/detector_retrieve.log
 
@@ -85,8 +86,14 @@ PREVIOUS_STILL_RUN=0
 while [ ${PREVIOUS_STILL_RUN} == 0 ]
 do
     sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
-    ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer > /dev/null 
-    PREVIOUS_STILL_RUN=$? # not found == 1
+#    ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer > /dev/null 
+#    PREVIOUS_STILL_RUN=$? # not found == 1
+#    PREVIOUS_STILL_RUN=1
+    n=`ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer | wc -l`
+    if [ ${n} -le 10 ]
+    then
+        PREVIOUS_STILL_RUN=1
+    fi
 done
 
 date2=$(date +%s)
@@ -116,7 +123,8 @@ taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/s
 
 wait
 
-coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
+#coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
+coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
 
 date3=$(date +%s)
 echo "Finished                : "`date`
@@ -128,13 +136,29 @@ then
     echo "File is written in raw format, no compression"
 else
     echo "Will call compression/convertion ${OUTFILE_RAW} --> ${OUTFILE}"
+
+    PREVIOUS_STILL_RUN=0
+    while [ ${PREVIOUS_STILL_RUN} == 0 ]
+    do
+        sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
+        n=`ps -fe | grep "scripts/export_file.py " | grep -v grep | grep export | wc -l`
+        if [ ${n} -le 10 ]
+        then
+            PREVIOUS_STILL_RUN=1
+        fi
+    done
+    date4=$(date +%s)
+    echo -n "Sleep Time : "
+    echo $((date4-date3)) | awk '{print int($1/60)":"int($1%60)}'
+
     export PATH=/home/dbe/miniconda3/bin:$PATH
     source deactivate >/dev/null 2>&1
     source activate conversion
     taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE} 
     python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE}
-    date4=$(date +%s)
+    date5=$(date +%s)
     echo "Finished                : "`date`
-    echo -n "Convertion Time : "
-    echo $((date4-date3)) | awk '{print int($1/60)":"int($1%60)}'
+    echo -n "Conversion Time : "
+    echo $((date5-date4)) | awk '{print int($1/60)":"int($1%60)}'
+
 fi

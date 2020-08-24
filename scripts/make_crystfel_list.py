@@ -62,7 +62,7 @@ except:
     print(f"Can't open {data_file}")
     exit()
 
-detector = 'JF06T08V01'
+detector = 'JF06T32V02'
 
 pulseids = f[f'/data/{detector}/pulse_id'][:]
 n_pulse_id = len(pulseids)

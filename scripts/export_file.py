@@ -59,14 +59,23 @@ with ju.File(
     mask=mask,
     gap_pixels=gap_pixels,
     geometry=geometry,
-    parallel=False,
+    parallel=True,
 ) as juf:
     n_input_frames = len(juf["data"])
     good_frames = np.nonzero(juf["is_good_frame"])[0]
     n_output_frames = len(good_frames)
 
     juf.handler.mask_double_pixels = mask_double_pixels
-    juf.export(args.file_out, index=good_frames, roi=None, compression=compression, factor=factor, dtype=dtype, batch_size=500)
+    juf.export(
+        args.file_out,
+        index=good_frames,
+        roi=None,
+        compression=compression,
+        factor=factor,
+        dtype=dtype,
+        batch_size=25,
+    )
+
     pixel_mask = juf.handler.get_pixel_mask(gap_pixels=gap_pixels, geometry=geometry)
 
 # Postprocessing
