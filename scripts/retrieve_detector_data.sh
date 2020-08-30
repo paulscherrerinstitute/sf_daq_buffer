@@ -90,7 +90,7 @@ do
 #    PREVIOUS_STILL_RUN=$? # not found == 1
 #    PREVIOUS_STILL_RUN=1
     n=`ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer | wc -l`
-    if [ ${n} -le 10 ]
+    if [ ${n} -lt 9 ]
     then
         PREVIOUS_STILL_RUN=1
     fi
@@ -125,6 +125,8 @@ wait
 
 #coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
 coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
+#TODO: calculate this number from coreAssociatedConversion
+#export NUMBA_NUM_THREADS=18
 
 date3=$(date +%s)
 echo "Finished                : "`date`
@@ -142,7 +144,7 @@ else
     do
         sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
         n=`ps -fe | grep "scripts/export_file.py " | grep -v grep | grep export | wc -l`
-        if [ ${n} -le 10 ]
+        if [ ${n} -lt 18 ]
         then
             PREVIOUS_STILL_RUN=1
         fi
@@ -154,7 +156,7 @@ else
     export PATH=/home/dbe/miniconda3/bin:$PATH
     source deactivate >/dev/null 2>&1
     source activate conversion
-    taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE} 
+    taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
     python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE}
     date5=$(date +%s)
     echo "Finished                : "`date`

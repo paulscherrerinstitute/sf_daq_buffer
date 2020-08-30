@@ -46,11 +46,6 @@ if not mask and mask_double_pixels:
     warnings.warn("mask_double_pixels set to False")
     mask_double_pixels = False
 
-if factor:
-    dtype = np.int32
-else:
-    dtype = None
-
 with ju.File(
     args.file_in,
     gain_file=gain_file,
@@ -59,7 +54,7 @@ with ju.File(
     mask=mask,
     gap_pixels=gap_pixels,
     geometry=geometry,
-    parallel=True,
+    parallel=False,
 ) as juf:
     n_input_frames = len(juf["data"])
     good_frames = np.nonzero(juf["is_good_frame"])[0]
@@ -72,8 +67,8 @@ with ju.File(
         roi=None,
         compression=compression,
         factor=factor,
-        dtype=dtype,
-        batch_size=25,
+        dtype=None,
+        batch_size=35,
     )
 
     pixel_mask = juf.handler.get_pixel_mask(gap_pixels=gap_pixels, geometry=geometry)
