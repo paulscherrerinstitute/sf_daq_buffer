@@ -8,6 +8,8 @@ class RamBufferWriter {
     const std::string detector_name_;
 
     int shm_fd_;
+    size_t buffer_size_;
+    void* buffer_;
 
 public:
     RamBufferWriter(const std::string& detector_name,

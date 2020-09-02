@@ -25,19 +25,24 @@ RamBufferWriter::RamBufferWriter(
     }
 
     size_t slot_size = MODULE_N_BYTES + sizeof(ModuleFrame);
-    size_t buffer_size = slot_size * n_modules * n_slots;
+    buffer_size_ = slot_size * n_modules * n_slots;
 
-    if ((ftruncate(shm_fd_, buffer_size)) == -1) {
+    if ((ftruncate(shm_fd_, buffer_size_)) == -1) {
         throw runtime_error(strerror(errno));
     }
 
-    void* buffer = mmap(NULL, buffer_size, PROT_WRITE, MAP_SHARED, shm_fd_, 0);
-    if (buffer ==  (void*)-1) {
+    // TODO: Test with MAP_HUGETLB
+    void* ptr = mmap(NULL, buffer_size_, PROT_WRITE, MAP_SHARED, shm_fd_, 0);
+    if (ptr ==  MAP_FAILED) {
         throw runtime_error(strerror(errno));
     }
+
+    buffer_ = ptr;
 }
 
 RamBufferWriter::~RamBufferWriter()
 {
-   shm_unlink(detector_name_.c_str());
+    munmap(buffer_, buffer_size_);
+    shm_unlink(detector_name_.c_str());
+    close(shm_fd_);
 }
