@@ -6,8 +6,9 @@
 
 class RamBuffer {
     const std::string detector_name_;
+    const int n_modules_;
     const int module_n_;
-    const size_t n_slots_;
+
     const size_t meta_size_;
     const size_t image_size_;
     const size_t buffer_size_;
@@ -20,15 +21,12 @@ class RamBuffer {
 
 public:
     RamBuffer(const std::string& detector_name,
-              const size_t n_modules,
-              const size_t n_slots,
+              const int n_modules,
               const int module_n=0);
     ~RamBuffer();
 
     void write_frame(const ModuleFrame *src_meta, const char *src_data) const;
-    void read_image(const uint64_t pulse_id,
-                    ModuleFrame *&dst_meta,
-                    char *&dst_data) const;
+    char* read_image(const uint64_t pulse_id, ImageMetadata &image_meta) const;
 };
 
 

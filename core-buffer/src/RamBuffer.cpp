@@ -11,15 +11,14 @@ using namespace buffer_config;
 
 RamBuffer::RamBuffer(
         const string &detector_name,
-        const size_t n_modules,
-        const size_t n_slots,
+        const int n_modules,
         const int module_n) :
         detector_name_(detector_name),
-        n_slots_(n_slots),
+        n_modules_(n_modules),
         module_n_(module_n),
-        meta_size_(sizeof(ModuleFrame) * n_modules),
-        image_size_(MODULE_N_BYTES * n_modules),
-        buffer_size_((meta_size_ + image_size_) * n_slots)
+        meta_size_(sizeof(ModuleFrame) * n_modules_),
+        image_size_(MODULE_N_BYTES * n_modules_),
+        buffer_size_((meta_size_ + image_size_) * RAM_BUFFER_N_SLOTS)
 {
     shm_fd_ = shm_open(detector_name_.c_str(), O_RDWR | O_CREAT, 0777);
     if (shm_fd_ < 0) {
@@ -38,7 +37,7 @@ RamBuffer::RamBuffer(
 
     meta_buffer_ = (ModuleFrame *) buffer_;
     // Image buffer start right after metadata buffer.
-    image_buffer_ = (char *) (meta_buffer_ + (n_modules * n_slots));
+    image_buffer_ = (char*)buffer_ + (meta_size_ * RAM_BUFFER_N_SLOTS);
 }
 
 RamBuffer::~RamBuffer()
@@ -52,7 +51,7 @@ void RamBuffer::write_frame(
         const ModuleFrame *src_meta,
         const char *src_data) const
 {
-    const size_t slot_n = src_meta->pulse_id % n_slots_;
+    const size_t slot_n = src_meta->pulse_id % RAM_BUFFER_N_SLOTS;
 
     ModuleFrame *dst_meta = meta_buffer_ +
                             (meta_size_ * slot_n) +
@@ -66,16 +65,61 @@ void RamBuffer::write_frame(
     memcpy(dst_data, src_data, MODULE_N_BYTES);
 }
 
-void RamBuffer::read_image(const uint64_t pulse_id,
-                           ModuleFrame *&dst_meta,
-                           char *&dst_data) const
+char* RamBuffer::read_image(const uint64_t pulse_id,
+                            ImageMetadata &image_meta) const
 {
-    const size_t slot_n = pulse_id % n_slots_;
+    const size_t slot_n = pulse_id % RAM_BUFFER_N_SLOTS;
 
     ModuleFrame *src_meta = meta_buffer_ +
                             (meta_size_ * slot_n);
 
     char *src_data = image_buffer_ +
                      (image_size_ * slot_n);
+
+    auto is_pulse_init = false;
+    auto is_good_image = true;
+
+    for (int i_module=0; i_module <  n_modules_; i_module++) {
+        ModuleFrame *frame_meta = src_meta + i_module;
+
+        auto is_good_frame =
+                frame_meta->n_recv_packets == JF_N_PACKETS_PER_FRAME;
+
+        if (!is_good_frame) {
+            is_good_image = false;
+            continue;
+        }
+
+        if (!is_pulse_init) {
+
+            if (frame_meta->pulse_id != pulse_id) {
+                throw runtime_error("Wrong pulse_id in ram buffer slot.");
+            }
+
+            image_meta.pulse_id = frame_meta->pulse_id;
+            image_meta.frame_index = frame_meta->frame_index;
+            image_meta.daq_rec = frame_meta->daq_rec;
+
+            is_pulse_init = 1;
+        }
+
+        if (is_good_image) {
+            if (frame_meta->pulse_id != image_meta.pulse_id) {
+                is_good_image = false;
+            }
+
+            if (frame_meta->frame_index != image_meta.frame_index) {
+                is_good_image = false;
+            }
+
+            if (frame_meta->daq_rec != image_meta.daq_rec) {
+                is_good_image = false;
+            }
+        }
+    }
+
+    image_meta.is_good_image = is_good_image;
+
+    return src_data;
 }
 

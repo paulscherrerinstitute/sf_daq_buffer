@@ -40,6 +40,8 @@ namespace buffer_config {
     const int BUFFER_ZMQ_SNDHWM = 100;
     // IPC address of the live stream.
     const std::string BUFFER_LIVE_IPC_URL = "ipc:///tmp/sf-live-";
+    // Number of image slots in ram buffer - 10 seconds should be enough
+    const int RAM_BUFFER_N_SLOTS = 100 * 10;
 }
 
 #endif //BUFFERCONFIG_HPP
