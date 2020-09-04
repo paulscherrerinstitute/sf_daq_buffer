@@ -12,13 +12,15 @@ using namespace buffer_config;
 RamBuffer::RamBuffer(
         const string &detector_name,
         const int n_modules,
-        const int module_n) :
+        const int module_n,
+        const int n_slots) :
         detector_name_(detector_name),
         n_modules_(n_modules),
         module_n_(module_n),
+        n_slots_(n_slots),
         meta_size_(sizeof(ModuleFrame) * n_modules_),
         image_size_(MODULE_N_BYTES * n_modules_),
-        buffer_size_((meta_size_ + image_size_) * RAM_BUFFER_N_SLOTS)
+        buffer_size_((meta_size_ + image_size_) * n_slots_)
 {
     shm_fd_ = shm_open(detector_name_.c_str(), O_RDWR | O_CREAT, 0777);
     if (shm_fd_ < 0) {
@@ -37,7 +39,7 @@ RamBuffer::RamBuffer(
 
     meta_buffer_ = (ModuleFrame *) buffer_;
     // Image buffer start right after metadata buffer.
-    image_buffer_ = (char*)buffer_ + (meta_size_ * RAM_BUFFER_N_SLOTS);
+    image_buffer_ = (char*)buffer_ + (meta_size_ * n_slots_);
 }
 
 RamBuffer::~RamBuffer()
@@ -51,7 +53,7 @@ void RamBuffer::write_frame(
         const ModuleFrame *src_meta,
         const char *src_data) const
 {
-    const size_t slot_n = src_meta->pulse_id % RAM_BUFFER_N_SLOTS;
+    const size_t slot_n = src_meta->pulse_id % n_slots_;
 
     ModuleFrame *dst_meta = meta_buffer_ +
                             (meta_size_ * slot_n) +
@@ -68,7 +70,7 @@ void RamBuffer::write_frame(
 char* RamBuffer::read_image(const uint64_t pulse_id,
                             ImageMetadata &image_meta) const
 {
-    const size_t slot_n = pulse_id % RAM_BUFFER_N_SLOTS;
+    const size_t slot_n = pulse_id % n_slots_;
 
     ModuleFrame *src_meta = meta_buffer_ +
                             (meta_size_ * slot_n);
