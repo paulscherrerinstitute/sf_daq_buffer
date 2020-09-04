@@ -12,13 +12,14 @@ using namespace buffer_config;
 RamBuffer::RamBuffer(
         const string &detector_name,
         const size_t n_modules,
-        const int module_n,
-        const size_t n_slots) :
+        const size_t n_slots,
+        const int module_n) :
         detector_name_(detector_name),
-        module_n_(module_n),
         n_slots_(n_slots),
+        module_n_(module_n),
+        meta_size_(sizeof(ModuleFrame) * n_modules),
         image_size_(MODULE_N_BYTES * n_modules),
-        buffer_size_((sizeof(ModuleFrame) + image_size_) * n_slots)
+        buffer_size_((meta_size_ + image_size_) * n_slots)
 {
     shm_fd_ = shm_open(detector_name_.c_str(), O_RDWR | O_CREAT, 0777);
     if (shm_fd_ < 0) {
@@ -37,7 +38,7 @@ RamBuffer::RamBuffer(
 
     meta_buffer_ = (ModuleFrame *) buffer_;
     // Image buffer start right after metadata buffer.
-    image_buffer_ = (char *) (meta_buffer_ + n_slots);
+    image_buffer_ = (char *) (meta_buffer_ + (n_modules * n_slots));
 }
 
 RamBuffer::~RamBuffer()
@@ -45,22 +46,36 @@ RamBuffer::~RamBuffer()
     munmap(buffer_, buffer_size_);
     close(shm_fd_);
     shm_unlink(detector_name_.c_str());
-
 }
 
 void RamBuffer::write_frame(
-        const ModuleFrame &metadata,
-        const char *data)
+        const ModuleFrame *src_meta,
+        const char *src_data) const
 {
-    size_t slot_n = metadata.pulse_id % n_slots_;
+    const size_t slot_n = src_meta->pulse_id % n_slots_;
 
-    ModuleFrame *meta = meta_buffer_ + slot_n;
-    *meta = metadata;
+    ModuleFrame *dst_meta = meta_buffer_ +
+                            (meta_size_ * slot_n) +
+                            module_n_;
 
-    char *frame = image_buffer_ +
-                  (image_size_ * slot_n) +
-                  (MODULE_N_BYTES * module_n_);
+    char *dst_data = image_buffer_ +
+                     (image_size_ * slot_n) +
+                     (MODULE_N_BYTES * module_n_);
 
-    memcpy(frame, data, MODULE_N_BYTES);
+    memcpy(dst_meta, src_meta, sizeof(ModuleFrame));
+    memcpy(dst_data, src_data, MODULE_N_BYTES);
+}
+
+void RamBuffer::read_image(const uint64_t pulse_id,
+                           ModuleFrame *&dst_meta,
+                           char *&dst_data) const
+{
+    const size_t slot_n = pulse_id % n_slots_;
+
+    ModuleFrame *src_meta = meta_buffer_ +
+                            (meta_size_ * slot_n);
+
+    char *src_data = image_buffer_ +
+                     (image_size_ * slot_n);
 }
 
