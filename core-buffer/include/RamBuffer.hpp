@@ -22,7 +22,7 @@ class RamBuffer {
 public:
     RamBuffer(const std::string& detector_name,
               const int n_modules,
-              const int n_slots=RAM_BUFFER_N_SLOTS);
+              const int n_slots=buffer_config::RAM_BUFFER_N_SLOTS);
     ~RamBuffer();
 
     void write_frame(const ModuleFrame *src_meta, const char *src_data) const;

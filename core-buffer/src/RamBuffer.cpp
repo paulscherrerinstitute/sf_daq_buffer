@@ -1,5 +1,5 @@
 #include <sys/mman.h>
-#include <bits/fcntl-linux.h>
+#include <fcntl.h>
 #include <cstring>
 #include <stdexcept>
 #include <unistd.h>
