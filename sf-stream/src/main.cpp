@@ -43,41 +43,18 @@ int main (int argc, char *argv[])
 
     // TODO: Remove stats trash.
     int stats_counter = 0;
-    size_t read_total_us = 0;
-    size_t read_max_us = 0;
-    size_t send_total_us = 0;
-    size_t send_max_us = 0;
 
     while (true) {
 
-        auto start_time = steady_clock::now();
-
-        auto n_lost_pulses = receiver.get_next_image(meta, data);
+        auto n_lost_pulses = receiver.get_next_pulse_id();
 
         if (n_lost_pulses > 0) {
             cout << "sf_stream:sync_lost_pulses " << n_lost_pulses << endl;
         }
 
-        auto end_time = steady_clock::now();
-        size_t read_us_duration = duration_cast<microseconds>(
-                end_time - start_time).count();
-
-        start_time = steady_clock::now();
-
         sender.send(meta, data);
 
-        end_time = steady_clock::now();
-        size_t send_us_duration = duration_cast<microseconds>(
-                end_time - start_time).count();
-
-        // TODO: Some poor statistics.
         stats_counter++;
-        read_total_us += read_us_duration;
-        send_total_us += send_us_duration;
-
-        read_max_us = max(read_max_us, read_us_duration);
-        send_max_us = max(send_max_us, send_us_duration);
-
         if (stats_counter == STATS_MODULO) {
             cout << "sf_stream:read_us " << read_total_us / STATS_MODULO;
             cout << " sf_stream:read_max_us " << read_max_us;
@@ -86,10 +63,6 @@ int main (int argc, char *argv[])
             cout << endl;
 
             stats_counter = 0;
-            read_total_us = 0;
-            read_max_us = 0;
-            send_total_us = 0;
-            send_max_us = 0;
         }
     }
 }
