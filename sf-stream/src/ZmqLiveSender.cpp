@@ -88,7 +88,7 @@ ZmqLiveSender::~ZmqLiveSender()
     zmq_close(socket_live_);
 }
 
-void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
+void ZmqLiveSender::send(const ImageMetadata *meta, const char *data)
 {
     uint16_t data_empty [] = { 0, 0, 0, 0};
 
@@ -96,41 +96,15 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
     auto& header_alloc = header.GetAllocator();
     string text_header;
 
-    uint64_t pulse_id    = 0;
-    uint64_t frame_index = 0;
-    uint64_t daq_rec     = 0;
-    bool is_good_frame   = true;
-
-    for (size_t i_module = 0; i_module < config_.n_modules; i_module++) {
-        // TODO: Place this tests in the appropriate spot.
-        auto& module_metadata = meta->module[i_module];
-        if (i_module == 0) {
-            pulse_id    = module_metadata.pulse_id;
-            frame_index = module_metadata.frame_index;
-            daq_rec     = module_metadata.daq_rec;
-
-            if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
-        } else {
-            if (module_metadata.pulse_id != pulse_id) is_good_frame = false;
-
-            if (module_metadata.frame_index != frame_index) is_good_frame = false;
-
-            if (module_metadata.daq_rec != daq_rec) is_good_frame = false;
-
-            if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
-        }
-    }
-
-    if(zmq_send(socket_pulse_, &pulse_id, sizeof(pulse_id), 0) == -1) {
+    if(zmq_send(socket_pulse_, &meta->pulse_id, sizeof(uint64_t), 0) == -1) {
         throw runtime_error(zmq_strerror(errno));
     }
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
-
-    header.AddMember("frame", frame_index, header_alloc);
-    header.AddMember("is_good_frame", is_good_frame, header_alloc);
-    header.AddMember("daq_rec", daq_rec, header_alloc);
-    header.AddMember("pulse_id", pulse_id, header_alloc);
+    header.AddMember("frame", meta->frame_index, header_alloc);
+    header.AddMember("is_good_frame", meta->is_good_image, header_alloc);
+    header.AddMember("daq_rec", meta->daq_rec, header_alloc);
+    header.AddMember("pulse_id", meta->pulse_id, header_alloc);
 
     rapidjson::Value pedestal_file;
     pedestal_file.SetString(config_.PEDE_FILENAME.c_str(), header_alloc);
@@ -144,7 +118,7 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
 
     rapidjson::Value run_name;
     run_name.SetString(
-            to_string(uint64_t(pulse_id/10000)*10000).c_str(),
+            to_string(uint64_t(meta->pulse_id/10000)*10000).c_str(),
             header_alloc);
     header.AddMember("run_name", run_name, header_alloc);
 
