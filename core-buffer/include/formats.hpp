@@ -22,7 +22,7 @@ struct ImageMetadata {
     uint64_t pulse_id;
     uint64_t frame_index;
     uint32_t daq_rec;
-    uint32_t is_good_frame;
+    uint32_t is_good_image;
 };
 #pragma pack(pop)
 
