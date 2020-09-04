@@ -12,11 +12,9 @@ using namespace buffer_config;
 RamBuffer::RamBuffer(
         const string &detector_name,
         const int n_modules,
-        const int module_n,
         const int n_slots) :
         detector_name_(detector_name),
         n_modules_(n_modules),
-        module_n_(module_n),
         n_slots_(n_slots),
         meta_size_(sizeof(ModuleFrame) * n_modules_),
         image_size_(MODULE_N_BYTES * n_modules_),
@@ -53,15 +51,15 @@ void RamBuffer::write_frame(
         const ModuleFrame *src_meta,
         const char *src_data) const
 {
-    const size_t slot_n = src_meta->pulse_id % n_slots_;
+    const int slot_n = src_meta->pulse_id % n_slots_;
 
     ModuleFrame *dst_meta = meta_buffer_ +
                             (meta_size_ * slot_n) +
-                            module_n_;
+                            src_meta->module_id;
 
     char *dst_data = image_buffer_ +
                      (image_size_ * slot_n) +
-                     (MODULE_N_BYTES * module_n_);
+                     (MODULE_N_BYTES * src_meta->module_id);
 
     memcpy(dst_meta, src_meta, sizeof(ModuleFrame));
     memcpy(dst_data, src_data, MODULE_N_BYTES);

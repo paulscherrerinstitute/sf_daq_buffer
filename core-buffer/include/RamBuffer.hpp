@@ -7,7 +7,6 @@
 class RamBuffer {
     const std::string detector_name_;
     const int n_modules_;
-    const int module_n_;
     const int n_slots_;
 
     const size_t meta_size_;
@@ -23,7 +22,6 @@ class RamBuffer {
 public:
     RamBuffer(const std::string& detector_name,
               const int n_modules,
-              const int module_n=0,
               const int n_slots=RAM_BUFFER_N_SLOTS);
     ~RamBuffer();
 
