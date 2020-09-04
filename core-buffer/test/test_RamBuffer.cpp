@@ -21,9 +21,17 @@ TEST(RamBuffer, simple_store)
     for (size_t i = 0; i < MODULE_N_PIXELS; i++) {
         frame_buffer[i] = i % 100;
     }
+
     for (int i_module=0; i_module<n_modules; i_module++) {
         frame_meta.module_id = i_module;
 
         buffer.write_frame(&frame_meta, (char *) (frame_buffer.get()));
     }
+
+    ImageMetadata image_meta;
+    buffer.read_image(frame_meta.pulse_id, image_meta);
+    ASSERT_EQ(image_meta.pulse_id, frame_meta.pulse_id);
+    ASSERT_EQ(image_meta.daq_rec, frame_meta.daq_rec);
+    ASSERT_EQ(image_meta.frame_index, frame_meta.frame_index);
+    ASSERT_EQ(image_meta.is_good_image, 1);
 }
