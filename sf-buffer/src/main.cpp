@@ -4,6 +4,7 @@
 #include <chrono>
 #include <sstream>
 #include <zconf.h>
+#include <RamBuffer.hpp>
 
 #include "formats.hpp"
 #include "buffer_config.hpp"
@@ -46,11 +47,12 @@ int main (int argc, char *argv[]) {
 
     if (argc != 6) {
         cout << endl;
-        cout << "Usage: sf_buffer [detector_name] [device_name]";
+        cout << "Usage: sf_buffer [detector_name] [n_modules] [device_name]";
         cout << " [udp_port] [root_folder] [source_id]";
         cout << endl;
         cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
-        cout << "\tdevice_name: Name to write to disk.";
+        cout << "\tn_modules: Number of modules in the detector." << endl;
+        cout << "\tdevice_name: Name to write to disk." << endl;
         cout << "\tudp_port: UDP port to connect to." << endl;
         cout << "\troot_folder: FS root folder." << endl;
         cout << "\tsource_id: ID of the source for live stream." << endl;
@@ -60,10 +62,11 @@ int main (int argc, char *argv[]) {
     }
 
     string detector_name = string(argv[1]);
-    string device_name = string(argv[2]);
-    int udp_port = atoi(argv[3]);
-    string root_folder = string(argv[4]);
-    int source_id = atoi(argv[5]);
+    int n_modules = atoi(argv[2]);
+    string device_name = string(argv[3]);
+    int udp_port = atoi(argv[4]);
+    string root_folder = string(argv[5]);
+    int source_id = atoi(argv[6]);
 
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
@@ -71,45 +74,22 @@ int main (int argc, char *argv[]) {
 
     BufferBinaryWriter writer(root_folder, device_name);
     FrameUdpReceiver receiver(udp_port, source_id);
+    RamBuffer buffer(detector_name, n_modules);
 
     auto binary_buffer = new BufferBinaryFormat();
     auto socket = get_live_stream_socket(detector_name, source_id);
-
-    size_t write_total_us = 0;
-    size_t write_max_us = 0;
-    size_t send_total_us = 0;
-    size_t send_max_us = 0;
 
     while (true) {
 
         auto pulse_id = receiver.get_frame_from_udp(
                 binary_buffer->metadata, binary_buffer->data);
 
-        auto start_time = steady_clock::now();
-
         writer.write(pulse_id, binary_buffer);
 
-        auto write_end_time = steady_clock::now();
-        size_t write_us_duration = duration_cast<microseconds>(
-                write_end_time-start_time).count();
+        buffer.write_frame(&(binary_buffer->metadata),
+                           &(binary_buffer->data[0]));
 
-        start_time = steady_clock::now();
-
-        zmq_send(socket, &(binary_buffer->metadata), sizeof(ModuleFrame),
-                ZMQ_SNDMORE);
-        zmq_send(socket, binary_buffer->data, MODULE_N_BYTES, 0);
-
-        auto send_end_time = steady_clock::now();
-        size_t send_us_duration = duration_cast<microseconds>(
-                send_end_time-start_time).count();
-
-        // TODO: Make real statistics, please.
-        stats_counter++;
-        write_total_us += write_us_duration;
-        send_total_us += send_us_duration;
-
-        write_max_us = max(write_max_us, write_us_duration);
-        send_max_us = max(send_max_us, send_us_duration);
+        zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
 
         if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
             n_missed_packets += JF_N_PACKETS_PER_FRAME -
@@ -117,25 +97,16 @@ int main (int argc, char *argv[]) {
             n_corrupted_frames++;
         }
 
+        stats_counter++;
         if (stats_counter == STATS_MODULO) {
             cout << "sf_buffer:device_name " << device_name;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
-
-            cout << " sf_buffer:write_total_us " << write_total_us/STATS_MODULO;
-            cout << " sf_buffer:write_max_us " << write_max_us;
-            cout << " sf_buffer:send_total_us " << send_total_us/STATS_MODULO;
-            cout << " sf_buffer:send_max_us " << send_max_us;
             cout << endl;
 
             stats_counter = 0;
             n_missed_packets = 0;
             n_corrupted_frames = 0;
-
-            write_total_us = 0;
-            write_max_us = 0;
-            send_total_us = 0;
-            send_max_us = 0;
         }
     }
 }
