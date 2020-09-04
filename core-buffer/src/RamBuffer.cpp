@@ -120,6 +120,12 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
 
     image_meta.is_good_image = is_good_image;
 
+    if (!is_pulse_init) {
+        image_meta.pulse_id = pulse_id;
+        image_meta.frame_index = 0;
+        image_meta.daq_rec = 0;
+    }
+
     return src_data;
 }
 
