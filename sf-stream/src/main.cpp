@@ -7,7 +7,7 @@
 #include "buffer_config.hpp"
 #include "stream_config.hpp"
 #include "ZmqLiveSender.hpp"
-#include "ZmqLiveReceiver.hpp"
+#include "ZmqPulseReceiver.hpp"
 
 using namespace std;
 using namespace chrono;
@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    ZmqLiveReceiver receiver(config.n_modules, ctx, RECV_IPC_URL);
+    ZmqPulseReceiver receiver(config.n_modules, ctx, RECV_IPC_URL);
     ZmqLiveSender sender(ctx, config);
 
     // TODO: Remove stats trash.
