@@ -63,7 +63,7 @@ void* ZmqPulseReceiver::connect_socket(const string url)
     return socket;
 }
 
-uint64_t ZmqPulseReceiver::get_next_pulse_id()
+uint64_t ZmqPulseReceiver::get_next_pulse_id() const
 {
     uint64_t pulses[n_modules_];
 

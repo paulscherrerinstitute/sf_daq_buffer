@@ -22,7 +22,7 @@ public:
     ZmqPulseReceiver(const std::vector<std::string>& ipc_urls, void* ctx);
     ~ZmqPulseReceiver();
 
-    uint64_t get_next_pulse_id();
+    uint64_t get_next_pulse_id() const;
 };
 
 
