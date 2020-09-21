@@ -38,7 +38,13 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    ZmqPulseReceiver receiver(config.n_modules, ctx, RECV_IPC_URL);
+    // TODO: This should be passed to the service and not calculated here.
+    vector<string> ipc_urls;
+    for (int i=0; i<config.n_modules; i++) {
+        ipc_urls.push_back(RECV_IPC_URL + to_string(i));
+    }
+
+    ZmqPulseReceiver receiver(ipc_urls, ctx);
     ZmqLiveSender sender(ctx, config);
 
     // TODO: Remove stats trash.
