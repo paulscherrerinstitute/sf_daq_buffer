@@ -1,26 +1,18 @@
-
-find_package(MPI REQUIRED)
-# Because of openmpi.
-add_definitions(-DOMPI_SKIP_MPICXX)
-
 file(GLOB SOURCES
         src/*.cpp)
 
-add_library(jf-live-daq-lib STATIC ${SOURCES})
-target_include_directories(jf-live-daq-lib
-        PUBLIC include/
-        SYSTEM ${MPI_INCLUDE_PATH})
-
-target_link_libraries(jf-live-daq-lib
+add_library(sf-buffer-writer-lib STATIC ${SOURCES})
+target_include_directories(sf-buffer-writer-lib PUBLIC include/)
+target_link_libraries(sf-buffer-writer-lib
         external
-        core-buffer-lib
-        ${MPI_LIBRARIES})
+        core-buffer-lib)
 
-add_executable(jf-live-daq src/main.cpp)
-set_target_properties(jf-live-daq PROPERTIES OUTPUT_NAME jf_live_daq)
-target_link_libraries(jf-live-daq
-        jf-live-daq-lib
-        )
+add_executable(sf-buffer-writer src/main.cpp)
+set_target_properties(sf-buffer-writer PROPERTIES OUTPUT_NAME sf_buffer)
+target_link_libraries(sf-buffer-writer
+        sf-buffer-writer-lib
+        zmq
+        rt)
 
 enable_testing()
 add_subdirectory(test/)

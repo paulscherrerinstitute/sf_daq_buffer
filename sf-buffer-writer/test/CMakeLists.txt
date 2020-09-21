@@ -1,10 +1,7 @@
-add_executable(jf-live-daq-tests main.cpp)
+add_executable(sf-buffer-writer-tests main.cpp)
 
-target_link_libraries(jf-live-daq-tests
-        jf-live-daq-lib
-        hdf5
-        hdf5_hl
-        hdf5_cpp
+target_link_libraries(sf-buffer-writer-tests
+        sf-buffer-writer-lib
         zmq
         gtest
         )
