@@ -30,6 +30,7 @@ add_subdirectory(
 
 add_subdirectory("core-buffer")
 add_subdirectory("sf-buffer")
+add_subdirectory("sf-buffer-writer")
 add_subdirectory("sf-stream")
 add_subdirectory("sf-writer")
 #add_subdirectory("jf-live-writer")
