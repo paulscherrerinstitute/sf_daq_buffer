@@ -106,6 +106,7 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         if (is_good_image) {
             if (frame_meta->pulse_id != image_meta.pulse_id) {
                 is_good_image = false;
+                // TODO: Add some diagnostics in case this happens.
             }
 
             if (frame_meta->frame_index != image_meta.frame_index) {
@@ -121,7 +122,7 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
     image_meta.is_good_image = is_good_image;
 
     if (!is_pulse_init) {
-        image_meta.pulse_id = pulse_id;
+        image_meta.pulse_id = 0;
         image_meta.frame_index = 0;
         image_meta.daq_rec = 0;
     }
