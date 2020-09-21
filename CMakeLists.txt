@@ -29,9 +29,8 @@ add_subdirectory(
         EXCLUDE_FROM_ALL)
 
 add_subdirectory("core-buffer")
-add_subdirectory("sf-buffer")
+add_subdirectory("sf-buffer-recv")
 add_subdirectory("sf-buffer-writer")
 add_subdirectory("sf-stream")
 add_subdirectory("sf-writer")
 #add_subdirectory("jf-live-writer")
-#add_subdirectory("jf-live-daq")

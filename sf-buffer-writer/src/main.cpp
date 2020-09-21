@@ -15,33 +15,6 @@ using namespace std;
 using namespace chrono;
 using namespace buffer_config;
 
-void* get_live_stream_socket(const string& detector_name, const int source_id)
-{
-    stringstream ipc_stream;
-    string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL + detector_name + "-";
-    ipc_stream << LIVE_IPC_URL << source_id;
-    const auto ipc_address = ipc_stream.str();
-
-    void* ctx = zmq_ctx_new();
-    void* socket = zmq_socket(ctx, ZMQ_PUB);
-
-    const int sndhwm = BUFFER_ZMQ_SNDHWM;
-    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    const int linger = 0;
-    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    if (zmq_bind(socket, ipc_address.c_str()) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    return socket;
-}
-
 int main (int argc, char *argv[]) {
 
     if (argc != 6) {
@@ -67,16 +40,19 @@ int main (int argc, char *argv[]) {
     string root_folder = string(argv[5]);
     int source_id = atoi(argv[6]);
 
+
+    string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL + detector_name + "-";
+    ipc_stream << LIVE_IPC_URL << source_id;
+    const auto ipc_address = ipc_stream.str();
+
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
     uint64_t n_corrupted_frames = 0;
 
     BufferBinaryWriter writer(root_folder, device_name);
-    FrameUdpReceiver receiver(udp_port, source_id);
     RamBuffer buffer(detector_name, n_modules);
 
     auto binary_buffer = new BufferBinaryFormat();
-    auto socket = get_live_stream_socket(detector_name, source_id);
 
     while (true) {
 
