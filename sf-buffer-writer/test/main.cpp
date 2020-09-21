@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "test_BufferBinaryWriter.cpp"
 
 
 using namespace std;

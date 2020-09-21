@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include "test_PacketUdpReceiver.cpp"
-#include "test_BufferBinaryWriter.cpp"
 #include "test_FrameUdpReceiver.cpp"
 
 using namespace std;
