@@ -9,7 +9,6 @@
 #include "formats.hpp"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
-#include "FrameUdpReceiver.hpp"
 #include "BufferBinaryWriter.hpp"
 
 using namespace std;

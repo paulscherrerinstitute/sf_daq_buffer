@@ -10,7 +10,6 @@
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "FrameUdpReceiver.hpp"
-#include "BufferBinaryWriter.hpp"
 
 using namespace std;
 using namespace chrono;
@@ -72,7 +71,6 @@ int main (int argc, char *argv[]) {
     uint64_t n_missed_packets = 0;
     uint64_t n_corrupted_frames = 0;
 
-    BufferBinaryWriter writer(root_folder, device_name);
     FrameUdpReceiver receiver(udp_port, source_id);
     RamBuffer buffer(detector_name, n_modules);
 
@@ -83,8 +81,6 @@ int main (int argc, char *argv[]) {
 
         auto pulse_id = receiver.get_frame_from_udp(
                 binary_buffer->metadata, binary_buffer->data);
-
-        writer.write(pulse_id, binary_buffer);
 
         buffer.write_frame(&(binary_buffer->metadata),
                            &(binary_buffer->data[0]));
