@@ -38,7 +38,7 @@ public:
                   const LiveStreamConfig& config);
     ~ZmqLiveSender();
 
-    void send(const ImageMetadata* meta, const char* data);
+    void send(const ImageMetadata& meta, const char* data);
 };
 
 
