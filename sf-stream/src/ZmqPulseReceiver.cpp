@@ -5,6 +5,7 @@
 #include <sstream>
 #include <chrono>
 #include <algorithm>
+#include <iostream>
 
 #include "stream_config.hpp"
 
@@ -81,6 +82,8 @@ uint64_t ZmqPulseReceiver::get_next_pulse_id() const
     }
 
     for (int i_sync; i_sync < SYNC_RETRY_LIMIT; i_sync++) {
+        cout << "Sync attempt " << i_sync << endl;
+
         uint64_t min_pulse_id = 0;
         uint64_t max_pulse_id = numeric_limits<uint64_t>::max();
 
