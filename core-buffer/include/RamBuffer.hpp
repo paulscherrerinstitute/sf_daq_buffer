@@ -9,9 +9,9 @@ class RamBuffer {
     const int n_modules_;
     const int n_slots_;
 
-    const size_t meta_size_;
-    const size_t image_size_;
-    const size_t buffer_size_;
+    const size_t meta_bytes_;
+    const size_t image_bytes_;
+    const size_t buffer_bytes_;
 
     int shm_fd_;
     void* buffer_;
@@ -26,6 +26,10 @@ public:
     ~RamBuffer();
 
     void write_frame(const ModuleFrame *src_meta, const char *src_data) const;
+    void read_frame(const uint64_t pulse_id,
+                     const uint64_t module_id,
+                     ModuleFrame *&meta,
+                     char *&data) const;
     char* read_image(const uint64_t pulse_id, ImageMetadata &image_meta) const;
 };
 
