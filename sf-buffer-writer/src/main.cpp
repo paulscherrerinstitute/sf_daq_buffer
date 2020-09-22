@@ -19,13 +19,12 @@ int main (int argc, char *argv[]) {
 
     if (argc != 6) {
         cout << endl;
-        cout << "Usage: sf_buffer [detector_name] [n_modules] [device_name]";
-        cout << " [udp_port] [root_folder] [source_id]";
+        cout << "Usage: sf_buffer_writer [detector_name] [n_modules]";
+        cout << " [device_name] [root_folder] [source_id]";
         cout << endl;
         cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
         cout << "\tn_modules: Number of modules in the detector." << endl;
         cout << "\tdevice_name: Name to write to disk." << endl;
-        cout << "\tudp_port: UDP port to connect to." << endl;
         cout << "\troot_folder: FS root folder." << endl;
         cout << "\tsource_id: ID of the source for live stream." << endl;
         cout << endl;
@@ -36,23 +35,20 @@ int main (int argc, char *argv[]) {
     string detector_name = string(argv[1]);
     int n_modules = atoi(argv[2]);
     string device_name = string(argv[3]);
-    int udp_port = atoi(argv[4]);
-    string root_folder = string(argv[5]);
-    int source_id = atoi(argv[6]);
+    string root_folder = string(argv[4]);
+    int source_id = atoi(argv[5]);
 
-
-    string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL + detector_name + "-";
-    ipc_stream << LIVE_IPC_URL << source_id;
-    const auto ipc_address = ipc_stream.str();
-
-    uint64_t stats_counter(0);
-    uint64_t n_missed_packets = 0;
-    uint64_t n_corrupted_frames = 0;
+    string ipc_address = BUFFER_LIVE_IPC_URL +
+                         detector_name + "-" +
+                         to_string(source_id);
 
     BufferBinaryWriter writer(root_folder, device_name);
     RamBuffer buffer(detector_name, n_modules);
 
     auto binary_buffer = new BufferBinaryFormat();
+
+    ImageMetadata* meta = nullptr;
+    char* data = nullptr;
 
     while (true) {
 
