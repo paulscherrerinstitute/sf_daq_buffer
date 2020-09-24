@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include <zmq.h>
 #include <chrono>
-#include <sstream>
 #include <zconf.h>
 #include <RamBuffer.hpp>
 
@@ -52,20 +51,20 @@ int main (int argc, char *argv[]) {
     auto ctx = zmq_ctx_new();
     auto socket = BufferUtils::bind_socket(ctx, detector_name, source_id);
 
+    ModuleFrame meta;
+    char* data = new char[MODULE_N_BYTES];
+
     while (true) {
 
-        auto pulse_id = receiver.get_frame_from_udp(
-                binary_buffer->metadata, binary_buffer->data);
+        auto pulse_id = receiver.get_frame_from_udp(meta, data);
 
-        buffer.write_frame(&(binary_buffer->metadata),
-                           &(binary_buffer->data[0]));
+        buffer.write_frame(meta, data);
 
         zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
 
         // TODO: Isolate in a class.
-        if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
-            n_missed_packets += JF_N_PACKETS_PER_FRAME -
-                    binary_buffer->metadata.n_recv_packets;
+        if (meta.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
+            n_missed_packets += JF_N_PACKETS_PER_FRAME - meta.n_recv_packets;
             n_corrupted_frames++;
         }
 
@@ -88,4 +87,6 @@ int main (int argc, char *argv[]) {
             stats_interval_start = steady_clock::now();
         }
     }
+
+    delete[] data;
 }
