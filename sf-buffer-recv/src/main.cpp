@@ -10,44 +10,18 @@
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "FrameUdpReceiver.hpp"
+#include "BufferUtils.hpp"
 
 using namespace std;
 using namespace chrono;
 using namespace buffer_config;
 
-void* get_live_stream_socket(const string& detector_name, const int source_id)
-{
-    stringstream ipc_stream;
-    string LIVE_IPC_URL = BUFFER_LIVE_IPC_URL + detector_name + "-";
-    ipc_stream << LIVE_IPC_URL << source_id;
-    const auto ipc_address = ipc_stream.str();
-
-    void* ctx = zmq_ctx_new();
-    void* socket = zmq_socket(ctx, ZMQ_PUB);
-
-    const int sndhwm = BUFFER_ZMQ_SNDHWM;
-    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    const int linger = 0;
-    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    if (zmq_bind(socket, ipc_address.c_str()) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    return socket;
-}
-
 int main (int argc, char *argv[]) {
 
     if (argc != 6) {
         cout << endl;
-        cout << "Usage: sf_buffer [detector_name] [n_modules] [device_name]";
-        cout << " [udp_port] [root_folder] [source_id]";
+        cout << "Usage: sf_buffer_recv [detector_name] [n_modules]";
+        cout << " [device_name] [udp_port] [root_folder] [source_id]";
         cout << endl;
         cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
         cout << "\tn_modules: Number of modules in the detector." << endl;
@@ -70,12 +44,13 @@ int main (int argc, char *argv[]) {
     uint64_t stats_counter(0);
     uint64_t n_missed_packets = 0;
     uint64_t n_corrupted_frames = 0;
+    auto stats_interval_start = steady_clock::now();
 
     FrameUdpReceiver receiver(udp_port, source_id);
     RamBuffer buffer(detector_name, n_modules);
 
-    auto binary_buffer = new BufferBinaryFormat();
-    auto socket = get_live_stream_socket(detector_name, source_id);
+    auto ctx = zmq_ctx_new();
+    auto socket = BufferUtils::bind_socket(ctx, detector_name, source_id);
 
     while (true) {
 
@@ -87,6 +62,7 @@ int main (int argc, char *argv[]) {
 
         zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
 
+        // TODO: Isolate in a class.
         if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
             n_missed_packets += JF_N_PACKETS_PER_FRAME -
                     binary_buffer->metadata.n_recv_packets;
@@ -95,14 +71,21 @@ int main (int argc, char *argv[]) {
 
         stats_counter++;
         if (stats_counter == STATS_MODULO) {
+            auto interval_ms_duration = duration_cast<milliseconds>(
+                    stats_interval_start-steady_clock::now()).count();
+            // * 1000 because milliseconds, 0.5 for truncation.
+            int rep_rate = ((stats_counter/interval_ms_duration) * 1000) + 0.5;
+
             cout << "sf_buffer:device_name " << device_name;
             cout << " sf_buffer:n_missed_packets " << n_missed_packets;
             cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
+            cout << " sf_buffer:repetition_rate " << rep_rate;
             cout << endl;
 
             stats_counter = 0;
             n_missed_packets = 0;
             n_corrupted_frames = 0;
+            stats_interval_start = steady_clock::now();
         }
     }
 }
