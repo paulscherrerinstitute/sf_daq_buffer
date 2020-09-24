@@ -38,6 +38,8 @@ namespace buffer_config {
     const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
     // HWM for live stream from buffer.
     const int BUFFER_ZMQ_SNDHWM = 100;
+    // HWM for live stream from buffer.
+    const int BUFFER_ZMQ_RCVHWM = 100;
     // IPC address of the live stream.
     const std::string BUFFER_LIVE_IPC_URL = "ipc:///tmp/sf-live-";
     // Number of image slots in ram buffer - 10 seconds should be enough

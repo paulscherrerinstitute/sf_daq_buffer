@@ -18,6 +18,11 @@ namespace BufferUtils
             const std::string& filename_to_write);
 
     void create_destination_folder(const std::string& output_file);
+
+    void* bind_socket(
+            void* ctx, const std::string& detector_name, const int source_id);
+    void* connect_socket(
+            void* ctx, const std::string& detector_name, const int source_id);
 }
 
 #endif //BUFFER_UTILS_HPP
