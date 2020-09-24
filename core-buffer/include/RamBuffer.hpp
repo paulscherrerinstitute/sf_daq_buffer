@@ -25,7 +25,7 @@ public:
               const int n_slots=buffer_config::RAM_BUFFER_N_SLOTS);
     ~RamBuffer();
 
-    void write_frame(const ModuleFrame *src_meta, const char *src_data) const;
+    void write_frame(const ModuleFrame &src_meta, const char *src_data) const;
     void read_frame(const uint64_t pulse_id,
                      const uint64_t module_id,
                      ModuleFrame *&meta,

@@ -49,20 +49,20 @@ RamBuffer::~RamBuffer()
 }
 
 void RamBuffer::write_frame(
-        const ModuleFrame *src_meta,
+        const ModuleFrame& src_meta,
         const char *src_data) const
 {
-    const int slot_n = src_meta->pulse_id % n_slots_;
+    const int slot_n = src_meta.pulse_id % n_slots_;
 
     ModuleFrame *dst_meta = meta_buffer_ +
                             (n_modules_ * slot_n) +
-                            src_meta->module_id;
+                            src_meta.module_id;
 
     char *dst_data = image_buffer_ +
                      (image_bytes_ * slot_n) +
-                     (MODULE_N_BYTES * src_meta->module_id);
+                     (MODULE_N_BYTES * src_meta.module_id);
 
-    memcpy(dst_meta, src_meta, sizeof(ModuleFrame));
+    memcpy(dst_meta, &src_meta, sizeof(ModuleFrame));
     memcpy(dst_data, src_data, MODULE_N_BYTES);
 }
 
