@@ -69,16 +69,19 @@ void RamBuffer::write_frame(
 void RamBuffer::read_frame(
         const uint64_t pulse_id,
         const uint64_t module_id,
-        ModuleFrame*& meta,
-        char*& data) const
+        ModuleFrame& dst_meta,
+        char* dst_data) const
 {
     const size_t slot_n = pulse_id % n_slots_;
 
-    meta = meta_buffer_ + (n_modules_ * slot_n) + module_id;
+    ModuleFrame *src_meta = meta_buffer_ + (n_modules_ * slot_n) + module_id;
 
-    data = image_buffer_ +
-           (image_bytes_ * slot_n) +
-           (MODULE_N_BYTES * module_id);
+    char *src_data = image_buffer_ +
+                     (image_bytes_ * slot_n) +
+                     (MODULE_N_BYTES * module_id);
+
+    memcpy(&dst_meta, src_meta, sizeof(ModuleFrame));
+    memcpy(dst_data, src_data, MODULE_N_BYTES);
 }
 
 char* RamBuffer::read_image(const uint64_t pulse_id,
