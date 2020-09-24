@@ -6,13 +6,13 @@ per detector.
 
 It currently has 3 output streams:
 
-- **Full data full metadata** rate stream (send all images and metadata)
-- **Reduced data full metadata** rate stream (send less images, but 
-all metadata)
+- **Full data full meta** rate stream (send all images and meta)
+- **Reduced data full meta** rate stream (send less images, but 
+all meta)
 - **Pulse_id** stream (send only the current pulse_id)
 
 In addition to receiving and assembling images, sf-stream also calculates 
-additional metadata and constructs the structures needed to send data in 
+additional meta and constructs the structures needed to send data in 
 Array 1.0 protocol.
 
 This component does not guarantee that the streams will always contain all 
@@ -103,12 +103,12 @@ arrived.
 We devide the ZMQ sending to 3 types of stream:
 
 - Data processing stream. This is basically the complete stream from 
-the detector with all metadata and data. It can be described as full data full
-metadata stream. Only 1 client at the time can be connected to this stream 
+the detector with all meta and data. It can be described as full data full
+meta stream. Only 1 client at the time can be connected to this stream 
 (PUSH/PULL for load balancing).
 
-- Live viewing stream. This is a reduced data full metadata stream. We send 
-metadata for all frames, but data only for subset of them (10Hz, for example). 
+- Live viewing stream. This is a reduced data full meta stream. We send 
+meta for all frames, but data only for subset of them (10Hz, for example). 
 Any number of clients can connect to the 10Hz stream, because we use PUB/SUB 
 for this socket.
 
@@ -137,7 +137,7 @@ We use following fields in the JSON header:
 |type|string|Value: "uint16"|
 |shape|Array[uint64]|Shape of the image in stream|
 
-### Full data full metadata stream
+### Full data full meta stream
 
 This stream runs at detector frequency and uses PUSH/PULL to distribute data 
 to max 1 client (this client can have many processes, but it needs to be a 
@@ -151,9 +151,9 @@ for purposes of online analysis. Given the large amount of data on this
 stream only "pre-approved" applications that can handle the load should be 
 attached here.
 
-### Reduced data full metadata stream
+### Reduced data full meta stream
 
-This streams also runs at detector frequency for JSON headers (metadata), but 
+This streams also runs at detector frequency for JSON headers (meta), but 
 it sends only part of the images in the stream. The rest of the images are 
 sent as empty buffers (the receiver needs to be aware of this behaviour, as 
 Array 1.0 alone does not define it).
