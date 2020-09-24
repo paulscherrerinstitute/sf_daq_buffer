@@ -10,6 +10,7 @@
 #include "jungfrau.hpp"
 #include "FrameUdpReceiver.hpp"
 #include "BufferUtils.hpp"
+#include "FrameStats.hpp"
 
 using namespace std;
 using namespace chrono;
@@ -40,52 +41,25 @@ int main (int argc, char *argv[]) {
     string root_folder = string(argv[5]);
     int source_id = atoi(argv[6]);
 
-    uint64_t stats_counter(0);
-    uint64_t n_missed_packets = 0;
-    uint64_t n_corrupted_frames = 0;
-    auto stats_interval_start = steady_clock::now();
-
     FrameUdpReceiver receiver(udp_port, source_id);
     RamBuffer buffer(detector_name, n_modules);
 
     auto ctx = zmq_ctx_new();
     auto socket = BufferUtils::bind_socket(ctx, detector_name, source_id);
 
+    FrameStats stats(device_name, STATS_MODULO);
+
     ModuleFrame meta;
     char* data = new char[MODULE_N_BYTES];
 
     while (true) {
-
         auto pulse_id = receiver.get_frame_from_udp(meta, data);
 
         buffer.write_frame(meta, data);
 
         zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
 
-        // TODO: Isolate in a class.
-        if (meta.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
-            n_missed_packets += JF_N_PACKETS_PER_FRAME - meta.n_recv_packets;
-            n_corrupted_frames++;
-        }
-
-        stats_counter++;
-        if (stats_counter == STATS_MODULO) {
-            auto interval_ms_duration = duration_cast<milliseconds>(
-                    stats_interval_start-steady_clock::now()).count();
-            // * 1000 because milliseconds, 0.5 for truncation.
-            int rep_rate = ((stats_counter/interval_ms_duration) * 1000) + 0.5;
-
-            cout << "sf_buffer:device_name " << device_name;
-            cout << " sf_buffer:n_missed_packets " << n_missed_packets;
-            cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
-            cout << " sf_buffer:repetition_rate " << rep_rate;
-            cout << endl;
-
-            stats_counter = 0;
-            n_missed_packets = 0;
-            n_corrupted_frames = 0;
-            stats_interval_start = steady_clock::now();
-        }
+        stats.record_stats(meta);
     }
 
     delete[] data;
