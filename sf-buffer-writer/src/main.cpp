@@ -40,33 +40,22 @@ int main (int argc, char *argv[]) {
     int source_id = atoi(argv[5]);
 
     BufferBinaryWriter writer(root_folder, device_name);
-    RamBuffer buffer(detector_name, n_modules);
-
-    auto binary_buffer = new BufferBinaryFormat();
+    RamBuffer ram_buff(detector_name, n_modules);
+    auto file_buff = new BufferBinaryFormat();
 
     auto ctx = zmq_ctx_new();
     auto socket = BufferUtils::connect_socket(ctx, detector_name, source_id);
 
-    ImageMetadata* meta = nullptr;
-    char* data = nullptr;
-
+    uint64_t pulse_id;
     while (true) {
 
-        auto pulse_id = receiver.get_frame_from_udp(
-                binary_buffer->metadata, binary_buffer->data);
+        zmq_recv(socket, &pulse_id, sizeof(pulse_id), 0);
 
-        writer.write(pulse_id, binary_buffer);
+        // TODO: Memory copy here. Optimize this one out.
+        ram_buff.read_frame(
+                pulse_id, source_id, file_buff->meta, file_buff->data);
 
-        buffer.write_frame(&(binary_buffer->metadata),
-                           &(binary_buffer->data[0]));
-
-        zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
-
-        if (binary_buffer->metadata.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
-            n_missed_packets += JF_N_PACKETS_PER_FRAME -
-                    binary_buffer->metadata.n_recv_packets;
-            n_corrupted_frames++;
-        }
+        writer.write(pulse_id, file_buff);
 
         stats_counter++;
         if (stats_counter == STATS_MODULO) {
