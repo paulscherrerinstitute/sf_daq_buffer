@@ -1,5 +1,5 @@
-#ifndef SF_DAQ_BUFFER_ZMQPULSERECEIVER_HPP
-#define SF_DAQ_BUFFER_ZMQPULSERECEIVER_HPP
+#ifndef SF_DAQ_BUFFER_ZMQPULSESYNCRECEIVER_HPP
+#define SF_DAQ_BUFFER_ZMQPULSESYNCRECEIVER_HPP
 
 
 #include <cstddef>
@@ -8,7 +8,7 @@
 
 #include "formats.hpp"
 
-class ZmqPulseReceiver {
+class ZmqPulseSyncReceiver {
 
     void* ctx_;
     const int n_modules_;
@@ -16,14 +16,14 @@ class ZmqPulseReceiver {
     std::vector<void*> sockets_;
 
 public:
-    ZmqPulseReceiver(
+    ZmqPulseSyncReceiver(
             void* ctx,
             const std::string& detector_name,
             const int n_modules);
-    ~ZmqPulseReceiver();
+    ~ZmqPulseSyncReceiver();
 
     uint64_t get_next_pulse_id() const;
 };
 
 
-#endif //SF_DAQ_BUFFER_ZMQPULSERECEIVER_HPP
+#endif //SF_DAQ_BUFFER_ZMQPULSESYNCRECEIVER_HPP

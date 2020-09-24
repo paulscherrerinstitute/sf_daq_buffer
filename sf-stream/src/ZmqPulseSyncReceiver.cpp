@@ -1,4 +1,4 @@
-#include "ZmqPulseReceiver.hpp"
+#include "ZmqPulseSyncReceiver.hpp"
 #include "BufferUtils.hpp"
 
 #include <zmq.h>
@@ -16,7 +16,7 @@ using namespace buffer_config;
 using namespace stream_config;
 
 
-ZmqPulseReceiver::ZmqPulseReceiver(
+ZmqPulseSyncReceiver::ZmqPulseSyncReceiver(
         void * ctx,
         const string& detector_name,
         const int n_modules) :
@@ -31,14 +31,14 @@ ZmqPulseReceiver::ZmqPulseReceiver(
     }
 }
 
-ZmqPulseReceiver::~ZmqPulseReceiver()
+ZmqPulseSyncReceiver::~ZmqPulseSyncReceiver()
 {
     for (auto& socket:sockets_) {
         zmq_close(socket);
     }
 }
 
-uint64_t ZmqPulseReceiver::get_next_pulse_id() const
+uint64_t ZmqPulseSyncReceiver::get_next_pulse_id() const
 {
     uint64_t pulses[n_modules_];
 

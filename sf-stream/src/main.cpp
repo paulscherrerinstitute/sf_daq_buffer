@@ -1,17 +1,14 @@
 #include <iostream>
 #include <string>
-#include <chrono>
-#include <cstring>
 #include <zmq.h>
 #include <RamBuffer.hpp>
 
 #include "buffer_config.hpp"
 #include "stream_config.hpp"
 #include "ZmqLiveSender.hpp"
-#include "ZmqPulseReceiver.hpp"
+#include "ZmqPulseSyncReceiver.hpp"
 
 using namespace std;
-using namespace chrono;
 using namespace buffer_config;
 using namespace stream_config;
 
@@ -34,15 +31,9 @@ int main (int argc, char *argv[])
     string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.DETECTOR_NAME + "-";
 
     auto ctx = zmq_ctx_new();
-    zmq_ctx_set (ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
+    zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    // TODO: This should be passed to the service and not calculated here.
-    vector<string> ipc_urls;
-    for (int i=0; i<config.n_modules; i++) {
-        ipc_urls.push_back(RECV_IPC_URL + to_string(i));
-    }
-
-    ZmqPulseReceiver receiver(ipc_urls, ctx);
+    ZmqPulseSyncReceiver receiver(ctx, config.DETECTOR_NAME, config.n_modules);
     RamBuffer ram_buffer(config.DETECTOR_NAME, config.n_modules);
     ZmqLiveSender sender(ctx, config);
 
