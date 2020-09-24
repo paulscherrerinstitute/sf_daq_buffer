@@ -34,7 +34,7 @@ struct ModuleFrameBuffer {
 #pragma pack(1)
 struct BufferBinaryFormat {
     const char FORMAT_MARKER = 0xBE;
-    ModuleFrame metadata;
+    ModuleFrame meta;
     char data[buffer_config::MODULE_N_BYTES];
 };
 #pragma pack(pop)
