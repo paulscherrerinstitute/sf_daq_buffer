@@ -1,10 +1,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <zmq.h>
-#include <chrono>
-#include <sstream>
-#include <zconf.h>
 #include <RamBuffer.hpp>
+#include <BufferStats.hpp>
 
 #include "formats.hpp"
 #include "BufferUtils.hpp"
@@ -13,7 +11,6 @@
 #include "BufferBinaryWriter.hpp"
 
 using namespace std;
-using namespace chrono;
 using namespace buffer_config;
 
 int main (int argc, char *argv[]) {
@@ -43,6 +40,8 @@ int main (int argc, char *argv[]) {
     RamBuffer ram_buff(detector_name, n_modules);
     auto file_buff = new BufferBinaryFormat();
 
+    BufferStats stats(device_name, STATS_MODULO);
+
     auto ctx = zmq_ctx_new();
     auto socket = BufferUtils::connect_socket(ctx, detector_name, source_id);
 
@@ -51,22 +50,14 @@ int main (int argc, char *argv[]) {
 
         zmq_recv(socket, &pulse_id, sizeof(pulse_id), 0);
 
+        stats.start_frame_write();
+
         // TODO: Memory copy here. Optimize this one out.
         ram_buff.read_frame(
                 pulse_id, source_id, file_buff->meta, file_buff->data);
 
         writer.write(pulse_id, file_buff);
 
-        stats_counter++;
-        if (stats_counter == STATS_MODULO) {
-            cout << "sf_buffer:device_name " << device_name;
-            cout << " sf_buffer:n_missed_packets " << n_missed_packets;
-            cout << " sf_buffer:n_corrupted_frames " << n_corrupted_frames;
-            cout << endl;
-
-            stats_counter = 0;
-            n_missed_packets = 0;
-            n_corrupted_frames = 0;
-        }
+        stats.end_frame_write();
     }
 }
