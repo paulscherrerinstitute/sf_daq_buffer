@@ -10,16 +10,16 @@
 
 class ZmqPulseReceiver {
 
-    const std::vector<std::string> ipc_urls_;
-    const int n_modules_;
     void* ctx_;
+    const int n_modules_;
 
     std::vector<void*> sockets_;
 
-    void* connect_socket(const std::string url);
-
 public:
-    ZmqPulseReceiver(const std::vector<std::string>& ipc_urls, void* ctx);
+    ZmqPulseReceiver(
+            void* ctx,
+            const std::string& detector_name,
+            const int n_modules);
     ~ZmqPulseReceiver();
 
     uint64_t get_next_pulse_id() const;
