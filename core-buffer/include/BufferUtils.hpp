@@ -7,11 +7,11 @@
 namespace BufferUtils
 {
     std::string get_filename(
-            std::string detector_folder,
-            std::string module_name,
-            uint64_t pulse_id);
+            const std::string& detector_folder,
+            const std::string& module_name,
+            const uint64_t pulse_id);
 
-    std::size_t get_file_frame_index(uint64_t pulse_id);
+    std::size_t get_file_frame_index(const uint64_t pulse_id);
 
     void update_latest_file(
             const std::string& latest_filename,

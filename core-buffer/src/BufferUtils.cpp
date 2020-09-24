@@ -8,9 +8,9 @@ using namespace std;
 using namespace buffer_config;
 
 string BufferUtils::get_filename(
-        std::string detector_folder,
-        std::string module_name,
-        uint64_t pulse_id)
+        const std::string& detector_folder,
+        const std::string& module_name,
+        const uint64_t pulse_id)
 {
     uint64_t data_folder = pulse_id / buffer_config::FOLDER_MOD;
     data_folder *= buffer_config::FOLDER_MOD;
@@ -27,7 +27,7 @@ string BufferUtils::get_filename(
     return folder.str();
 }
 
-size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
+size_t BufferUtils::get_file_frame_index(const uint64_t pulse_id)
 {
     uint64_t file_base = pulse_id / buffer_config::FILE_MOD;
     file_base *= buffer_config::FILE_MOD;
