@@ -29,7 +29,7 @@ BufferBinaryWriter::~BufferBinaryWriter()
 }
 
 void BufferBinaryWriter::write(
-        uint64_t pulse_id,
+        const uint64_t pulse_id,
         const BufferBinaryFormat* buffer)
 {
     auto current_frame_file =
