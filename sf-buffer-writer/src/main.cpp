@@ -7,6 +7,7 @@
 #include <RamBuffer.hpp>
 
 #include "formats.hpp"
+#include "BufferUtils.hpp"
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "BufferBinaryWriter.hpp"
@@ -38,14 +39,13 @@ int main (int argc, char *argv[]) {
     string root_folder = string(argv[4]);
     int source_id = atoi(argv[5]);
 
-    string ipc_address = BUFFER_LIVE_IPC_URL +
-                         detector_name + "-" +
-                         to_string(source_id);
-
     BufferBinaryWriter writer(root_folder, device_name);
     RamBuffer buffer(detector_name, n_modules);
 
     auto binary_buffer = new BufferBinaryFormat();
+
+    auto ctx = zmq_ctx_new();
+    auto socket = BufferUtils::connect_socket(ctx, detector_name, source_id);
 
     ImageMetadata* meta = nullptr;
     char* data = nullptr;
