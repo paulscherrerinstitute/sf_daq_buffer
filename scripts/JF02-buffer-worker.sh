@@ -9,9 +9,10 @@ fi
 M=$1
 
 # Add ourselves to the user cpuset.
-# echo $$ > /sys/fs/cgroup/cpuset/user/tasks
+echo $$ > /sys/fs/cgroup/cpuset/user/tasks
 
-coreAssociatedBuffer=(39 39 39 40 40 40 41 41 41)
+#coreAssociatedBuffer=(25 25 26 26 27 27 28 28 29)
+coreAssociatedBuffer=(1 2 2 3 3 4 4 5 5)
 
 initialUDPport=50020
 port=$((${initialUDPport}+10#${M}))
