@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(sf_daq_buffer)
 set(CMAKE_CXX_STANDARD 17)
 
-set (LIB_CPP_H5_WRITER_VERSION "1.0.0")
+set (SF_DAQ_BUFFER_VERSION "1.0.0")
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
