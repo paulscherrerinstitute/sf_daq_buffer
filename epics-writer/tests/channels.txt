@@ -1,6 +1,0 @@
-S10-CPCL-VM1MGC:LOAD
-
-ONE
- TWO
-# Comment that need to be removed
-THREE # one more comment at the end that need to be removed

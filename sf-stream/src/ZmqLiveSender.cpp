@@ -59,27 +59,6 @@ ZmqLiveSender::ZmqLiveSender(
             throw runtime_error(zmq_strerror(errno));
         }
     }
-
-    if (false) {
-        socket_pulse_ = zmq_socket(ctx, ZMQ_PUB);
-
-        if (zmq_bind(socket_pulse_, config.pulse_address.c_str()) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-
-        const int sndhwm = PULSE_ZMQ_SNDHWM;
-        if (zmq_setsockopt(
-                socket_pulse_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-
-        const int linger = 0;
-        if (zmq_setsockopt(
-                socket_pulse_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-    }
-
 }
 
 ZmqLiveSender::~ZmqLiveSender()
@@ -120,10 +99,6 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
             if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
         }
     }
-
-//    if(zmq_send(socket_pulse_, &pulse_id, sizeof(pulse_id), 0) == -1) {
-//        throw runtime_error(zmq_strerror(errno));
-//    }
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
 
