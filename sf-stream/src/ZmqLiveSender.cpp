@@ -60,7 +60,7 @@ ZmqLiveSender::ZmqLiveSender(
         }
     }
 
-    {
+    if (false) {
         socket_pulse_ = zmq_socket(ctx, ZMQ_PUB);
 
         if (zmq_bind(socket_pulse_, config.pulse_address.c_str()) != 0) {
@@ -121,9 +121,9 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
         }
     }
 
-    if(zmq_send(socket_pulse_, &pulse_id, sizeof(pulse_id), 0) == -1) {
-        throw runtime_error(zmq_strerror(errno));
-    }
+//    if(zmq_send(socket_pulse_, &pulse_id, sizeof(pulse_id), 0) == -1) {
+//        throw runtime_error(zmq_strerror(errno));
+//    }
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
 
