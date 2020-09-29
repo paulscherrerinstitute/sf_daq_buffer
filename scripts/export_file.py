@@ -54,7 +54,7 @@ with ju.File(
     mask=mask,
     gap_pixels=gap_pixels,
     geometry=geometry,
-    parallel=False,
+    parallel=True,
 ) as juf:
     n_input_frames = len(juf["data"])
     good_frames = np.nonzero(juf["is_good_frame"])[0]

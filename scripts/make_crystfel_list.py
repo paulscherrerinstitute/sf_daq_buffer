@@ -38,10 +38,12 @@ def is_it_dark(laser_mode, detector_rate, pulseid):
 parser = argparse.ArgumentParser()
 parser.add_argument("data_file", type=str)
 parser.add_argument("run_info", type=str)
+parser.add_argument("detector", type=str)
 args = parser.parse_args()
 
 data_file = args.data_file
 run_info_file = args.run_info
+detector = args.detector
 
 try:
     with open(run_info_file) as json_file:
@@ -61,8 +63,6 @@ try:
 except:
     print(f"Can't open {data_file}")
     exit()
-
-detector = 'JF06T32V02'
 
 pulseids = f[f'/data/{detector}/pulse_id'][:]
 n_pulse_id = len(pulseids)

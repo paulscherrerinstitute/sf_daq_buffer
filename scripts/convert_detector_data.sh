@@ -90,7 +90,7 @@ do
 #    PREVIOUS_STILL_RUN=$? # not found == 1
 #    PREVIOUS_STILL_RUN=1
     n=`ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer | wc -l`
-    if [ ${n} -lt 9 ]
+    if [ ${n} -le 10 ]
     then
         PREVIOUS_STILL_RUN=1
     fi
@@ -119,12 +119,13 @@ else
     fi
 fi
 
-taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
+#taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
 
-wait
+#wait
 
+coreAssociatedConversion="35,34,33,32,31,30,29,28,27,9,10,11,12,13,14,15,16,17"
 #coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
-coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
+#coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
 #TODO: calculate this number from coreAssociatedConversion
 #export NUMBA_NUM_THREADS=18
 
@@ -142,9 +143,9 @@ else
     PREVIOUS_STILL_RUN=0
     while [ ${PREVIOUS_STILL_RUN} == 0 ]
     do
-        sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
+        sleep $(( $RANDOM % 30 + 1 )) # we need to sleep at least to make sure that we don't read from CURRENT file
         n=`ps -fe | grep "scripts/export_file.py " | grep -v grep | grep export | wc -l`
-        if [ ${n} -lt 18 ]
+        if [ ${n} -le 100 ]
         then
             PREVIOUS_STILL_RUN=1
         fi
@@ -157,10 +158,7 @@ else
     source deactivate >/dev/null 2>&1
     source activate conversion
     taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
-    if [ ${DETECTOR} == "JF06T32V02" ]
-    then
-        python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
-    fi
+#    python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE}
     date5=$(date +%s)
     echo "Finished                : "`date`
     echo -n "Conversion Time : "
