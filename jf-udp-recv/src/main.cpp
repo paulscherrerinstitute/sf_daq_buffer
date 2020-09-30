@@ -34,7 +34,8 @@ int main (int argc, char *argv[]) {
     const auto udp_port = config.start_udp_port + module_id;
     FrameUdpReceiver receiver(udp_port, module_id);
     RamBuffer buffer(config.detector_name, config.n_modules);
-    FrameStats stats("M" + to_string(module_id), STATS_MODULO);
+    const string module_name = "M" + to_string(module_id);
+    FrameStats stats(module_name, STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
     auto socket = bind_socket(ctx, config.detector_name, module_id);
