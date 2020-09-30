@@ -12,40 +12,35 @@
 
 using namespace std;
 using namespace buffer_config;
+using namespace BufferUtils;
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 6) {
+    if (argc != 2) {
         cout << endl;
-        cout << "Usage: sf_buffer_writer [detector_name] [n_modules]";
-        cout << " [device_name] [root_folder] [source_id]";
+        cout << "Usage: jf_buffer_writer [detector_json_filename] [module_id]";
         cout << endl;
-        cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
-        cout << "\tn_modules: Number of modules in the detector." << endl;
-        cout << "\tdevice_name: Name to write to disk." << endl;
-        cout << "\troot_folder: FS root folder." << endl;
-        cout << "\tsource_id: ID of the source for live stream." << endl;
+        cout << "\tdetector_json_filename: detector config file path." << endl;
+        cout << "\tmodule_id: id of the module for this process." << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    string detector_name = string(argv[1]);
-    int n_modules = atoi(argv[2]);
-    string device_name = string(argv[3]);
-    string root_folder = string(argv[4]);
-    int source_id = atoi(argv[5]);
+    const auto config = read_json_config(string(argv[1]));
+    const int module_id = atoi(argv[2]);
 
-    BufferBinaryWriter writer(root_folder, device_name);
-    RamBuffer ram_buff(detector_name, n_modules);
-    auto file_buff = new BufferBinaryFormat();
-
-    BufferStats stats(device_name, STATS_MODULO);
+    const auto module_name = "M" + to_string(module_id);
+    BufferBinaryWriter writer(config.buffer_folder, module_name);
+    RamBuffer ram_buff(config.detector_name, config.n_modules);
+    BufferStats stats(module_name, STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
-    auto socket = BufferUtils::connect_socket(ctx, detector_name, source_id);
+    auto socket = connect_socket(ctx, config.detector_name, module_id);
 
+    auto file_buff = new BufferBinaryFormat();
     uint64_t pulse_id;
+
     while (true) {
 
         zmq_recv(socket, &pulse_id, sizeof(pulse_id), 0);
@@ -54,7 +49,7 @@ int main (int argc, char *argv[]) {
 
         // TODO: Memory copy here. Optimize this one out.
         ram_buff.read_frame(
-                pulse_id, source_id, file_buff->meta, file_buff->data);
+                pulse_id, module_id, file_buff->meta, file_buff->data);
 
         writer.write(pulse_id, file_buff);
 
