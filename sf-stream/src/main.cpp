@@ -18,8 +18,7 @@ int main (int argc, char *argv[])
     if (argc != 1) {
         cout << endl;
         cout << "Usage: sf_stream [detector_json_filename]" << endl;
-        cout << "\tdetector_json_filename: json file with the configuration "
-                "of the detector." << endl;
+        cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << endl;
 
         exit(-1);
