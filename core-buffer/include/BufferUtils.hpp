@@ -14,7 +14,8 @@ namespace BufferUtils
         const int reduction_factor_live_analysis;
         const std::string PEDE_FILENAME;
         const std::string GAIN_FILENAME;
-        const std::string DETECTOR_NAME;
+
+        const std::string detector_name;
         const int n_modules;
         const int start_udp_port;
     };

@@ -13,6 +13,7 @@
 using namespace std;
 using namespace chrono;
 using namespace buffer_config;
+using namespace BufferUtils;
 
 int main (int argc, char *argv[]) {
 
@@ -27,18 +28,16 @@ int main (int argc, char *argv[]) {
         exit(-1);
     }
 
-    auto config = BufferUtils::read_json_config(string(argv[1]));
-    int module_id = atoi(argv[2]);
+    const auto config = read_json_config(string(argv[1]));
+    const int module_id = atoi(argv[2]);
 
-    auto udp_port = config.start_udp_port + module_id;
+    const auto udp_port = config.start_udp_port + module_id;
     FrameUdpReceiver receiver(udp_port, module_id);
-    RamBuffer buffer(config.DETECTOR_NAME, config.n_modules);
+    RamBuffer buffer(config.detector_name, config.n_modules);
+    FrameStats stats("M" + to_string(module_id), STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
-    auto socket = BufferUtils::bind_socket(
-            ctx, config.DETECTOR_NAME, module_id);
-
-    FrameStats stats("M" + to_string(module_id), STATS_MODULO);
+    auto socket = bind_socket(ctx, config.detector_name, module_id);
 
     ModuleFrame meta;
     char* data = new char[MODULE_N_BYTES];

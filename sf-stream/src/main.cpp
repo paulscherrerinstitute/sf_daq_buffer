@@ -25,13 +25,13 @@ int main (int argc, char *argv[])
     }
 
     auto config = BufferUtils::read_json_config(string(argv[1]));
-    string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.DETECTOR_NAME + "-";
+    string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.detector_name + "-";
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
 
-    ZmqPulseSyncReceiver receiver(ctx, config.DETECTOR_NAME, config.n_modules);
-    RamBuffer ram_buffer(config.DETECTOR_NAME, config.n_modules);
+    ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
+    RamBuffer ram_buffer(config.detector_name, config.n_modules);
     ZmqLiveSender sender(ctx, config);
 
     // TODO: Remove stats trash.

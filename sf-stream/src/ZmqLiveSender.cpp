@@ -106,7 +106,7 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data)
     header.AddMember("run_name", run_name, header_alloc);
 
     rapidjson::Value detector_name;
-    detector_name.SetString(config_.DETECTOR_NAME.c_str(), header_alloc);
+    detector_name.SetString(config_.detector_name.c_str(), header_alloc);
     header.AddMember("detector_name", detector_name, header_alloc);
 
     header.AddMember("htype", "array-1.0", header_alloc);
