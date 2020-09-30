@@ -18,6 +18,7 @@ namespace BufferUtils
         const std::string detector_name;
         const int n_modules;
         const int start_udp_port;
+        const std::string buffer_folder;
     };
 
 
