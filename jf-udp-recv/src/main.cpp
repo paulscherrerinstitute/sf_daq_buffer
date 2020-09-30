@@ -16,37 +16,29 @@ using namespace buffer_config;
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 6) {
+    if (argc != 2) {
         cout << endl;
-        cout << "Usage: sf_buffer_recv [detector_name] [n_modules]";
-        cout << " [device_name] [udp_port] [root_folder] [source_id]";
+        cout << "Usage: jf_udp_recv [detector_json_filename] [module_id]";
         cout << endl;
-        cout << "\tdetector_name: Detector name, example JF07T32V01" << endl;
-        cout << "\tn_modules: Number of modules in the detector." << endl;
-        cout << "\tdevice_name: Name to write to disk." << endl;
-        cout << "\tudp_port: UDP port to connect to." << endl;
-        cout << "\troot_folder: FS root folder." << endl;
-        cout << "\tsource_id: ID of the source for live stream." << endl;
+        cout << "\tdetector_json_filename: detector config file path." << endl;
+        cout << "\tmodule_id: id of the module for this process." << endl;
         cout << endl;
 
         exit(-1);
     }
-    /usr/bin/sf_buffer ${DETECTOR} ${N_MODULES} M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${M}
 
-    string detector_name = string(argv[1]);
-    int n_modules = atoi(argv[2]);
-    string device_name = string(argv[3]);
-    int udp_port = atoi(argv[4]);
-    string root_folder = string(argv[5]);
-    int module_id = atoi(argv[6]);
+    auto config = BufferUtils::read_json_config(string(argv[1]));
+    int module_id = atoi(argv[2]);
 
+    auto udp_port = config.start_udp_port + module_id;
     FrameUdpReceiver receiver(udp_port, module_id);
-    RamBuffer buffer(detector_name, n_modules);
+    RamBuffer buffer(config.DETECTOR_NAME, config.n_modules);
 
     auto ctx = zmq_ctx_new();
-    auto socket = BufferUtils::bind_socket(ctx, detector_name, source_id);
+    auto socket = BufferUtils::bind_socket(
+            ctx, config.DETECTOR_NAME, module_id);
 
-    FrameStats stats(device_name, STATS_MODULO);
+    FrameStats stats("M" + to_string(module_id), STATS_MODULO);
 
     ModuleFrame meta;
     char* data = new char[MODULE_N_BYTES];
