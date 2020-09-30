@@ -3,33 +3,16 @@
 
 #include "zmq.h"
 #include <stdexcept>
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 
 using namespace std;
 using namespace stream_config;
 
-LiveStreamConfig read_json_config(const std::string filename)
-{
-    std::ifstream ifs(filename);
-    rapidjson::IStreamWrapper isw(ifs);
-    rapidjson::Document config_parameters;
-    config_parameters.ParseStream(isw);
-
-    return {
-            config_parameters["streamvis_stream"].GetString(),
-            config_parameters["streamvis_rate"].GetInt(),
-            config_parameters["live_stream"].GetString(),
-            config_parameters["live_rate"].GetInt(),
-            config_parameters["pedestal_file"].GetString(),
-            config_parameters["gain_file"].GetString(),
-            config_parameters["detector_name"].GetString(),
-            config_parameters["n_modules"].GetInt(),
-            "tcp://127.0.0.1:51234"
-    };
-}
-
 ZmqLiveSender::ZmqLiveSender(
         void* ctx,
-        const LiveStreamConfig& config) :
+        const BufferUtils::DetectorConfig& config) :
             ctx_(ctx),
             config_(config)
 {

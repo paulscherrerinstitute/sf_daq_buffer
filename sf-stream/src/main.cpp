@@ -2,6 +2,7 @@
 #include <string>
 #include <zmq.h>
 #include <RamBuffer.hpp>
+#include <BufferUtils.hpp>
 
 #include "buffer_config.hpp"
 #include "stream_config.hpp"
@@ -17,17 +18,16 @@ int main (int argc, char *argv[])
     if (argc != 2) {
         cout << endl;
         cout << "Usage: sf_stream ";
-        cout << " [config_json_file]";
+        cout << " [detector_json_filename]";
         cout << endl;
-        cout << "\tconfig_json_file: json file with the configuration "
-                "parameters(detector name, number of modules, pedestal and "
-                "gain files" << endl;
+        cout << "\tdetector_json_filename: json file with the configuration "
+                "of the detector." << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    auto config = read_json_config(string(argv[1]));
+    auto config = BufferUtils::read_json_config(string(argv[1]));
     string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.DETECTOR_NAME + "-";
 
     auto ctx = zmq_ctx_new();
