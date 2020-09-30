@@ -127,7 +127,8 @@ void* BufferUtils::bind_socket(
     return socket;
 }
 
-BufferUtils::DetectorConfig read_json_config(const std::string& filename)
+BufferUtils::DetectorConfig BufferUtils::read_json_config(
+        const std::string& filename)
 {
     std::ifstream ifs(filename);
     rapidjson::IStreamWrapper isw(ifs);
