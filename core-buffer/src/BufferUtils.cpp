@@ -144,6 +144,6 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
-            "tcp://127.0.0.1:51234"
+            config_parameters["start_udp_port"].GetInt()
     };
 }

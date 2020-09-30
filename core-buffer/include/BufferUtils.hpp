@@ -16,7 +16,7 @@ namespace BufferUtils
         const std::string GAIN_FILENAME;
         const std::string DETECTOR_NAME;
         const int n_modules;
-        const std::string pulse_address;
+        const int start_udp_port;
     };
 
 
