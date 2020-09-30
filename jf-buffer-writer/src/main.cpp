@@ -42,7 +42,6 @@ int main (int argc, char *argv[]) {
     uint64_t pulse_id;
 
     while (true) {
-
         zmq_recv(socket, &pulse_id, sizeof(pulse_id), 0);
 
         stats.start_frame_write();
