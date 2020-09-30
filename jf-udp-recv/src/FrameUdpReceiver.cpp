@@ -7,8 +7,8 @@ using namespace buffer_config;
 
 FrameUdpReceiver::FrameUdpReceiver(
         const uint16_t port,
-        const int source_id) :
-            source_id_(source_id)
+        const int module_id) :
+            module_id_(module_id)
 {
     udp_receiver_.bind(port);
 
@@ -33,7 +33,7 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.pulse_id = packet_buffer_[i_packet].bunchid;
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
-    frame_metadata.module_id = (int64_t) source_id_;
+    frame_metadata.module_id = (int64_t) module_id_;
 }
 
 inline void FrameUdpReceiver::copy_packet_to_buffers(

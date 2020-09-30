@@ -31,15 +31,16 @@ int main (int argc, char *argv[]) {
 
         exit(-1);
     }
+    /usr/bin/sf_buffer ${DETECTOR} ${N_MODULES} M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${M}
 
     string detector_name = string(argv[1]);
     int n_modules = atoi(argv[2]);
     string device_name = string(argv[3]);
     int udp_port = atoi(argv[4]);
     string root_folder = string(argv[5]);
-    int source_id = atoi(argv[6]);
+    int module_id = atoi(argv[6]);
 
-    FrameUdpReceiver receiver(udp_port, source_id);
+    FrameUdpReceiver receiver(udp_port, module_id);
     RamBuffer buffer(detector_name, n_modules);
 
     auto ctx = zmq_ctx_new();
