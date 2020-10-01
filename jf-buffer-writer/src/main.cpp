@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
     const auto module_name = "M" + to_string(module_id);
     BufferBinaryWriter writer(config.buffer_folder, module_name);
     RamBuffer ram_buff(config.detector_name, config.n_modules);
-    BufferStats stats(module_name, STATS_MODULO);
+    BufferStats stats(config.detector_name, module_id, STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
     auto socket = connect_socket(ctx, config.detector_name, module_id);

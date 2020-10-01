@@ -4,9 +4,13 @@
 using namespace std;
 using namespace chrono;
 
-BufferStats::BufferStats(const string& source_name, const size_t stats_modulo) :
-    source_name_(source_name),
-    stats_modulo_(stats_modulo)
+BufferStats::BufferStats(
+        const string& detector_name,
+        const int module_id,
+        const size_t stats_modulo) :
+            detector_name_(detector_name),
+            module_id_(module_id),
+            stats_modulo_(stats_modulo)
 {
    reset_counters();
 }
@@ -43,8 +47,17 @@ void BufferStats::print_stats()
 {
     float avg_buffer_write_us = total_buffer_write_us_ / frames_counter_;
 
-    cout << "sf_buffer:device_name " << source_name_;
-    cout << " sf_buffer:avg_buffer_write_us " << avg_buffer_write_us;
-    cout << " sf_buffer:max_buffer_write_us " << max_buffer_write_us_;
+    uint64_t timestamp = time_point_cast<nanoseconds>(
+            system_clock::now()).time_since_epoch().count();
+
+    // Output in InfluxDB line protocol
+    cout << "jf-buffer-writer";
+    cout << ",detector_name=" << detector_name_;
+    cout << ",module_name=M" << module_id_;
+    cout << " ";
+    cout << "avg_buffer_write_us=" << avg_buffer_write_us;
+    cout << ",max_buffer_write_us=" << max_buffer_write_us_ << "i";
+    cout << " ";
+    cout << timestamp;
     cout << endl;
 }

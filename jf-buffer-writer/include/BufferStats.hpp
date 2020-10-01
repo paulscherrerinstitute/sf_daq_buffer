@@ -7,7 +7,8 @@
 
 
 class BufferStats {
-    const std::string source_name_;
+    const std::string detector_name_;
+    const int module_id_;
     size_t stats_modulo_;
 
     int frames_counter_;
@@ -19,7 +20,10 @@ class BufferStats {
     void print_stats();
 
 public:
-    BufferStats(const std::string &source_name, const size_t stats_modulo);
+    BufferStats(
+            const std::string &detector_name,
+            const int module_id,
+            const size_t stats_modulo);
     void start_frame_write();
     void end_frame_write();
 };
