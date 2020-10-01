@@ -53,11 +53,10 @@ void FrameStats::print_stats()
     cout << ",detector_name=" << detector_name_;
     cout << ",module_name=M" << module_id_;
     cout << " ";
-    cout << ",n_missed_packets=" << n_missed_packets_ << "i";
+    cout << "n_missed_packets=" << n_missed_packets_ << "i";
     cout << ",n_corrupted_frames=" << n_corrupted_frames_ << "i";
     cout << ",repetition_rate=" << rep_rate << "i";
     cout << " ";
     cout << timestamp;
-
     cout << endl;
 }
