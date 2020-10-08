@@ -125,6 +125,7 @@ wait
 
 #coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
 coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
+#coreAssociatedConversion="26,25,24,23,22,21,20,19,18"
 #TODO: calculate this number from coreAssociatedConversion
 #export NUMBA_NUM_THREADS=18
 
@@ -144,7 +145,7 @@ else
     do
         sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
         n=`ps -fe | grep "scripts/export_file.py " | grep -v grep | grep export | wc -l`
-        if [ ${n} -lt 18 ]
+        if [ ${n} -lt 15 ]
         then
             PREVIOUS_STILL_RUN=1
         fi
@@ -154,10 +155,14 @@ else
     echo $((date4-date3)) | awk '{print int($1/60)":"int($1%60)}'
 
     export PATH=/home/dbe/miniconda3/bin:$PATH
-    source deactivate >/dev/null 2>&1
-    source activate conversion
+
+    source /home/dbe/miniconda3/etc/profile.d/conda.sh
+
+    conda deactivate
+    conda activate bsread
+
     taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
-    if [ ${DETECTOR} == "JF06T32V02" ]
+    if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
     then
         python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
     fi
