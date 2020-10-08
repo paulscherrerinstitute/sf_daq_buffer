@@ -1,12 +1,14 @@
 #!/bin/bash
 
 export PATH=/home/dbe/miniconda3/bin:$PATH
-source deactivate >/dev/null 2>&1
-source activate conversion
+source /home/dbe/miniconda3/etc/profile.d/conda.sh
+conda deactivate
+conda activate bsread
+
 
 #export NUMBA_NUM_THREADS=$1
 #OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-PAR-${NUMBA_NUM_THREADS}
-OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-NEW.NO-LOAD.4
+OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-NEW.20-daq2
 
 #coreAssociatedBuffer=(35 34 33 32 31 30 29 28 27 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 8 7 6 5 4 3 2 1 0)
 #coreAssociatedBuffer=(35 34 33 32 31 30 29 28 27 18 19 20 21 22 23 24 25 26 9 10 11 12 13 14 15 16 17 8 7 6 5 4 3 2 1 0)
@@ -14,9 +16,11 @@ OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-NEW.NO-LOAD.4
 coreAssociatedBuffer=(35 26 34 25 33 24 32 23 31 22 30 21 29 20 28 19 27 18 17 8 16 7 15 6 14 5 13 4 12 3 11 2 10 1 9)
 
 coreAssociated="35,26,34,25,33,24,32,23,31,22,30,21,29,20,28,19,27,18"
+#coreAssociated="35,34,33,32,31,30,29,28,27"
+#coreAssociated="26,25,24,23,22,21,20,19,18"
 
 #for N in 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35
-for N in 1 12 14 16 18 20 2 4 6 8 10 22 24 26 28 30 32 35
+for N in 10 12 14 16 18 20 1 2 4 6 8 22 24 26 28 30 32 35
 do
 
     for n in `seq -f %02g 1 $N`
