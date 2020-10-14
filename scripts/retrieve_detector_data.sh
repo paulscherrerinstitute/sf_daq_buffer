@@ -126,6 +126,9 @@ coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
 #TODO: calculate this number from coreAssociatedConversion
 #export NUMBA_NUM_THREADS=18
 
+#not clear why, but bitshuffle doesn't respect OMP_NUM_THREADS set in jungfrau_utils anymore, thus we set it here
+export OMP_NUM_THREADS=1
+
 date3=$(date +%s)
 echo "Finished                : "`date`
 echo -n "Retrieve Time : "
