@@ -86,9 +86,6 @@ PREVIOUS_STILL_RUN=0
 while [ ${PREVIOUS_STILL_RUN} == 0 ]
 do
     sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
-#    ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer > /dev/null 
-#    PREVIOUS_STILL_RUN=$? # not found == 1
-#    PREVIOUS_STILL_RUN=1
     n=`ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer | wc -l`
     if [ ${n} -lt 9 ]
     then
@@ -119,7 +116,7 @@ else
     fi
 fi
 
-taskset -c ${coreAssociated} /usr/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
+taskset -c ${coreAssociated} /usr/local/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
 
 wait
 
@@ -159,7 +156,7 @@ else
     source /home/dbe/miniconda3/etc/profile.d/conda.sh
 
     conda deactivate
-    conda activate bsread
+    conda activate sf-daq
 
     taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
     if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
