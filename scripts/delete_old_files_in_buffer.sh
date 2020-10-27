@@ -3,11 +3,11 @@
 hours=5
 threshold=80
 
-if [ $# = 1 ]
+if [ $# -ge 1 ]
 then
     threshold=$1
 fi
-if [ $# = 2 ]
+if [ $# -eq 2 ]
 then
     hours=$2
 fi
