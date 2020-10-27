@@ -26,6 +26,9 @@ def is_it_dark(laser_mode, detector_rate, pulseid):
         dark = True
     elif laser_mode == 1:
         dark = False
+    elif laser_mode == 13:
+        if (pulseid % int(100/detector_rate*4)) == 0:
+            dark = False
     else:
         if (pulseid + int(100/detector_rate) ) % dark_rate == 0:
             dark = True
@@ -34,6 +37,17 @@ def is_it_dark(laser_mode, detector_rate, pulseid):
 
     return dark
 
+def which_dark(laser_mode, detector_rate, pulseid):
+
+    dark_mode = -1
+    if laser_mode != 13:
+        dark_mode = 0
+    else:
+        for m in range(1,4):
+            if ((pulseid-m*int(100/detector_rate)) % int(100/detector_rate*4)) == 0:
+                dark_mode = m
+
+    return dark_mode
 
 parser = argparse.ArgumentParser()
 parser.add_argument("data_file", type=str)
@@ -76,6 +90,9 @@ nProcessedFrames = 0
 
 index_dark = []
 index_light = []
+
+index_dark_mode = {}
+
 for i in range(len(pulseids)):
     if not is_good_frame[i]:
         continue
@@ -84,6 +101,11 @@ for i in range(len(pulseids)):
     nProcessedFrames += 1
     if is_it_dark(laser_mode, detector_rate, p):
         index_dark.append(i)
+        if laser_mode == 13:
+            dark_mode = which_dark(laser_mode, detector_rate, p)
+            if dark_mode not in index_dark_mode:
+                index_dark_mode[dark_mode] = []
+            index_dark_mode[dark_mode].append(i) 
     else:
         index_light.append(i)
 
@@ -111,4 +133,13 @@ if len(index_light) > 0:
         print(f'{data_file} {delim}{frame_number}', file = f_list)
     f_list.close()
 
+
+for m in index_dark_mode:
+    if len(index_dark_mode[m]) > 0:
+        file_dark = f'{data_file[:-3]}.dark{m}.lst'
+        print(f"List of dark{m} frames : {file_dark} , {len(index_dark_mode[m])} frames")
+        f_list = open(file_dark, "w")
+        for frame_number in index_dark_mode[m]:
+            print(f'{data_file} //{frame_number}', file = f_list)
+        f_list.close()
 

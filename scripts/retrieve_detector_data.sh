@@ -61,7 +61,7 @@ case ${DETECTOR} in
   ;;
 'JF06T08V02')
   NM=8
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.json
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.daq8.json
   ;;
 'JF07T32V01')
   NM=32
