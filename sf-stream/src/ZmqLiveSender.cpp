@@ -4,6 +4,8 @@
 #include "zmq.h"
 #include <stdexcept>
 
+#include <iostream>
+//
 using namespace std;
 using namespace stream_config;
 
@@ -97,6 +99,9 @@ void ZmqLiveSender::send(const ModuleFrameBuffer *meta, const char *data)
             if (module_metadata.daq_rec != daq_rec) is_good_frame = false;
 
             if (module_metadata.n_recv_packets != 128 ) is_good_frame = false;
+        }
+        if (pulse_id % 10000 == 0 && is_good_frame != true) {
+            cout << "Frame is not good " << pulse_id << " module : " << i_module << " frame_index(0) : " << frame_index << " frame_index : " << module_metadata.frame_index << endl;
         }
     }
 

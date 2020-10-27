@@ -3,12 +3,13 @@
 export PATH=/home/dbe/miniconda3/bin:$PATH
 source /home/dbe/miniconda3/etc/profile.d/conda.sh
 conda deactivate
-conda activate bsread
+conda activate sf-daq
 
+export OMP_NUM_THREADS=1
 
 #export NUMBA_NUM_THREADS=$1
 #OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-PAR-${NUMBA_NUM_THREADS}
-OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-NEW.20-daq2
+OUTDIR=/sf/alvra/data/p18674/raw/run_info/003000/CONVERSION-NEW.21-daq1
 
 #coreAssociatedBuffer=(35 34 33 32 31 30 29 28 27 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 8 7 6 5 4 3 2 1 0)
 #coreAssociatedBuffer=(35 34 33 32 31 30 29 28 27 18 19 20 21 22 23 24 25 26 9 10 11 12 13 14 15 16 17 8 7 6 5 4 3 2 1 0)
