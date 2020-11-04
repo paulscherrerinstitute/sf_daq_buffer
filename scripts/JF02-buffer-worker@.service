@@ -8,7 +8,7 @@ BindsTo=JF02-buffer.service
 PermissionsStartOnly=true
 Type=idle
 User=root
-ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF02-buffer-worker.sh %i
+ExecStart=/usr/bin/sh /home/dbe/service_scripts/JF02-buffer-worker.sh %i
 TimeoutStartSec=10
 RestartSec=10
 
