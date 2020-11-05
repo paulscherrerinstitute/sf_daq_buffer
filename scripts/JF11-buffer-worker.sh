@@ -2,19 +2,16 @@
 
 if [ $# != 1 ]
 then
-    systemctl start JF06_4M-buffer-worker@{00..07}
+    systemctl start JF11-buffer-worker@{00..03}
     exit
 fi
 
 M=$1
 
-# Add ourselves to the user cpuset.
-# echo $$ > /sys/fs/cgroup/cpuset/user/tasks
+coreAssociatedBuffer=(11 12 13 1)
 
-coreAssociatedBuffer=(6 7 8 9 10 22 23 24)
-
-initialUDPport=50060
+initialUDPport=50170
 port=$((${initialUDPport}+10#${M}))
-DETECTOR=JF06T08V02
+DETECTOR=JF11T04V01
 
 taskset -c ${coreAssociatedBuffer[10#${M}]} /usr/local/bin/sf_buffer ${DETECTOR} M${M} ${port} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${M}

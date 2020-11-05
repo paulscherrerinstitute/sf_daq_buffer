@@ -1,5 +1,5 @@
 #!/bin/bash
 
-coreAssociated="13,14,15,16"
+coreAssociated="2,3,4,5"
 
-taskset -c ${coreAssociated} /usr/bin/sf_stream /gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.json
+taskset -c ${coreAssociated} /usr/local/bin/sf_stream /gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.daq8.json

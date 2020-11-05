@@ -10,7 +10,7 @@ Type=idle
 User=root
 ExecStart=/usr/bin/sh /home/dbe/service_scripts/JF02-buffer-worker.sh %i
 TimeoutStartSec=10
-RestartSec=10
+RestartSec=1
 
 [Install]
 WantedBy=JF02-buffer.service

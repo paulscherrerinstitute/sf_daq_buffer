@@ -5,27 +5,14 @@ source /home/dbe/miniconda3/etc/profile.d/conda.sh
 conda deactivate
 conda activate vis
 
-PORT=5002
-PORT_BACKEND=9002
+PORT=5011
+PORT_BACKEND=9011
 
 H=`echo ${HOSTNAME} | sed 's/.psi.ch//'`
 BACKEND=${H}
 
-
-case ${H} in
-'sf-daq-4')
-  CORES='36,37'
-  ;;
-'sf-daq-8')
-  CORES='17,18'
-  ;;
-*)
-  CORES='2'
-esac
-
-taskset -c ${CORES} \
+taskset -c 17,18 \
 streamvis alvra --allow-websocket-origin=${H}:${PORT} \
 --allow-websocket-origin=sf-daq-alvra:${PORT} --port=${PORT} \
 --address tcp://${BACKEND}:${PORT_BACKEND} \
---page-title 4p5M_Alvra
-
+--page-title TXS_Flex

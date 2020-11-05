@@ -1,0 +1,13 @@
+[Unit]
+Description=streamvis: JF06
+
+[Service]
+User=root
+TimeoutStartSec=2
+ExecStart=/bin/bash ./home/dbe/service_scripts/JF06-vis.sh
+Restart=on-failure
+RestartSec=4
+
+[Install]
+WantedBy=multi-user.target
+
