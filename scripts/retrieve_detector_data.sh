@@ -71,6 +71,10 @@ case ${DETECTOR} in
   NM=1
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF13.json
   ;;
+'JF11T04V01')
+  NM=4
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF11.json
+  ;;
 *)
   NM=1
 esac
