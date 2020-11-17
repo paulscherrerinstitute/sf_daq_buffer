@@ -71,20 +71,12 @@ with ju.File(
         batch_size=35,
     )
 
-    pixel_mask = juf.handler.get_pixel_mask(gap_pixels=gap_pixels, geometry=geometry)
+# Utility info
+with h5py.File(args.file_out, "r") as h5f:
+    print("daq_rec:", h5f[f"/data/{detector_name}/daq_rec"][0, 0])
 
-# Postprocessing
-with h5py.File(args.file_out, "r+") as h5f:
-    h5f[f"/data/{detector_name}/pixel_mask"] = np.invert(pixel_mask)
-    if conversion:
-        print("daq_rec:", h5f[f"/data/{detector_name}/daq_rec"][0, 0])
-        del h5f[f"/data/{detector_name}/daq_rec"]
-
-        frame_index = h5f[f"/data/{detector_name}/frame_index"][:]
-        print("frame_index range:", (np.min(frame_index), np.max(frame_index)))
-        del h5f[f"/data/{detector_name}/frame_index"]
-
-        del h5f[f"/data/{detector_name}/is_good_frame"]
+    frame_index = h5f[f"/data/{detector_name}/frame_index"][:]
+    print("frame_index range:", (np.min(frame_index), np.max(frame_index)))
 
 print("input frames:", n_input_frames)
 print("bad frames:", n_input_frames - n_output_frames)
@@ -99,4 +91,3 @@ print("geometry:", geometry)
 print("gap_pixels:", gap_pixels)
 print("compression:", compression)
 print("factor:", factor)
-
