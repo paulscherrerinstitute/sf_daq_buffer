@@ -4,16 +4,15 @@
 #include <cstdint>
 
 #define JUNGFRAU_N_MODULES 32
-#define JUNGFRAU_BYTES_PER_PACKET 8246
+#define JUNGFRAU_BYTES_PER_PACKET 8240
 #define JUNGFRAU_DATA_BYTES_PER_PACKET 8192
 #define JF_N_PACKETS_PER_FRAME 128
 #define JUNGFRAU_DATA_BYTES_PER_FRAME 1048576
 
-// 6 bytes + 48 bytes + 8192 bytes = 8246 bytes
+// 48 bytes + 8192 bytes = 8240 bytes
 #pragma pack(push)
 #pragma pack(2)
 struct jungfrau_packet {
-    char emptyheader[6];
     uint64_t framenum;
     uint32_t exptime;
     uint32_t packetnum;
