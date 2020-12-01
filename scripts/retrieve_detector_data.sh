@@ -55,6 +55,10 @@ case ${DETECTOR} in
   NM=9
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF02.json
   ;;
+'JF04T01V01')
+  NM=1
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF04.json
+  ;;
 'JF06T32V02')
   NM=32
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06.json
@@ -66,6 +70,14 @@ case ${DETECTOR} in
 'JF07T32V01')
   NM=32
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF07.json
+  ;;
+'JF09T01V01')
+  NM=1
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF09.json
+  ;;
+'JF10T01V01')
+  NM=1
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF10.json
   ;;
 'JF13T01V01')
   NM=1
@@ -141,6 +153,51 @@ echo $((date3-date2)) | awk '{print int($1/60)":"int($1%60)}'
 if [ ${JF_CONVERSION} == 0 ]
 then
     echo "File is written in raw format, no compression"
+    
+    dir_name=`dirname ${OUTFILE_RAW}`
+    base_name=`basename ${dir_name}`
+
+    if [ ${base_name} == "JF_pedestals" ]
+    then
+        echo "Pedestal run will make conversion"
+
+        export PATH=/home/dbe/miniconda3/bin:$PATH
+
+        source /home/dbe/miniconda3/etc/profile.d/conda.sh
+
+        conda deactivate
+        conda activate sf-daq
+
+        if [ ${DETECTOR} == "JF07T32V01" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF07T32V01/pixel_mask_13_full.h5 
+        elif [ ${DETECTOR} == "JF03T01V02" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF03T01V02/pixel_mask_half_chip.h5  
+        elif [ ${DETECTOR} == "JF02T09V02" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1 
+        elif [ ${DETECTOR} == "JF06T08V02" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T08V01/mask_2lines_module3.h5 
+#        elif [ ${DETECTOR} == "JF06T32V02" ]
+#        then
+#            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T32V02/mask_noise_in_28.h5 
+        elif [ ${DETECTOR} == "JF13T01V01" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF13T01V01/pixel_mask_bad_rb_22.09.2020.h5 
+        elif [ ${DETECTOR} == "JF11T04V01" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=2 
+        elif [ ${DETECTOR} == "JF11T04V01" ]
+        then
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1
+        else
+            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG 
+        fi
+
+    fi
+
 else
     echo "Will call compression/convertion ${OUTFILE_RAW} --> ${OUTFILE}"
 
