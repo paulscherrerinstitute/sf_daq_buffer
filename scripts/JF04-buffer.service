@@ -1,0 +1,10 @@
+[Unit]
+Description=All UDP-buffer instances of JF04
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh /home/dbe/service_scripts/JF04-buffer-worker.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
