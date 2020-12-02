@@ -189,7 +189,7 @@ then
         elif [ ${DETECTOR} == "JF11T04V01" ]
         then
             time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=2 
-        elif [ ${DETECTOR} == "JF10T04V01" ]
+        elif [ ${DETECTOR} == "JF10T01V01" ]
         then
             time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1
         else
