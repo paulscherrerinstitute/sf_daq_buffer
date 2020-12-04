@@ -170,30 +170,30 @@ then
 
         if [ ${DETECTOR} == "JF07T32V01" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF07T32V01/pixel_mask_13_full.h5 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF07T32V01/pixel_mask_13_full.h5 
         elif [ ${DETECTOR} == "JF03T01V02" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF03T01V02/pixel_mask_half_chip.h5  
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF03T01V02/pixel_mask_half_chip.h5  
         elif [ ${DETECTOR} == "JF02T09V02" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1 
         elif [ ${DETECTOR} == "JF06T08V02" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T08V01/mask_2lines_module3.h5 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T08V01/mask_2lines_module3.h5 
 #        elif [ ${DETECTOR} == "JF06T32V02" ]
 #        then
-#            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T32V02/mask_noise_in_28.h5 
+#            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T32V02/mask_noise_in_28.h5 
         elif [ ${DETECTOR} == "JF13T01V01" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF13T01V01/pixel_mask_bad_rb_22.09.2020.h5 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF13T01V01/pixel_mask_bad_rb_22.09.2020.h5 
         elif [ ${DETECTOR} == "JF11T04V01" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=2 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=2 
         elif [ ${DETECTOR} == "JF10T01V01" ]
         then
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1
         else
-            time python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG 
+            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG 
         fi
 
     fi
@@ -225,7 +225,7 @@ else
     taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
     if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
     then
-        python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
+        taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
     fi
     date5=$(date +%s)
     echo "Finished                : "`date`
