@@ -17,7 +17,7 @@ case ${H} in
   CORES='36,37'
   ;;
 'sf-daq-8')
-  CORES='17,18'
+  CORES='33,34'
   ;;
 *)
   CORES='2'

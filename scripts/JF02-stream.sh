@@ -7,7 +7,7 @@ case ${H} in
     config=/gpfs/photonics/swissfel/buffer/config/stream-JF02.json
     ;;
 'sf-daq-8')
-    coreAssociated="14,15,16"
+    coreAssociated="20,21"
     config=/gpfs/photonics/swissfel/buffer/config/stream-JF02.daq8.json
     ;;
 *)

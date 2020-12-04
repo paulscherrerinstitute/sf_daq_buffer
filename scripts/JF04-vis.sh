@@ -11,7 +11,9 @@ PORT_BACKEND=9004
 H=`echo ${HOSTNAME} | sed 's/.psi.ch//'`
 BACKEND=${H}
 
-taskset -c 16 \
+CORES=39
+
+taskset -c ${CORES} \
 streamvis bernina --allow-websocket-origin=${H}:${PORT} \
 --allow-websocket-origin=sf-daq-bernina:${PORT} --port=${PORT} \
 --address tcp://${BACKEND}:${PORT_BACKEND} \

@@ -11,7 +11,9 @@ PORT_BACKEND=9009
 H=`echo ${HOSTNAME} | sed 's/.psi.ch//'`
 BACKEND=${H}
 
-taskset -c 17 \
+CORES=37
+
+taskset -c ${CORES} \
 streamvis alvra --allow-websocket-origin=${H}:${PORT} \
 --allow-websocket-origin=sf-daq-alvra:${PORT} --port=${PORT} \
 --address tcp://${BACKEND}:${PORT_BACKEND} \

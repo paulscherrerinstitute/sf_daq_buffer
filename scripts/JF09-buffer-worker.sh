@@ -8,7 +8,7 @@ fi
 
 M=$1
 
-coreAssociatedBuffer=(34)
+coreAssociatedBuffer=(12)
 
 initialUDPport=50150
 port=$((${initialUDPport}+10#${M}))

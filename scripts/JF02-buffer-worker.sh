@@ -15,7 +15,7 @@ case ${H} in
   coreAssociatedBuffer=(11 12 13 14 15 16 17 18 19)
   ;;
 'sf-daq-8')
-  coreAssociatedBuffer=(11 11 12 12 13 13 1 1 0)
+  coreAssociatedBuffer=(1 1 1 2 2 2 3 3 3)
   ;;
 *)
   CORES=(25 25 26 26 27 27 28 28 29)
