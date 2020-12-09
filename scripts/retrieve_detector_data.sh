@@ -59,6 +59,10 @@ case ${DETECTOR} in
   NM=1
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF04.json
   ;;
+'JF03T01V01')
+  NM=1
+  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF03.json
+  ;;
 'JF06T32V02')
   NM=32
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06.json
@@ -196,6 +200,10 @@ then
             time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG 
         fi
 
+        PEDESTAL_FILE=`echo ${OUTFILE_RAW} | sed 's/.h5/.res.h5/'`
+
+        taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/copy_pedestal_file.py ${PEDESTAL_FILE} ${RUN_FILE} ${DETECTOR} ${DET_CONFIG_FILE}
+
     fi
 
 else
@@ -222,7 +230,7 @@ else
     conda deactivate
     conda activate sf-daq
 
-    taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
+    time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
     if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
     then
         taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
