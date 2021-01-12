@@ -42,9 +42,8 @@ void FrameStats::print_stats()
 {
     auto interval_ms_duration = duration_cast<milliseconds>(
             steady_clock::now()-stats_interval_start_).count();
-    // * 1000 because milliseconds, 0.5 for truncation.
-    int rep_rate = ((frames_counter_/interval_ms_duration) * 1000) + 0.5;
-
+    // * 1000 because milliseconds, + 250 because of truncation.
+    int rep_rate = ((frames_counter_ * 1000) + 250) / interval_ms_duration;
     uint64_t timestamp = time_point_cast<nanoseconds>(
             system_clock::now()).time_since_epoch().count();
 
