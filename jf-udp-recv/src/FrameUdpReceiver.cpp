@@ -54,10 +54,9 @@ inline uint64_t FrameUdpReceiver::process_packets(
         ModuleFrame& metadata,
         char* frame_buffer)
 {
-    for (
-            int i_packet=start_offset;
-            i_packet < packet_buffer_n_packets_;
-            i_packet++) {
+    for (int i_packet=start_offset;
+         i_packet < packet_buffer_n_packets_;
+         i_packet++) {
 
         // First packet for this frame.
         if (metadata.pulse_id == 0) {
