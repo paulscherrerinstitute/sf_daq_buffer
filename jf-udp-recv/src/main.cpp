@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <zmq.h>
-#include <zconf.h>
 #include <RamBuffer.hpp>
 
 #include "formats.hpp"
@@ -17,7 +16,7 @@ using namespace BufferUtils;
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 2) {
+    if (argc != 3) {
         cout << endl;
         cout << "Usage: jf_udp_recv [detector_json_filename] [module_id]";
         cout << endl;
