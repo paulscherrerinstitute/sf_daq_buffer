@@ -41,7 +41,7 @@ void FrameStats::record_stats(const ModuleFrame &meta)
 void FrameStats::print_stats()
 {
     auto interval_ms_duration = duration_cast<milliseconds>(
-            stats_interval_start_-steady_clock::now()).count();
+            steady_clock::now()-stats_interval_start_).count();
     // * 1000 because milliseconds, 0.5 for truncation.
     int rep_rate = ((frames_counter_/interval_ms_duration) * 1000) + 0.5;
 
