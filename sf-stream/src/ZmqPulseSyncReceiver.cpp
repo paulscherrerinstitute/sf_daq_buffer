@@ -58,8 +58,8 @@ uint64_t ZmqPulseSyncReceiver::get_next_pulse_id() const
     for (int i_sync=0; i_sync < SYNC_RETRY_LIMIT; i_sync++) {
         cout << "Sync attempt " << i_sync << endl;
 
-        uint64_t min_pulse_id = 0;
-        uint64_t max_pulse_id = numeric_limits<uint64_t>::max();
+        uint64_t min_pulse_id = numeric_limits<uint64_t>::max();;
+        uint64_t max_pulse_id = 0;
 
         for (int i = 0; i < n_modules_; i++) {
             min_pulse_id = min(min_pulse_id, pulses[i]);
