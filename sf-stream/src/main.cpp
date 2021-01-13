@@ -15,7 +15,7 @@ using namespace stream_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 1) {
+    if (argc != 2) {
         cout << endl;
         cout << "Usage: sf_stream [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
