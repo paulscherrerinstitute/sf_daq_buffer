@@ -30,7 +30,10 @@ int main (int argc, char *argv[]) {
     const auto config = read_json_config(string(argv[1]));
     const int module_id = atoi(argv[2]);
 
-    const auto module_name = "M" + to_string(module_id);
+    // TODO: Remove this also in reader.
+    const string module_prefix = (module_id < 10) ? "0" : "";
+    const auto module_name = "M" + module_prefix + to_string(module_id);
+
     BufferBinaryWriter writer(config.buffer_folder, module_name);
     RamBuffer ram_buff(config.detector_name, config.n_modules);
     BufferStats stats(config.detector_name, module_id, STATS_MODULO);
