@@ -43,26 +43,6 @@ ZmqLiveSender::ZmqLiveSender(
         }
     }
 
-    {
-        socket_pulse_ = zmq_socket(ctx, ZMQ_PUB);
-
-        if (zmq_bind(socket_pulse_, config.pulse_address.c_str()) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-
-        const int sndhwm = PULSE_ZMQ_SNDHWM;
-        if (zmq_setsockopt(
-                socket_pulse_, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-
-        const int linger = 0;
-        if (zmq_setsockopt(
-                socket_pulse_, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-            throw runtime_error(zmq_strerror(errno));
-        }
-    }
-
 }
 
 ZmqLiveSender::~ZmqLiveSender()
@@ -78,10 +58,6 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data)
     rapidjson::Document header(rapidjson::kObjectType);
     auto& header_alloc = header.GetAllocator();
     string text_header;
-
-    if(zmq_send(socket_pulse_, &meta.pulse_id, sizeof(uint64_t), 0) == -1) {
-        throw runtime_error(zmq_strerror(errno));
-    }
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
     header.AddMember("frame", meta.frame_index, header_alloc);

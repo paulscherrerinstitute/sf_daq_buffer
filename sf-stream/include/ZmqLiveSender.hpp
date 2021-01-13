@@ -12,7 +12,6 @@ class ZmqLiveSender {
 
     void* socket_streamvis_;
     void* socket_live_;
-    void* socket_pulse_;
 
 public:
     ZmqLiveSender(void* ctx,
