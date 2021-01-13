@@ -55,7 +55,7 @@ uint64_t ZmqPulseSyncReceiver::get_next_pulse_id() const
         return pulses[0];
     }
 
-    for (int i_sync; i_sync < SYNC_RETRY_LIMIT; i_sync++) {
+    for (int i_sync=0; i_sync < SYNC_RETRY_LIMIT; i_sync++) {
         cout << "Sync attempt " << i_sync << endl;
 
         uint64_t min_pulse_id = 0;
@@ -69,7 +69,7 @@ uint64_t ZmqPulseSyncReceiver::get_next_pulse_id() const
         auto max_diff = max_pulse_id - min_pulse_id;
         if (max_diff > PULSE_OFFSET_LIMIT) {
             stringstream err_msg;
-            err_msg << "[ZmqLiveReceiver::get_next_pulse_id]";
+            err_msg << "[ZmqPulseSyncReceiver::get_next_pulse_id]";
             err_msg << " PULSE_OFFSET_LIMIT exceeded.";
             err_msg << " max_diff=" << max_diff << " pulses.";
 
