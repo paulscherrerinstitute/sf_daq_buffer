@@ -51,7 +51,7 @@ void BufferStats::print_stats()
             system_clock::now()).time_since_epoch().count();
 
     // Output in InfluxDB line protocol
-    cout << "jf-buffer-writer";
+    cout << "jf_buffer_writer";
     cout << ",detector_name=" << detector_name_;
     cout << ",module_name=M" << module_id_;
     cout << " ";

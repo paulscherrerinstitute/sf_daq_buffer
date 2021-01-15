@@ -50,7 +50,7 @@ void StreamStats::print_stats()
             system_clock::now()).time_since_epoch().count();
 
     // Output in InfluxDB line protocol
-    cout << "sf-stream";
+    cout << "sf_stream";
     cout << ",detector_name=" << detector_name_;
     cout << ",stream_name=" << stream_name_;
     cout << " ";
