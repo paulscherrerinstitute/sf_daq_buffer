@@ -8,6 +8,11 @@
 
 #include "formats.hpp"
 
+struct PulseAndSync {
+    const uint64_t pulse_id;
+    const uint32_t n_lost_pulses;
+};
+
 class ZmqPulseSyncReceiver {
 
     void* ctx_;
@@ -22,7 +27,7 @@ public:
             const int n_modules);
     ~ZmqPulseSyncReceiver();
 
-    uint64_t get_next_pulse_id() const;
+    PulseAndSync get_next_pulse_id() const;
 };
 
 
