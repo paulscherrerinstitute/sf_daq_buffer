@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <cstring>
 #include <stdexcept>
+#include <sstream>
 #include <unistd.h>
 #include "RamBuffer.hpp"
 #include "buffer_config.hpp"
@@ -110,7 +111,21 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         if (!is_pulse_init) {
 
             if (frame_meta->pulse_id != pulse_id) {
-                throw runtime_error("Wrong pulse_id in ram buffer slot.");
+                stringstream err_msg;
+                err_msg << "[RamBuffer::read_image]";
+                err_msg << " Unexpected pulse_id in ram buffer.";
+                err_msg << " expected=" << pulse_id;
+                err_msg << " got=" << frame_meta->pulse_id;
+
+                for (int i = 0; i < n_modules_; i++) {
+                    ModuleFrame *meta = src_meta + i_module;
+
+                    err_msg << " (module " << i << ", ";
+                    err_msg << meta->pulse_id << "),";
+                }
+                err_msg << endl;
+
+                throw runtime_error(err_msg.str());
             }
 
             image_meta.pulse_id = frame_meta->pulse_id;
