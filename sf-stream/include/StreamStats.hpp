@@ -12,7 +12,6 @@ class StreamStats {
 
     int image_counter_;
     int n_corrupted_images_;
-    int n_sync_lost_images_;
     std::chrono::time_point<std::chrono::steady_clock> stats_interval_start_;
 
     void reset_counters();
@@ -23,7 +22,7 @@ public:
                 const std::string &stream_name,
                 const size_t stats_modulo);
 
-    void record_stats(const ImageMetadata &meta, const uint32_t n_lost_pulses);
+    void record_stats(const ImageMetadata &meta);
 };
 
 

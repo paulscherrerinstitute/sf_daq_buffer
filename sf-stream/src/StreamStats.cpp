@@ -19,16 +19,14 @@ StreamStats::StreamStats(
 void StreamStats::reset_counters()
 {
     image_counter_ = 0;
-    n_sync_lost_images_ = 0;
     n_corrupted_images_ = 0;
     stats_interval_start_ = steady_clock::now();
 }
 
 void StreamStats::record_stats(
-        const ImageMetadata &meta, const uint32_t n_lost_pulses)
+        const ImageMetadata &meta)
 {
     image_counter_++;
-    n_sync_lost_images_ += n_lost_pulses;
 
     if (!meta.is_good_image) {
         n_corrupted_images_++;
@@ -56,7 +54,6 @@ void StreamStats::print_stats()
     cout << " ";
     cout << "n_processed_images=" << image_counter_ << "i";
     cout << ",n_corrupted_images=" << n_corrupted_images_ << "i";
-    cout << ",n_sync_lost_images=" << n_sync_lost_images_ << "i";
     cout << ",repetition_rate=" << rep_rate << "i";
     cout << " ";
     cout << timestamp;
