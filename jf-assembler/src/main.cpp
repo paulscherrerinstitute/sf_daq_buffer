@@ -5,7 +5,6 @@
 #include <BufferUtils.hpp>
 #include <AssemblerStats.hpp>
 
-#include "buffer_config.hpp"
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
 
@@ -27,16 +26,14 @@ int main (int argc, char *argv[])
     auto config = BufferUtils::read_json_config(string(argv[1]));
     auto const stream_name = "assembler";
 
-    string RECV_IPC_URL = BUFFER_LIVE_IPC_URL + config.detector_name + "-";
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, ASSEMBLER_ZMQ_IO_THREADS);
+    auto sender = BufferUtils::bind_socket(
+            ctx, config.detector_name, stream_name);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
-
-    auto sender = BufferUtils::bind_socket(
-            ctx, config.detector_name, stream_name);
 
     ImageMetadata meta;
     while (true) {
