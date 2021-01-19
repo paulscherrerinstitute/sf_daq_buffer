@@ -25,7 +25,7 @@ TEST(RamBuffer, simple_store)
     for (int i_module=0; i_module<n_modules; i_module++) {
         frame_meta.module_id = i_module;
 
-        buffer.write_frame(&frame_meta, (char *) (frame_buffer.get()));
+        buffer.write_frame(frame_meta, (char *) (frame_buffer.get()));
     }
 
     ImageMetadata image_meta;
