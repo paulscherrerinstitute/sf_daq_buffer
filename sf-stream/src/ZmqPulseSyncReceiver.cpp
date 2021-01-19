@@ -27,7 +27,7 @@ ZmqPulseSyncReceiver::ZmqPulseSyncReceiver(
 
     for (int i=0; i<n_modules_; i++) {
         sockets_.push_back(
-                BufferUtils::connect_socket(ctx_, detector_name, i));
+                BufferUtils::connect_socket(ctx_, detector_name, to_string(i)));
     }
 }
 

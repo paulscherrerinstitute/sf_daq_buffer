@@ -69,11 +69,11 @@ void BufferUtils::create_destination_folder(const string& output_file)
 }
 
 void* BufferUtils::connect_socket(
-        void* ctx, const string& detector_name, const int source_id)
+        void* ctx, const string& detector_name, const string& stream_name)
 {
     string ipc_address = BUFFER_LIVE_IPC_URL +
                          detector_name + "-" +
-                         to_string(source_id);
+                         stream_name;
 
     void* socket = zmq_socket(ctx, ZMQ_SUB);
     if (socket == nullptr) {
@@ -102,11 +102,11 @@ void* BufferUtils::connect_socket(
 }
 
 void* BufferUtils::bind_socket(
-        void* ctx, const string& detector_name, const int source_id)
+        void* ctx, const string& detector_name, const string& stream_name)
 {
     string ipc_address = BUFFER_LIVE_IPC_URL +
                          detector_name + "-" +
-                         to_string(source_id);
+                         stream_name;
 
     void* socket = zmq_socket(ctx, ZMQ_PUB);
 

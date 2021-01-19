@@ -36,9 +36,14 @@ namespace BufferUtils
     void create_destination_folder(const std::string& output_file);
 
     void* bind_socket(
-            void* ctx, const std::string& detector_name, const int source_id);
+            void* ctx,
+            const std::string& detector_name,
+            const std::string& stream_name);
+
     void* connect_socket(
-            void* ctx, const std::string& detector_name, const int source_id);
+            void* ctx,
+            const std::string& detector_name,
+            const std::string& stream_name);
 
     DetectorConfig read_json_config(const std::string& filename);
 }

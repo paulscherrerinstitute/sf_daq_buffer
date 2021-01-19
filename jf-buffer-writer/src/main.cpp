@@ -39,7 +39,8 @@ int main (int argc, char *argv[]) {
     BufferStats stats(config.detector_name, module_id, STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
-    auto socket = connect_socket(ctx, config.detector_name, module_id);
+    auto socket = connect_socket(
+            ctx, config.detector_name, to_string(module_id));
 
     auto file_buff = new BufferBinaryFormat();
     uint64_t pulse_id;

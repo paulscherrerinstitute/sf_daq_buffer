@@ -36,7 +36,7 @@ int main (int argc, char *argv[]) {
     FrameStats stats(config.detector_name, module_id, STATS_MODULO);
 
     auto ctx = zmq_ctx_new();
-    auto socket = bind_socket(ctx, config.detector_name, module_id);
+    auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
 
     ModuleFrame meta;
     char* data = new char[MODULE_N_BYTES];
