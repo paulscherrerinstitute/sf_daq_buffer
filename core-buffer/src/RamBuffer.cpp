@@ -85,14 +85,11 @@ void RamBuffer::read_frame(
     memcpy(dst_data, src_data, MODULE_N_BYTES);
 }
 
-char* RamBuffer::read_image(const uint64_t pulse_id,
-                            ImageMetadata &image_meta) const
+void RamBuffer::assemble_image(
+        const uint64_t pulse_id, ImageMetadata &image_meta) const
 {
     const size_t slot_n = pulse_id % n_slots_;
-
     ModuleFrame *src_meta = meta_buffer_ + (n_modules_ * slot_n);
-
-    char *src_data = image_buffer_ + (image_bytes_ * slot_n);
 
     auto is_pulse_init = false;
     auto is_good_image = true;
@@ -158,7 +155,12 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         image_meta.frame_index = 0;
         image_meta.daq_rec = 0;
     }
+}
+
+char* RamBuffer::read_image(const uint64_t pulse_id) const
+{
+    const size_t slot_n = pulse_id % n_slots_;
+    char *src_data = image_buffer_ + (image_bytes_ * slot_n);
 
     return src_data;
 }
-
