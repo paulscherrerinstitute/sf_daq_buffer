@@ -4,7 +4,5 @@ target_link_libraries(core-buffer-tests
         core-buffer-lib
         external
         rt
-        hdf5
-        hdf5_cpp
         zmq
         gtest)
