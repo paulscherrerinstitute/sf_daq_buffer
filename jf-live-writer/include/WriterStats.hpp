@@ -8,7 +8,8 @@
 
 class WriterStats {
     const std::string detector_name_;
-    size_t stats_modulo_;
+    const size_t stats_modulo_;
+    const size_t image_n_bytes_;
 
     int image_counter_;
     uint32_t total_buffer_write_us_;
@@ -21,7 +22,8 @@ class WriterStats {
 public:
     WriterStats(
             const std::string &detector_name,
-            const size_t stats_modulo);
+            const size_t stats_modulo,
+            const size_t image_n_bytes);
     void start_image_write();
     void end_image_write();
 };
