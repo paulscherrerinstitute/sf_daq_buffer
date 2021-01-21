@@ -1,15 +1,16 @@
-#ifndef BINARYWRITER_HPP
-#define BINARYWRITER_HPP
+#ifndef IMAGEBINARYWRITER_HPP
+#define IMAGEBINARYWRITER_HPP
 
 #include <string>
 
 #include "formats.hpp"
 
+
+
 class ImageBinaryWriter {
-
-    const size_t MAX_FILE_BYTES =
-            buffer_config::FILE_MOD * sizeof(BufferBinaryFormat);
-
+    const size_t IMAGE_BYTES;
+    const size_t IMAGE_SLOT_BYTES;
+    const size_t MAX_FILE_BYTES;
     const std::string detector_folder_;
     std::string latest_filename_;
 
@@ -21,13 +22,15 @@ class ImageBinaryWriter {
 
 
 public:
-    ImageBinaryWriter(const std::string& detector_folder);
+    ImageBinaryWriter(
+            const std::string& detector_folder,
+            const uint64_t image_n_bytes);
 
     virtual ~ImageBinaryWriter();
 
-    void write(const uint64_t pulse_id, const BufferBinaryFormat* buffer);
+    void write(const ImageMetadata meta, const char* data);
 
 };
 
 
-#endif //BINARYWRITER_HPP
+#endif //IMAGEBINARYWRITER_HPP
