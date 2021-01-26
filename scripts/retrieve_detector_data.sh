@@ -59,7 +59,7 @@ case ${DETECTOR} in
   NM=1
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF04.json
   ;;
-'JF03T01V01')
+'JF03T01V02')
   NM=1
   DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF03.json
   ;;
@@ -178,6 +178,7 @@ then
         elif [ ${DETECTOR} == "JF03T01V02" ]
         then
             time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/bernina/config/jungfrau/pixel_mask/JF03T01V02/pixel_mask_half_chip.h5  
+#            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG
         elif [ ${DETECTOR} == "JF02T09V02" ]
         then
             time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --number_bad_modules=1 
