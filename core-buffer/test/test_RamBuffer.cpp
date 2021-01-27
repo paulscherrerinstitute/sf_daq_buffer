@@ -13,7 +13,7 @@ TEST(RamBuffer, simple_store)
     frame_meta.pulse_id = 123523;
     frame_meta.daq_rec = 1234;
     frame_meta.frame_index = 12342300;
-    frame_meta.n_recv_packets = JF_N_PACKETS_PER_FRAME;
+    frame_meta.n_recv_packets = EIGER_N_PACKETS_PER_FRAME;
 
     auto frame_buffer = make_unique<uint16_t[]>(MODULE_N_PIXELS);
 
@@ -25,7 +25,7 @@ TEST(RamBuffer, simple_store)
     for (int i_module=0; i_module<n_modules; i_module++) {
         frame_meta.module_id = i_module;
 
-        buffer.write_frame(&frame_meta, (char *) (frame_buffer.get()));
+        buffer.write_frame(frame_meta, (char *) (frame_buffer.get()));
     }
 
     ImageMetadata image_meta;

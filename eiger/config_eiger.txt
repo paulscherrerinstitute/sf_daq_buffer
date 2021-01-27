@@ -1,0 +1,8 @@
+hostname localhost:2050+
+0:udp_dstport 50100
+0:udp_dstport2 50101
+0:udp_dstip 127.0.0.1
+0:udp_dstmac 90:1b:0e:19:1c:ae 
+
+0:udp_srcip 129.129.130.177
+0:udp_srcmac 90:1b:0e:19:1c:ae 

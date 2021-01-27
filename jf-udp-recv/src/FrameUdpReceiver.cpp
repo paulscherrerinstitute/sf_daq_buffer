@@ -1,6 +1,9 @@
 #include <cstring>
-#include <jungfrau.hpp>
+// #include <jungfrau.hpp>
+#include <eiger.hpp>
 #include "FrameUdpReceiver.hpp"
+#include <ostream>
+#include <iostream>
 
 using namespace std;
 using namespace buffer_config;
@@ -14,7 +17,7 @@ FrameUdpReceiver::FrameUdpReceiver(
 
     for (int i = 0; i < BUFFER_UDP_N_RECV_MSG; i++) {
         recv_buff_ptr_[i].iov_base = (void*) &(packet_buffer_[i]);
-        recv_buff_ptr_[i].iov_len = sizeof(jungfrau_packet);
+        recv_buff_ptr_[i].iov_len = sizeof(eiger_packet);
 
         msgs_[i].msg_hdr.msg_iov = &recv_buff_ptr_[i];
         msgs_[i].msg_hdr.msg_iovlen = 1;
@@ -40,11 +43,11 @@ inline void FrameUdpReceiver::copy_packet_to_buffers(
         ModuleFrame& metadata, char* frame_buffer, const int i_packet)
 {
     size_t frame_buffer_offset =
-            JUNGFRAU_DATA_BYTES_PER_PACKET * packet_buffer_[i_packet].packetnum;
+            EIGER_DATA_BYTES_PER_PACKET * packet_buffer_[i_packet].packetnum;
     memcpy(
             (void*) (frame_buffer + frame_buffer_offset),
             packet_buffer_[i_packet].data,
-            JUNGFRAU_DATA_BYTES_PER_PACKET);
+            EIGER_DATA_BYTES_PER_PACKET);
 
     metadata.n_recv_packets++;
 }
@@ -73,10 +76,10 @@ inline uint64_t FrameUdpReceiver::process_packets(
         }
 
         copy_packet_to_buffers(metadata, frame_buffer, i_packet);
-
+        
         // Last frame packet received. Frame finished.
         if (packet_buffer_[i_packet].packetnum ==
-            JF_N_PACKETS_PER_FRAME - 1)
+            EIGER_N_PACKETS_PER_FRAME - 1)
         {
             // Buffer is loaded only if this is not the last message.
             if (i_packet+1 != packet_buffer_n_packets_) {
@@ -86,6 +89,10 @@ inline uint64_t FrameUdpReceiver::process_packets(
 
             // If i_packet is the last packet the buffer is empty.
             } else {
+                cout << "[FrameUdpReceiver::process_packets] Received final packet of frame: "; 
+                cout << packet_buffer_[i_packet].framenum;
+                cout << endl;
+
                 packet_buffer_loaded_ = false;
                 packet_buffer_offset_ = 0;
             }
@@ -106,7 +113,7 @@ uint64_t FrameUdpReceiver::get_frame_from_udp(
     // Reset the metadata and frame buffer for the next frame.
     metadata.pulse_id = 0;
     metadata.n_recv_packets = 0;
-    memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
+    memset(frame_buffer, 0, EIGER_DATA_BYTES_PER_FRAME);
 
     // Happens when last packet from previous frame was missed.
     if (packet_buffer_loaded_) {

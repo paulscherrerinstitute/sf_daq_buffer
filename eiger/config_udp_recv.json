@@ -1,0 +1,5 @@
+{
+    "detector_name": "Eiger",
+    "n_modules": 1,
+    "start_udp_port": 50100
+}
