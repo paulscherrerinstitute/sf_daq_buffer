@@ -25,8 +25,8 @@ void FrameStats::reset_counters()
 
 void FrameStats::record_stats(const ModuleFrame &meta)
 {
-    if (meta.n_recv_packets < EIGER_N_PACKETS_PER_FRAME) {
-        n_missed_packets_ += EIGER_N_PACKETS_PER_FRAME - meta.n_recv_packets;
+    if (meta.n_recv_packets < N_PACKETS_PER_FRAME) {
+        n_missed_packets_ += N_PACKETS_PER_FRAME - meta.n_recv_packets;
         n_corrupted_frames_++;
     }
 

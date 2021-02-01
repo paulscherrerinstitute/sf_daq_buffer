@@ -1,5 +1,6 @@
 #include <netinet/in.h>
 #include <iostream>
+#include <stdexcept>
 #include "PacketUdpReceiver.hpp"
 #include "jungfrau.hpp"
 #include <unistd.h>

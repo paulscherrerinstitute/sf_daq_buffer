@@ -101,7 +101,7 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         ModuleFrame *frame_meta = src_meta + i_module;
 
         auto is_good_frame =
-                frame_meta->n_recv_packets == EIGER_N_PACKETS_PER_FRAME;
+                frame_meta->n_recv_packets == N_PACKETS_PER_FRAME;
 
         if (!is_good_frame) {
             is_good_image = false;

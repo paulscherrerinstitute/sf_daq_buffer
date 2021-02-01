@@ -2,7 +2,17 @@
 #define SF_DAQ_BUFFER_FORMATS_HPP
 
 #include "buffer_config.hpp"
+
+#ifndef USE_EIGER
+#include "jungfrau.hpp"
+#else
 #include "eiger.hpp"
+#endif
+
+#ifdef DEBUG_OUTPUT
+#define EIGER_DATA_BYTES_PER_PACKET_VALIDATION 131072
+#define JUNGFRAU_DATA_BYTES_PER_PACKET_VALIDATION 1048576
+#endif
 
 #pragma pack(push)
 #pragma pack(1)
@@ -27,7 +37,7 @@ struct ImageMetadata {
 #pragma pack(pop)
 
 struct ModuleFrameBuffer {
-    ModuleFrame module[EIGER_N_MODULES];
+    ModuleFrame module[N_MODULES];
 };
 
 #pragma pack(push)
