@@ -11,7 +11,7 @@ class FrameUdpReceiver {
 
     PacketUdpReceiver udp_receiver_;
 
-    eiger_packet packet_buffer_[buffer_config::BUFFER_UDP_N_RECV_MSG];
+    det_packet packet_buffer_[buffer_config::BUFFER_UDP_N_RECV_MSG];
     iovec recv_buff_ptr_[buffer_config::BUFFER_UDP_N_RECV_MSG];
     mmsghdr msgs_[buffer_config::BUFFER_UDP_N_RECV_MSG];
     sockaddr_in sock_from_[buffer_config::BUFFER_UDP_N_RECV_MSG];

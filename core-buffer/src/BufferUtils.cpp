@@ -4,6 +4,7 @@
 #include <buffer_config.hpp>
 #include <zmq.h>
 #include <fstream>
+#include <stdexcept>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>

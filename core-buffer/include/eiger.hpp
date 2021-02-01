@@ -3,17 +3,15 @@
 
 #include <cstdint>
 
+#define N_MODULES 1
+#define BYTES_PER_PACKET 1072
+#define DATA_BYTES_PER_PACKET 1024
+#define N_PACKETS_PER_FRAME 128
+#define DATA_BYTES_PER_FRAME 131072
 
-#define EIGER_N_MODULES 1
-#define EIGER_BYTES_PER_PACKET 1072
-#define EIGER_DATA_BYTES_PER_PACKET 1024
-#define EIGER_N_PACKETS_PER_FRAME 128
-#define EIGER_DATA_BYTES_PER_FRAME 131072
-
-// 48 bytes + 8192 bytes = 8240 bytes
 #pragma pack(push)
 #pragma pack(2)
-struct eiger_packet {
+struct det_packet {
     uint64_t framenum;
     uint32_t exptime;
     uint32_t packetnum;
@@ -30,7 +28,7 @@ struct eiger_packet {
     uint16_t roundRobin;
     uint8_t detectortype;
     uint8_t headerVersion;
-    char data[EIGER_DATA_BYTES_PER_PACKET];
+    char data[DATA_BYTES_PER_PACKET];
 };
 #pragma pack(pop)
 
