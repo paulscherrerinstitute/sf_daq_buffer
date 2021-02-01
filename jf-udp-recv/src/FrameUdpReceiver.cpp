@@ -81,6 +81,13 @@ inline uint64_t FrameUdpReceiver::process_packets(
         if (packet_buffer_[i_packet].packetnum ==
             N_PACKETS_PER_FRAME - 1)
         {
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [FrameUdpReceiver::process_packets] :";
+                cout << " Total packets of frame finished. ";
+                cout << endl;
+            #endif
             // Buffer is loaded only if this is not the last message.
             if (i_packet+1 != packet_buffer_n_packets_) {
                 packet_buffer_loaded_ = true;
