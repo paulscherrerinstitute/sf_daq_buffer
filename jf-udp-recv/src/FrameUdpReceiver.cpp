@@ -13,6 +13,16 @@ FrameUdpReceiver::FrameUdpReceiver(
         const int module_id) :
             module_id_(module_id)
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [FrameUdpReceiver::FrameUdpReceiver] :";
+        cout << " Details of FrameUdpReceiver:";
+        cout << "module_id: " << module_id_;
+        cout << " || port: " << port;
+        cout << " BUFFER_UDP_N_RECV_MSG: " << BUFFER_UDP_N_RECV_MSG << endl;
+        cout << endl;
+    #endif
     udp_receiver_.bind(port);
 
     for (int i = 0; i < BUFFER_UDP_N_RECV_MSG; i++) {
@@ -37,6 +47,14 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
     frame_metadata.module_id = (int64_t) module_id_;
+    // #ifdef DEBUG_OUTPUT
+    //     using namespace date;
+    //     cout << " [" << std::chrono::system_clock::now();
+    //     cout << "] [FrameUdpReceiver::init_frame] :";
+    //     cout << " Frame number: " << frame_metadata.frame_index << endl;
+    //     cout << "i_packet" << i_packet << endl;
+    //     cout << endl;
+    // #endif
 }
 
 inline void FrameUdpReceiver::copy_packet_to_buffers(
@@ -50,6 +68,13 @@ inline void FrameUdpReceiver::copy_packet_to_buffers(
             DATA_BYTES_PER_PACKET);
 
     metadata.n_recv_packets++;
+    // #ifdef DEBUG_OUTPUT
+    //     using namespace date;
+    //     cout << " [" << std::chrono::system_clock::now();
+    //     cout << "] [FrameUdpReceiver::copy_packet_to_buffers] :";
+    //     cout << "buffer: n_recv_packets" << metadata.n_recv_packets;
+    //     cout << endl;
+    // #endif
 }
 
 inline uint64_t FrameUdpReceiver::process_packets(
@@ -62,7 +87,7 @@ inline uint64_t FrameUdpReceiver::process_packets(
          i_packet++) {
 
         // First packet for this frame.
-        if (metadata.pulse_id == 0) {
+        if (i_packet == 0) {
             init_frame(metadata, i_packet);
 
         // Happens if the last packet from the previous frame gets lost.
@@ -85,7 +110,8 @@ inline uint64_t FrameUdpReceiver::process_packets(
                 using namespace date;
                 cout << " [" << std::chrono::system_clock::now();
                 cout << "] [FrameUdpReceiver::process_packets] :";
-                cout << " Total packets of frame finished. ";
+                cout << " Frame " << metadata.frame_index << " || ";
+                cout << packet_buffer_[i_packet].packetnum << " packets received.";
                 cout << endl;
             #endif
             // Buffer is loaded only if this is not the last message.
@@ -100,7 +126,7 @@ inline uint64_t FrameUdpReceiver::process_packets(
                 packet_buffer_offset_ = 0;
             }
 
-            return metadata.pulse_id;
+            return metadata.frame_index;
         }
     }
     // We emptied the buffer.

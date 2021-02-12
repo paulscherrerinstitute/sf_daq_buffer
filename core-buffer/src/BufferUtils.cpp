@@ -4,7 +4,10 @@
 #include <buffer_config.hpp>
 #include <zmq.h>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
+#include <chrono>
+#include "date.h"
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -136,16 +139,32 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
     rapidjson::Document config_parameters;
     config_parameters.ParseStream(isw);
 
-    return {
-            config_parameters["streamvis_stream"].GetString(),
-            config_parameters["streamvis_rate"].GetInt(),
-            config_parameters["live_stream"].GetString(),
-            config_parameters["live_rate"].GetInt(),
-            config_parameters["pedestal_file"].GetString(),
-            config_parameters["gain_file"].GetString(),
+    BufferUtils::DetectorConfig det_config = {
+            // config_parameters["streamvis_stream"].GetString(),
+            "",
+            // config_parameters["streamvis_rate"].GetInt(),
+            -1,
+            // config_parameters["live_stream"].GetString(),
+            "",
+            // config_parameters["live_rate"].GetInt(),
+            -1,
+            // config_parameters["pedestal_file"].GetString(),
+            "",
+            // config_parameters["gain_file"].GetString(),
+            "",
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
-            config_parameters["buffer_folder"].GetString()
-    };
+            // config_parameters["buffer_folder"].GetString()
+            ""
+            };
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [BufferUtils::read_json_config] Config:";
+        cout << det_config;
+        cout << endl;
+    #endif
+    return det_config;
 }

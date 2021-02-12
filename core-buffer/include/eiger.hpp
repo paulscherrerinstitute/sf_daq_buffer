@@ -6,8 +6,12 @@
 #define N_MODULES 1
 #define BYTES_PER_PACKET 1072
 #define DATA_BYTES_PER_PACKET 1024
-#define N_PACKETS_PER_FRAME 128
-#define DATA_BYTES_PER_FRAME 131072
+// DR 16
+#define N_PACKETS_PER_FRAME 256
+#define DATA_BYTES_PER_FRAME 262144
+// DR 32
+// #define N_PACKETS_PER_FRAME 512
+// #define DATA_BYTES_PER_FRAME 524288
 
 #pragma pack(push)
 #pragma pack(2)

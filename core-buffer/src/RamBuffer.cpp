@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include "RamBuffer.hpp"
 #include "buffer_config.hpp"
+#include "date.h"
+#include <chrono>
+#include <iostream>
 
 
 using namespace std;
@@ -40,6 +43,19 @@ RamBuffer::RamBuffer(
     meta_buffer_ = (ModuleFrame *) buffer_;
     // Image buffer start right after metadata buffer.
     image_buffer_ = (char*)buffer_ + (meta_bytes_ * n_slots_);
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [RamBuffer::RamBuffer] :";
+        cout << " Details of rambuffer:";
+        cout << "n_modules: " << n_modules_;
+        cout << " || meta_bytes: " << meta_bytes_;
+        cout << " || image_bytes: " << image_bytes_;
+        cout << " || buffer_bytes: " << buffer_bytes_;
+        cout << " || n_slots: " << n_slots_;
+        cout << endl;
+    #endif
 }
 
 RamBuffer::~RamBuffer()
@@ -53,7 +69,8 @@ void RamBuffer::write_frame(
         const ModuleFrame& src_meta,
         const char *src_data) const
 {
-    const int slot_n = src_meta.pulse_id % n_slots_;
+    
+    const int slot_n = src_meta.frame_index % n_slots_;
 
     ModuleFrame *dst_meta = meta_buffer_ +
                             (n_modules_ * slot_n) +
@@ -62,6 +79,18 @@ void RamBuffer::write_frame(
     char *dst_data = image_buffer_ +
                      (image_bytes_ * slot_n) +
                      (MODULE_N_BYTES * src_meta.module_id);
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [RamBuffer::write_frame] :";
+        cout << " || src_meta.frame_index " << src_meta.frame_index;
+        cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
+        cout << " || src_meta.daq_rec " << src_meta.daq_rec;
+        cout << " || src_meta.module_id " << src_meta.module_id;
+        cout << " || dst_data " << dst_data;
+        cout << endl;
+    #endif
 
     memcpy(dst_meta, &src_meta, sizeof(ModuleFrame));
     memcpy(dst_data, src_data, MODULE_N_BYTES);

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
 
 namespace BufferUtils
 {
@@ -19,6 +20,20 @@ namespace BufferUtils
         const int n_modules;
         const int start_udp_port;
         const std::string buffer_folder;
+
+        friend std::ostream& operator <<(std::ostream& os, DetectorConfig const& det_config)
+        {
+                return os << det_config.streamvis_address << ' '
+                        << det_config.reduction_factor_streamvis << ' '
+                        << det_config.live_analysis_address << ' '
+                        << det_config.reduction_factor_live_analysis << ' '
+                        << det_config.PEDE_FILENAME << ' '
+                        << det_config.GAIN_FILENAME << ' '
+                        << det_config.detector_name << ' '
+                        << det_config.n_modules << ' '
+                        << det_config.start_udp_port << ' '
+                        << det_config.buffer_folder << ' ';
+        }
     };
 
 
