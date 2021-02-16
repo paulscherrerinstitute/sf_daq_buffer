@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
     const auto udp_port = config.start_udp_port + module_id;
     FrameUdpReceiver receiver(udp_port, module_id);
     RamBuffer buffer(config.detector_name, config.n_modules);
-    FrameStats stats(config.detector_name, module_id, STATS_MODULO);
+    FrameStats stats(config.detector_name, module_id, STATS_TIME);
 
     auto ctx = zmq_ctx_new();
     auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
@@ -41,14 +41,34 @@ int main (int argc, char *argv[]) {
     ModuleFrame meta;
     char* data = new char[MODULE_N_BYTES];
 
+    uint64_t pulse_id_previous = 0;
+    uint64_t frame_index_previous = 0; 
+
     while (true) {
+
         auto pulse_id = receiver.get_frame_from_udp(meta, data);
 
-        buffer.write_frame(meta, data);
+        bool bad_pulse_id = false;
 
-        zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
+        if ( ( meta.frame_index != (frame_index_previous+1) ) ||
+             ( (pulse_id-pulse_id_previous) < 0 ) ||
+             ( (pulse_id-pulse_id_previous) > 1000 ) ) {
 
-        stats.record_stats(meta);
+            bad_pulse_id = true;
+
+        } else { 
+
+            buffer.write_frame(meta, data);
+
+            zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
+
+        }
+
+        stats.record_stats(meta, bad_pulse_id);
+
+        pulse_id_previous = pulse_id;
+        frame_index_previous = meta.frame_index;
+
     }
 
     delete[] data;

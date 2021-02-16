@@ -7,10 +7,10 @@ using namespace chrono;
 FrameStats::FrameStats(
         const std::string &detector_name,
         const int module_id,
-        const size_t stats_modulo) :
+        const size_t stats_time) :
             detector_name_(detector_name),
             module_id_(module_id),
-            stats_modulo_(stats_modulo)
+            stats_time_(stats_time)
 {
    reset_counters();
 }
@@ -20,11 +20,17 @@ void FrameStats::reset_counters()
     frames_counter_ = 0;
     n_missed_packets_ = 0;
     n_corrupted_frames_ = 0;
+    n_corrupted_pulse_id_ = 0;
     stats_interval_start_ = steady_clock::now();
 }
 
-void FrameStats::record_stats(const ModuleFrame &meta)
+void FrameStats::record_stats(const ModuleFrame &meta, const bool bad_pulse_id)
 {
+
+    if (bad_pulse_id) {
+        n_corrupted_pulse_id_++;
+    } 
+
     if (meta.n_recv_packets < JF_N_PACKETS_PER_FRAME) {
         n_missed_packets_ += JF_N_PACKETS_PER_FRAME - meta.n_recv_packets;
         n_corrupted_frames_++;
@@ -32,7 +38,10 @@ void FrameStats::record_stats(const ModuleFrame &meta)
 
     frames_counter_++;
 
-    if (frames_counter_ == stats_modulo_) {
+    auto time_passed = duration_cast<milliseconds>(
+             steady_clock::now()-stats_interval_start_).count(); 
+
+    if (time_passed >= stats_time_*1000) {
         print_stats();
         reset_counters();
     }
@@ -55,6 +64,7 @@ void FrameStats::print_stats()
     cout << "n_missed_packets=" << n_missed_packets_ << "i";
     cout << ",n_corrupted_frames=" << n_corrupted_frames_ << "i";
     cout << ",repetition_rate=" << rep_rate << "i";
+    cout << ",n_corrupted_pulse_ids=" << n_corrupted_pulse_id_ << "i";
     cout << " ";
     cout << timestamp;
     cout << endl;
