@@ -9,11 +9,12 @@
 class FrameStats {
     const std::string detector_name_;
     const int module_id_;
-    size_t stats_modulo_;
+    size_t stats_time_;
 
     int frames_counter_;
     int n_missed_packets_;
     int n_corrupted_frames_;
+    int n_corrupted_pulse_id_;
     std::chrono::time_point<std::chrono::steady_clock> stats_interval_start_;
 
     void reset_counters();
@@ -22,8 +23,8 @@ class FrameStats {
 public:
     FrameStats(const std::string &detector_name,
                const int module_id,
-               const size_t stats_modulo);
-    void record_stats(const ModuleFrame &meta);
+               const size_t stats_time);
+    void record_stats(const ModuleFrame &meta, const bool bad_pulse_id);
 };
 
 
