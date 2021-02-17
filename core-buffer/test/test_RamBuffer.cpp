@@ -29,7 +29,7 @@ TEST(RamBuffer, simple_store)
     }
 
     ImageMetadata image_meta;
-    buffer.read_image(frame_meta.pulse_id, image_meta);
+    buffer.assemble_image(frame_meta.pulse_id, image_meta);
     ASSERT_EQ(image_meta.pulse_id, frame_meta.pulse_id);
     ASSERT_EQ(image_meta.daq_rec, frame_meta.daq_rec);
     ASSERT_EQ(image_meta.frame_index, frame_meta.frame_index);

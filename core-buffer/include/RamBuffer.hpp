@@ -30,7 +30,9 @@ public:
                      const uint64_t module_id,
                      ModuleFrame &meta,
                      char *data) const;
-    char* read_image(const uint64_t pulse_id, ImageMetadata &image_meta) const;
+    char* read_image(const uint64_t pulse_id) const;
+    void assemble_image(
+            const uint64_t pulse_id, ImageMetadata &image_meta) const;
 };
 
 

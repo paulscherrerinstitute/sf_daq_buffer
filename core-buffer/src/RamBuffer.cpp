@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <cstring>
 #include <stdexcept>
+#include <sstream>
 #include <unistd.h>
 #include "RamBuffer.hpp"
 #include "buffer_config.hpp"
@@ -118,14 +119,11 @@ void RamBuffer::read_frame(
     memcpy(dst_data, src_data, MODULE_N_BYTES);
 }
 
-char* RamBuffer::read_image(const uint64_t pulse_id,
-                            ImageMetadata &image_meta) const
+void RamBuffer::assemble_image(
+        const uint64_t pulse_id, ImageMetadata &image_meta) const
 {
     const size_t slot_n = pulse_id % n_slots_;
-
     ModuleFrame *src_meta = meta_buffer_ + (n_modules_ * slot_n);
-
-    char *src_data = image_buffer_ + (image_bytes_ * slot_n);
 
     auto is_pulse_init = false;
     auto is_good_image = true;
@@ -153,7 +151,21 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
                 cout << endl;
             #endif
             if (frame_meta->pulse_id != pulse_id) {
-                throw runtime_error("Wrong pulse_id in ram buffer slot.");
+                stringstream err_msg;
+                err_msg << "[RamBuffer::read_image]";
+                err_msg << " Unexpected pulse_id in ram buffer.";
+                err_msg << " expected=" << pulse_id;
+                err_msg << " got=" << frame_meta->pulse_id;
+
+                for (int i = 0; i < n_modules_; i++) {
+                    ModuleFrame *meta = src_meta + i_module;
+
+                    err_msg << " (module " << i << ", ";
+                    err_msg << meta->pulse_id << "),";
+                }
+                err_msg << endl;
+
+                throw runtime_error(err_msg.str());
             }
 
             image_meta.pulse_id = frame_meta->pulse_id;
@@ -186,7 +198,12 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         image_meta.frame_index = 0;
         image_meta.daq_rec = 0;
     }
+}
+
+char* RamBuffer::read_image(const uint64_t pulse_id) const
+{
+    const size_t slot_n = pulse_id % n_slots_;
+    char *src_data = image_buffer_ + (image_bytes_ * slot_n);
 
     return src_data;
 }
-

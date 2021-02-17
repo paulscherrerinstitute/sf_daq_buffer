@@ -20,15 +20,17 @@ namespace buffer_config {
     const size_t FOLDER_MOD = 100000;
     // Extension of our file format.
     const std::string FILE_EXTENSION = ".bin";
-    // Number of pulses between each statistics print out.
-    const size_t STATS_MODULO = 100;
+    // Number of pulses between each statistics print out (buffer_writer, stream2vis...)
+    const size_t STATS_MODULO = 1000;
+    // Number of seconds after which statistics is print out (udp_recv)
+    const size_t STATS_TIME = 10;
     // If the RB is empty, how much time to wait before trying to read it again.
     const size_t RB_READ_RETRY_INTERVAL_MS = 5;
     // How many frames to read at once from file.
     const size_t BUFFER_BLOCK_SIZE = 100;
 
 
-    const size_t BUFFER_UDP_N_RECV_MSG = 64;
+    const size_t BUFFER_UDP_N_RECV_MSG = 128;
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // 8246 bytes for each UDP packet.

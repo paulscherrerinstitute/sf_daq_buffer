@@ -8,12 +8,12 @@
 #include <algorithm>
 #include <iostream>
 
-#include "stream_config.hpp"
+#include "assembler_config.hpp"
 
 using namespace std;
 using namespace chrono;
 using namespace buffer_config;
-using namespace stream_config;
+using namespace assembler_config;
 
 
 ZmqPulseSyncReceiver::ZmqPulseSyncReceiver(
