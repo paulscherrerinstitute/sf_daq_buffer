@@ -9,7 +9,7 @@ target_link_libraries(core-buffer-lib
         external)
 
 if (USE_EIGER)
-        target_compile_definitions(core-buffer-lib INTERFACE -DUSE_EIGER)
+        target_compile_definitions(core-buffer-lib PUBLIC -DUSE_EIGER)
 endif (USE_EIGER)
 
 if (DEBUG_OUTPUT)

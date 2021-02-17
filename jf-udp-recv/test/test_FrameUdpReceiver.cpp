@@ -12,7 +12,7 @@ using namespace std;
 
 TEST(BufferUdpReceiver, simple_recv)
 {
-    auto n_packets = JF_N_PACKETS_PER_FRAME;
+    auto n_packets = N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 5;
 
@@ -26,7 +26,7 @@ TEST(BufferUdpReceiver, simple_recv)
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
             for (size_t i_packet=0; i_packet<n_packets; i_packet++) {
-                jungfrau_packet send_udp_buffer;
+                det_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
                 send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
@@ -35,7 +35,7 @@ TEST(BufferUdpReceiver, simple_recv)
                 ::sendto(
                         send_socket_fd,
                         &send_udp_buffer,
-                        JUNGFRAU_BYTES_PER_PACKET,
+                        BYTES_PER_PACKET,
                         0,
                         (sockaddr*) &server_address,
                         sizeof(server_address));
@@ -46,7 +46,7 @@ TEST(BufferUdpReceiver, simple_recv)
     handle.wait();
 
     ModuleFrame metadata;
-    auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
+    auto frame_buffer = make_unique<char[]>(DATA_BYTES_PER_FRAME);
 
     for (int i_frame=0; i_frame < n_frames; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(
@@ -65,7 +65,7 @@ TEST(BufferUdpReceiver, simple_recv)
 
 TEST(BufferUdpReceiver, missing_middle_packet)
 {
-    auto n_packets = JF_N_PACKETS_PER_FRAME;
+    auto n_packets = N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 
@@ -84,7 +84,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
                     continue;
                 }
 
-                jungfrau_packet send_udp_buffer;
+                det_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
                 send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
@@ -93,7 +93,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
                 ::sendto(
                         send_socket_fd,
                         &send_udp_buffer,
-                        JUNGFRAU_BYTES_PER_PACKET,
+                        BYTES_PER_PACKET,
                         0,
                         (sockaddr*) &server_address,
                         sizeof(server_address));
@@ -104,7 +104,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
     handle.wait();
 
     ModuleFrame metadata;
-    auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
+    auto frame_buffer = make_unique<char[]>(DATA_BYTES_PER_FRAME);
 
     for (int i_frame=0; i_frame < n_frames; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(
@@ -123,7 +123,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
 
 TEST(BufferUdpReceiver, missing_first_packet)
 {
-    auto n_packets = JF_N_PACKETS_PER_FRAME;
+    auto n_packets = N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 
@@ -142,7 +142,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
                     continue;
                 }
 
-                jungfrau_packet send_udp_buffer;
+                det_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
                 send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
@@ -151,7 +151,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
                 ::sendto(
                         send_socket_fd,
                         &send_udp_buffer,
-                        JUNGFRAU_BYTES_PER_PACKET,
+                        BYTES_PER_PACKET,
                         0,
                         (sockaddr*) &server_address,
                         sizeof(server_address));
@@ -162,7 +162,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
     handle.wait();
 
     ModuleFrame metadata;
-    auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
+    auto frame_buffer = make_unique<char[]>(DATA_BYTES_PER_FRAME);
 
     for (int i_frame=0; i_frame < n_frames; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(
@@ -181,7 +181,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
 
 TEST(BufferUdpReceiver, missing_last_packet)
 {
-    auto n_packets = JF_N_PACKETS_PER_FRAME;
+    auto n_packets = N_PACKETS_PER_FRAME;
     int source_id = 1234;
     int n_frames = 3;
 
@@ -200,7 +200,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
                     continue;
                 }
 
-                jungfrau_packet send_udp_buffer;
+                det_packet send_udp_buffer;
                 send_udp_buffer.packetnum = i_packet;
                 send_udp_buffer.bunchid = i_frame + 1;
                 send_udp_buffer.framenum = i_frame + 1000;
@@ -209,7 +209,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
                 ::sendto(
                         send_socket_fd,
                         &send_udp_buffer,
-                        JUNGFRAU_BYTES_PER_PACKET,
+                        BYTES_PER_PACKET,
                         0,
                         (sockaddr*) &server_address,
                         sizeof(server_address));
@@ -220,7 +220,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
     handle.wait();
 
     ModuleFrame metadata;
-    auto frame_buffer = make_unique<char[]>(JUNGFRAU_DATA_BYTES_PER_FRAME);
+    auto frame_buffer = make_unique<char[]>(DATA_BYTES_PER_FRAME);
 
     // n_frames -1 because the last frame is not complete.
     for (int i_frame=0; i_frame < n_frames - 1; i_frame++) {

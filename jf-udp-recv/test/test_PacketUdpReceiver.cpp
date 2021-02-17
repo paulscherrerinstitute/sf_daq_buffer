@@ -19,7 +19,7 @@ TEST(PacketUdpReceiver, simple_recv)
     PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
-    jungfrau_packet send_udp_buffer;
+    det_packet send_udp_buffer;
     send_udp_buffer.packetnum = 91;
     send_udp_buffer.framenum = 92;
     send_udp_buffer.bunchid = 93;
@@ -29,16 +29,16 @@ TEST(PacketUdpReceiver, simple_recv)
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET,
+            BYTES_PER_PACKET,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
 
     this_thread::sleep_for(chrono::milliseconds(100));
 
-    jungfrau_packet recv_udp_buffer;
+    det_packet recv_udp_buffer;
     ASSERT_TRUE(udp_receiver.receive(
-            &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
+            &recv_udp_buffer, BYTES_PER_PACKET));
 
     EXPECT_EQ(send_udp_buffer.packetnum, recv_udp_buffer.packetnum);
     EXPECT_EQ(send_udp_buffer.framenum, recv_udp_buffer.framenum);
@@ -46,7 +46,7 @@ TEST(PacketUdpReceiver, simple_recv)
     EXPECT_EQ(send_udp_buffer.debug, recv_udp_buffer.debug);
 
     ASSERT_FALSE(udp_receiver.receive(
-            &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
+            &recv_udp_buffer, BYTES_PER_PACKET));
 
     udp_receiver.disconnect();
     ::close(send_socket_fd);
@@ -62,43 +62,43 @@ TEST(PacketUdpReceiver, false_recv)
     PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
-    jungfrau_packet send_udp_buffer;
-    jungfrau_packet recv_udp_buffer;
+    det_packet send_udp_buffer;
+    det_packet recv_udp_buffer;
 
     auto server_address = get_server_address(udp_port);
 
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET-1,
+            BYTES_PER_PACKET-1,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
 
     ASSERT_FALSE(udp_receiver.receive(
-            &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
+            &recv_udp_buffer, BYTES_PER_PACKET));
 
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET,
+            BYTES_PER_PACKET,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
 
     ASSERT_TRUE(udp_receiver.receive(
-            &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET));
+            &recv_udp_buffer, BYTES_PER_PACKET));
 
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET-1,
+            BYTES_PER_PACKET-1,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
 
     ASSERT_TRUE(udp_receiver.receive(
-            &recv_udp_buffer, JUNGFRAU_BYTES_PER_PACKET-1));
+            &recv_udp_buffer, BYTES_PER_PACKET-1));
 
     udp_receiver.disconnect();
     ::close(send_socket_fd);
@@ -106,15 +106,15 @@ TEST(PacketUdpReceiver, false_recv)
 
 TEST(PacketUdpReceiver, receive_many)
 {
-    auto n_msg_buffer = JF_N_PACKETS_PER_FRAME;
-    jungfrau_packet recv_buffer[n_msg_buffer];
+    auto n_msg_buffer = N_PACKETS_PER_FRAME;
+    det_packet recv_buffer[n_msg_buffer];
     iovec recv_buff_ptr[n_msg_buffer];
     struct mmsghdr msgs[n_msg_buffer];
     struct sockaddr_in sockFrom[n_msg_buffer];
 
     for (int i = 0; i < n_msg_buffer; i++) {
         recv_buff_ptr[i].iov_base = (void*) &(recv_buffer[i]);
-        recv_buff_ptr[i].iov_len = sizeof(jungfrau_packet);
+        recv_buff_ptr[i].iov_len = sizeof(det_packet);
 
         msgs[i].msg_hdr.msg_iov = &recv_buff_ptr[i];
         msgs[i].msg_hdr.msg_iovlen = 1;
@@ -130,7 +130,7 @@ TEST(PacketUdpReceiver, receive_many)
     PacketUdpReceiver udp_receiver;
     udp_receiver.bind(udp_port);
 
-    jungfrau_packet send_udp_buffer;
+    det_packet send_udp_buffer;
 
     auto server_address = get_server_address(udp_port);
 
@@ -138,7 +138,7 @@ TEST(PacketUdpReceiver, receive_many)
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET,
+            BYTES_PER_PACKET,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
@@ -147,22 +147,22 @@ TEST(PacketUdpReceiver, receive_many)
     ::sendto(
             send_socket_fd,
             &send_udp_buffer,
-            JUNGFRAU_BYTES_PER_PACKET,
+            BYTES_PER_PACKET,
             0,
             (sockaddr*) &server_address,
             sizeof(server_address));
 
     this_thread::sleep_for(chrono::milliseconds(10));
 
-    auto n_msgs = udp_receiver.receive_many(msgs, JF_N_PACKETS_PER_FRAME);
+    auto n_msgs = udp_receiver.receive_many(msgs, N_PACKETS_PER_FRAME);
     ASSERT_EQ(n_msgs, 2);
 
     for (size_t i=0;i<n_msgs;i++) {
-        ASSERT_EQ(msgs[i].msg_len, JUNGFRAU_BYTES_PER_PACKET);
+        ASSERT_EQ(msgs[i].msg_len, BYTES_PER_PACKET);
         ASSERT_EQ(recv_buffer[i].bunchid, i);
     }
 
-    n_msgs = udp_receiver.receive_many(msgs, JF_N_PACKETS_PER_FRAME);
+    n_msgs = udp_receiver.receive_many(msgs, N_PACKETS_PER_FRAME);
     ASSERT_EQ(n_msgs, -1);
 
     udp_receiver.disconnect();

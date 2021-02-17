@@ -14,11 +14,17 @@ using namespace chrono;
 using namespace buffer_config;
 using namespace BufferUtils;
 
+
+
 int main (int argc, char *argv[]) {
 
     if (argc != 3) {
         cout << endl;
-        cout << "Usage: XXX_udp_recv [detector_json_filename] [module_id]";
+        #ifndef USE_EIGER
+            cout << "Usage: jf_udp_recv [detector_json_filename] [module_id]";
+        #else
+            cout << "Usage: eiger_udp_recv [detector_json_filename] [module_id]";
+        #endif
         cout << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tmodule_id: id of the module for this process." << endl;

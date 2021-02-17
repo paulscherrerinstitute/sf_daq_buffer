@@ -140,14 +140,10 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
     config_parameters.ParseStream(isw);
 
     BufferUtils::DetectorConfig det_config = {
-            // config_parameters["streamvis_stream"].GetString(),
-            "",
-            // config_parameters["streamvis_rate"].GetInt(),
-            -1,
-            // config_parameters["live_stream"].GetString(),
-            "",
-            // config_parameters["live_rate"].GetInt(),
-            -1,
+            config_parameters["streamvis_stream"].GetString(),
+            config_parameters["streamvis_rate"].GetInt(),
+            config_parameters["live_stream"].GetString(),
+            config_parameters["live_rate"].GetInt(),
             // config_parameters["pedestal_file"].GetString(),
             "",
             // config_parameters["gain_file"].GetString(),

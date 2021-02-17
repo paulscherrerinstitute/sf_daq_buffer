@@ -89,6 +89,10 @@ void RamBuffer::write_frame(
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
         cout << " || src_meta.module_id " << src_meta.module_id;
         cout << " || dst_data " << dst_data;
+        cout << " || image_buffer_ " << image_buffer_;
+        cout << " || image_bytes_ " << image_bytes_;
+        cout << " || slot_n " << slot_n;
+        cout << " || MODULE_N_BYTES " << MODULE_N_BYTES;
         cout << endl;
     #endif
 
@@ -138,7 +142,16 @@ char* RamBuffer::read_image(const uint64_t pulse_id,
         }
 
         if (!is_pulse_init) {
-
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [RamBuffer::read_image] !is_pulse_init:";
+                cout << "Frame_meta pulse id: " << frame_meta->pulse_id;
+                cout << " || pulse id: " << pulse_id;
+                cout << " || frame_meta->n_recv_packets " << frame_meta->n_recv_packets;
+                cout << " || frame_index: " << frame_meta->frame_index;
+                cout << endl;
+            #endif
             if (frame_meta->pulse_id != pulse_id) {
                 throw runtime_error("Wrong pulse_id in ram buffer slot.");
             }

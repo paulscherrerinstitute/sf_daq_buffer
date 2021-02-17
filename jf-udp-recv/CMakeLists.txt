@@ -8,7 +8,15 @@ target_link_libraries(jf-udp-recv-lib
         core-buffer-lib)
 
 add_executable(jf-udp-recv src/main.cpp)
-set_target_properties(jf-udp-recv PROPERTIES OUTPUT_NAME jf_udp_recv)
+
+if (USE_EIGER)
+        set (LIB_NAME_UDP_RECV "eiger_udp_recv")
+else()
+        set (LIB_NAME_UDP_RECV "jf_udp_recv")
+endif()
+
+set_target_properties(jf-udp-recv PROPERTIES OUTPUT_NAME ${LIB_NAME_UDP_RECV})
+
 target_link_libraries(jf-udp-recv
         jf-udp-recv-lib
         zmq

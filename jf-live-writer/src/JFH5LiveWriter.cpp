@@ -53,7 +53,7 @@ void JFH5LiveWriter::init_file(const string& output_file)
 
     image_dataset_ = file_.createDataSet(
             "/data/" + detector_name_ + "/data",
-            H5_UINT16,
+            H5::PredType::NATIVE_UINT16,
             image_dataspace,
             image_dataset_properties);
 }
@@ -98,10 +98,10 @@ void JFH5LiveWriter::write_dataset(
 
 void JFH5LiveWriter::write_metadata()
 {
-    write_dataset("pulse_id", &b_pulse_id_, H5_UINT64);
-    write_dataset("frame_index", &b_frame_index_, H5_UINT64);
-    write_dataset("daq_rec", &b_daq_rec_, H5_UINT32);
-    write_dataset("is_good_frame", &b_is_good_frame_, H5_UINT8);
+    write_dataset("pulse_id", &b_pulse_id_, H5::PredType::NATIVE_UINT64);
+    write_dataset("frame_index", &b_frame_index_, H5::PredType::NATIVE_UINT64);
+    write_dataset("daq_rec", &b_daq_rec_, H5::PredType::NATIVE_UINT32);
+    write_dataset("is_good_frame", &b_is_good_frame_, H5::PredType::NATIVE_UINT8);
 }
 
 void JFH5LiveWriter::close_file()
