@@ -42,6 +42,12 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
 {
     uint64_t pulses[n_modules_];
 
+    #ifdef DEBUG_OUTPUT
+        cout << "[ZmqPulseSyncReceiver::get_next_pulse_id()]";
+        cout << "n_modules_" << n_modules_;
+        cout << endl;
+    #endif
+
     bool modules_in_sync = true;
     for (int i = 0; i < n_modules_; i++) {
         zmq_recv(sockets_[i], &pulses[i], sizeof(uint64_t), 0);

@@ -8,7 +8,14 @@ target_link_libraries(sf-stream-lib
         core-buffer-lib)
 
 add_executable(sf-stream src/main.cpp)
-set_target_properties(sf-stream PROPERTIES OUTPUT_NAME sf_stream)
+
+if (USE_EIGER)
+        set (LIB_NAME_STREAMER "eiger_stream")
+else()
+        set (LIB_NAME_STREAMER "sf_stream")
+endif()
+
+set_target_properties(sf-stream PROPERTIES OUTPUT_NAME ${LIB_NAME_STREAMER})
 target_link_libraries(sf-stream
         external
         core-buffer-lib

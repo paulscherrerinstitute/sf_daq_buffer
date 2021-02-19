@@ -52,8 +52,6 @@ inline void FrameUdpReceiver::init_frame(
         cout << " [" << std::chrono::system_clock::now();
         cout << "] [FrameUdpReceiver::init_frame] :";
         cout << " Frame number: " << frame_metadata.frame_index << endl;
-        // cout << " packet_buffer_ " << packet_buffer_[i_packet] << endl;
-        cout << "i_packet" << i_packet << endl;
         cout << endl;
     #endif
 }
@@ -98,7 +96,7 @@ inline uint64_t FrameUdpReceiver::process_packets(
             // Continue on this packet.
             packet_buffer_offset_ = i_packet;
 
-            return metadata.pulse_id;
+            return metadata.frame_index;
         }
 
         copy_packet_to_buffers(metadata, frame_buffer, i_packet);
@@ -114,7 +112,8 @@ inline uint64_t FrameUdpReceiver::process_packets(
                 cout << " Frame " << metadata.frame_index << " || ";
                 cout << packet_buffer_[i_packet].packetnum << " packets received.";
                 cout << " packet_buffer_n_packets_ " << packet_buffer_n_packets_;
-                cout << " i_packet "<< i_packet;
+                cout << " I_PACKET "<< i_packet;
+                cout << " PULSE ID "<<  metadata.pulse_id;
                 cout << endl;
             #endif
             // Buffer is loaded only if this is not the last message.

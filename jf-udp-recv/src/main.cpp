@@ -56,12 +56,10 @@ int main (int argc, char *argv[]) {
 
         bool bad_pulse_id = false;
 
-        if ( ( meta.frame_index != (frame_index_previous+1) ) ||
-             ( (pulse_id-pulse_id_previous) < 0 ) ||
-             ( (pulse_id-pulse_id_previous) > 1000 ) ) {
+        if ( meta.frame_index != (frame_index_previous+1) && frame_index_previous != 0) {
 
             bad_pulse_id = true;
-
+            
         } else { 
 
             buffer.write_frame(meta, data);

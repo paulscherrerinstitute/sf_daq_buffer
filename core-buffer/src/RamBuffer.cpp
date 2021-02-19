@@ -89,11 +89,7 @@ void RamBuffer::write_frame(
         cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
         cout << " || src_meta.module_id " << src_meta.module_id;
-        cout << " || dst_data " << dst_data;
-        cout << " || image_buffer_ " << image_buffer_;
-        cout << " || image_bytes_ " << image_bytes_;
         cout << " || slot_n " << slot_n;
-        cout << " || MODULE_N_BYTES " << MODULE_N_BYTES;
         cout << endl;
     #endif
 
@@ -136,23 +132,20 @@ void RamBuffer::assemble_image(
 
         if (!is_good_frame) {
             is_good_image = false;
-            continue;
-        }
-
-        if (!is_pulse_init) {
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 cout << " [" << std::chrono::system_clock::now();
-                cout << "] [RamBuffer::read_image] !is_pulse_init:";
-                cout << "Frame_meta pulse id: " << frame_meta->pulse_id;
-                cout << " || pulse id: " << pulse_id;
-                cout << " || frame_meta->n_recv_packets " << frame_meta->n_recv_packets;
-                cout << " || frame_index: " << frame_meta->frame_index;
+                cout << "] [RamBuffer::assemble_image] ";
+                cout << " not a good frame " << is_good_frame;
+                cout << "n_recv_packets != N_PACKETS_PER_FRAME";
                 cout << endl;
             #endif
-            if (frame_meta->pulse_id != pulse_id) {
+            continue;
+        }
+        if (!is_pulse_init) {
+            if (frame_meta->frame_index != pulse_id) {
                 stringstream err_msg;
-                err_msg << "[RamBuffer::read_image]";
+                err_msg << "[RamBuffer::assemble_image]";
                 err_msg << " Unexpected pulse_id in ram buffer.";
                 err_msg << " expected=" << pulse_id;
                 err_msg << " got=" << frame_meta->pulse_id;
@@ -178,15 +171,38 @@ void RamBuffer::assemble_image(
         if (is_good_image) {
             if (frame_meta->pulse_id != image_meta.pulse_id) {
                 is_good_image = false;
+                #ifdef DEBUG_OUTPUT
+                    using namespace date;
+                    cout << " [" << std::chrono::system_clock::now();
+                    cout << "] [RamBuffer::assemble_image] ";
+                    cout << "not good image";
+                    cout << "frame_meta->pulse_id != image_meta.pulse_id";
+                    cout << endl;
+                #endif
+
                 // TODO: Add some diagnostics in case this happens.
             }
 
             if (frame_meta->frame_index != image_meta.frame_index) {
                 is_good_image = false;
+                #ifdef DEBUG_OUTPUT
+                    using namespace date;
+                    cout << " [" << std::chrono::system_clock::now();
+                    cout << "] [RamBuffer::assemble_image] !is_pulse_init:";
+                    cout << "frame_meta->frame_index != image_meta.frame_index";
+                    cout << endl;
+                #endif
             }
 
             if (frame_meta->daq_rec != image_meta.daq_rec) {
                 is_good_image = false;
+                #ifdef DEBUG_OUTPUT
+                    using namespace date;
+                    cout << " [" << std::chrono::system_clock::now();
+                    cout << "] [RamBuffer::assemble_image] !is_pulse_init:";
+                    cout << "frame_meta->daq_rec != image_meta.daq_rec";
+                    cout << endl;
+                #endif
             }
         }
     }

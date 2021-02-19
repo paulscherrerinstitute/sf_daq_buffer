@@ -7,6 +7,7 @@
 #include <chrono>
 #include <algorithm>
 #include <iostream>
+#include "date.h"
 
 #include "assembler_config.hpp"
 
@@ -52,6 +53,13 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
     }
 
     if (modules_in_sync) {
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << " [" << std::chrono::system_clock::now();
+            cout << "] [ZmqPulseSyncReceiver::get_next_pulse_id] modules_in_sync true";
+            cout << "] returning pulses[0]";
+            cout << endl;
+        #endif
         return {pulses[0], 0};
     }
 
@@ -102,6 +110,12 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
         n_lost_pulses += i_sync_lost_pulses;
 
         if (modules_in_sync) {
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [ZmqPulseSyncReceiver::get_next_pulse_id] modules_in_sync false";
+                cout << endl;
+            #endif
             return {pulses[0], n_lost_pulses};
         }
     }

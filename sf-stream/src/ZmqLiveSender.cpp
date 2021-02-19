@@ -2,6 +2,9 @@
 #include "stream_config.hpp"
 
 #include "zmq.h"
+#include "date.h"
+#include <chrono>
+#include <iostream>
 #include <stdexcept>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -121,17 +124,19 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data)
              text_header.size(),
              ZMQ_SNDMORE);
 
+    auto size_to_send = buffer_config::MODULE_N_BYTES * config_.n_modules;
     if ( send_streamvis == 0 ) {
-        zmq_send(socket_streamvis_,
-                 (char*)data,
-                 buffer_config::MODULE_N_BYTES * config_.n_modules,
-                 0);
-    } else {
-        zmq_send(socket_streamvis_,
-                 (char*)data_empty,
-                 8,
-                 0);
+        size_to_send = 8;
     }
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [ZmqLiveSender::send] ";
+        cout << "send_streamvis : " << text_header.c_str();
+        cout << endl;
+    #endif
+
+    zmq_send(socket_streamvis_, (char*)data, size_to_send, 0);
 
     //same for live analysis
     int send_live_analysis = 0;
@@ -156,24 +161,27 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data)
         text_header = buffer.GetString();
     }
 
-    // TODO: Ugly. Fix this flow control.
+    size_to_send = buffer_config::MODULE_N_BYTES * config_.n_modules;
+    if ( send_live_analysis == 0 ) {
+        size_to_send = 8;
+    }
+
     if (zmq_send(socket_live_,
                  text_header.c_str(),
                  text_header.size(),
                  ZMQ_SNDMORE | ZMQ_NOBLOCK) != -1) {
-
-        if ( send_live_analysis == 0 ) {
-            zmq_send(socket_live_,
-                     (char*)data,
-                     buffer_config::MODULE_N_BYTES * config_.n_modules,
-                     ZMQ_NOBLOCK);
-        } else {
-            zmq_send(socket_live_,
-                     (char*)data_empty,
-                     8,
-                     ZMQ_NOBLOCK);
-        }
+        zmq_send(socket_live_,
+                (char*)data,
+                size_to_send,
+                ZMQ_NOBLOCK);
     }
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [ZmqLiveSender::send] ";
+        cout << "send_live_analysis : " << text_header.c_str();
+        cout << endl;
+    #endif
 
 
 }

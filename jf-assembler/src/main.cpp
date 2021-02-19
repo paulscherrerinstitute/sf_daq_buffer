@@ -16,7 +16,11 @@ int main (int argc, char *argv[])
 {
     if (argc != 2) {
         cout << endl;
-        cout << "Usage: jf_assembler [detector_json_filename]" << endl;
+        #ifndef USE_EIGER
+            cout << "Usage: jf_assembler [detector_json_filename]" << endl;
+        #else
+            cout << "Usage: eiger_assembler [detector_json_filename]" << endl;
+        #endif
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << endl;
 

@@ -1,6 +1,7 @@
 #ifndef SF_DAQ_BUFFER_STREAMSTATS_HPP
 #define SF_DAQ_BUFFER_STREAMSTATS_HPP
 
+#include "date.h"
 #include <chrono>
 #include <string>
 #include <formats.hpp>

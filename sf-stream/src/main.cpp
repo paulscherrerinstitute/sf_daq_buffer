@@ -19,6 +19,7 @@ int main (int argc, char *argv[])
         cout << "Usage: sf_stream [detector_json_filename]"
                 " [stream_name]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
+        cout << "\tstream_name: name of the stream." << endl;
         cout << endl;
 
         exit(-1);
@@ -40,7 +41,8 @@ int main (int argc, char *argv[])
     ImageMetadata meta;
     while (true) {
         zmq_recv(receiver, &meta, sizeof(meta), 0);
-        char* data = ram_buffer.read_image(meta.pulse_id);
+        char* data = ram_buffer.read_image(meta.frame_index);
+        
 
         sender.send(meta, data);
 

@@ -13,6 +13,15 @@ StreamStats::StreamStats(
             stream_name_(stream_name),
             stats_modulo_(stats_modulo)
 {
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [StreamStats::StreamStats] ";
+        cout << " detector_name: " << detector_name_;
+        cout << " || stream_name: " << stream_name;
+        cout << " || stats_modulo: " << stats_modulo;
+        cout << endl;
+    #endif
     reset_counters();
 }
 
