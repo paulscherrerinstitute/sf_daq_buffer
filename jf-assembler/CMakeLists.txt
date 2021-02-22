@@ -8,7 +8,14 @@ target_link_libraries(jf-assembler-lib
         core-buffer-lib)
 
 add_executable(jf-assembler src/main.cpp)
-set_target_properties(jf-assembler PROPERTIES OUTPUT_NAME jf_assembler)
+
+if (USE_EIGER)
+        set (LIB_NAME_ASSEMBLER "eiger_assembler")
+else()
+        set (LIB_NAME_ASSEMBLER "jf_assembler")
+endif()
+
+set_target_properties(jf-assembler PROPERTIES OUTPUT_NAME ${LIB_NAME_ASSEMBLER})
 target_link_libraries(jf-assembler
         external
         core-buffer-lib
