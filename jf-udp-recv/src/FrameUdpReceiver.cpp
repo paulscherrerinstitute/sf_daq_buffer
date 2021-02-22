@@ -47,13 +47,13 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
     frame_metadata.module_id = (int64_t) module_id_;
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << " [" << std::chrono::system_clock::now();
-        cout << "] [FrameUdpReceiver::init_frame] :";
-        cout << " Frame number: " << frame_metadata.frame_index << endl;
-        cout << endl;
-    #endif
+    // #ifdef DEBUG_OUTPUT
+    //     using namespace date;
+    //     cout << " [" << std::chrono::system_clock::now();
+    //     cout << "] [FrameUdpReceiver::init_frame] :";
+    //     cout << " Frame number: " << frame_metadata.frame_index << endl;
+    //     cout << endl;
+    // #endif
 }
 
 inline void FrameUdpReceiver::copy_packet_to_buffers(
