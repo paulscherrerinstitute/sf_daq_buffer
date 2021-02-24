@@ -19,6 +19,8 @@ namespace BufferUtils
         const int n_modules;
         const int start_udp_port;
         const std::string buffer_folder;
+        const int image_y_size;
+        const int image_x_size;
     };
 
 
