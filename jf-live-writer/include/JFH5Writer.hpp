@@ -3,48 +3,46 @@
 
 #include <memory>
 #include <string>
-#include <H5Cpp.h>
+#include <BufferUtils.hpp>
+#include <formats.hpp>
 
-#include "ImageAssembler.hpp"
+extern "C" {
+    #include <hdf5_hl.h>
+}
 
 class JFH5Writer {
 
+    const std::string root_folder_;
     const std::string detector_name_;
-    const size_t n_modules_;
-    const uint64_t start_pulse_id_;
-    const uint64_t stop_pulse_id_;
-    const size_t pulse_id_step_;
-    const size_t n_images_;
-    const size_t n_total_pulses_;
-    size_t meta_write_index_;
-    size_t data_write_index_;
+    const uint32_t image_y_size_;
+    const uint32_t image_x_size_;
 
-    H5::H5File file_;
-    H5::DataSet image_dataset_;
+    static const int64_t NO_RUN_ID;
+    int64_t current_run_id_ = NO_RUN_ID;
 
-    uint64_t* b_pulse_id_;
-    uint64_t* b_frame_index_;
-    uint32_t* b_daq_rec_;
-    uint8_t* b_is_good_frame_ ;
+    hid_t file_id_ = -1;
+    hid_t image_dataset_id_ = -1;
+    hid_t pulse_dataset_id_= -1;
+    hid_t frame_dataset_id_ = -1;
+    hid_t daq_rec_dataset_id_ = -1;
+    hid_t is_good_dataset_id_ = -1;
 
-    size_t get_n_pulses_in_range(const uint64_t start_pulse_id,
-                                 const uint64_t stop_pulse_id,
-                                 const int pulse_id_step);
-
-    void write_metadata();
-    std::string get_device_name(const std::string& device);
-
+    void open_file(const std::string& output_file, const uint32_t n_images);
     void close_file();
 
 public:
-    JFH5Writer(const std::string& output_file,
-               const std::string& device,
-               const size_t n_modules,
-               const uint64_t start_pulse_id,
-               const uint64_t stop_pulse_id,
-               const size_t pulse_id_step);
+    JFH5Writer(const BufferUtils::DetectorConfig config);
     ~JFH5Writer();
-    void write(const ImageMetadataBlock* metadata, const char* data);
+    void open_run(const int64_t run_id, const uint32_t n_images);
+    void close_run();
+
+    void write_data(const int64_t run_id,
+                    const uint32_t index,
+                    const char* data);
+
+    void write_meta(const int64_t run_id,
+                    const uint32_t index,
+                    const ImageMetadata& meta);
 };
 
 #endif //SFWRITER_HPP
