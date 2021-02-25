@@ -61,21 +61,23 @@ int main (int argc, char *argv[])
         }
 
         if (meta.op_code == OP_END) {
-            writer.close_run(meta.run_id);
+            writer.close_run();
             continue;
         }
 
-        if (meta.i_image % n_writers != i_writer) {
-            continue;
+        // Fair distribution of images among writers.
+        if (meta.i_image % n_writers == i_writer) {
+            char* data = ram_buffer.read_image(meta.image_metadata.pulse_id);
+
+            stats.start_image_write();
+            writer.write_data(meta.run_id, meta.i_image, data);
+            stats.end_image_write();
         }
 
-        char* data = ram_buffer.read_image(meta.image_metadata.pulse_id);
-
-        stats.start_image_write();
-
-        writer.write(meta.run_id, meta.image_metadata, data);
-
-        stats.end_image_write();
+        // Only the first instance writes metadata.
+        if (i_writer == 0) {
+            writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
+        }
     }
 
     MPI_Finalize();
