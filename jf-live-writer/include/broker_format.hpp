@@ -3,7 +3,6 @@
 
 #include "formats.hpp"
 
-const static uint8_t OP_CONTINUE = 0;
 const static uint8_t OP_START = 1;
 const static uint8_t OP_END = 2;
 
