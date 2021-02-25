@@ -56,7 +56,11 @@ int main (int argc, char *argv[])
         zmq_recv(receiver, &meta, sizeof(meta), 0);
 
         if (meta.op_code == OP_START) {
-            writer.open_run(meta.run_id, meta.n_images);
+            writer.open_run(meta.run_id,
+                            meta.n_images,
+                            meta.image_y_size,
+                            meta.image_x_size,
+                            meta.bits_per_pixel);
             continue;
         }
 
