@@ -22,8 +22,6 @@ using namespace live_writer_config;
 JFH5Writer::JFH5Writer(const BufferUtils::DetectorConfig config):
         root_folder_(config.buffer_folder),
         detector_name_(config.detector_name),
-        image_x_size_(config.image_x_size),
-        image_y_size_(config.image_y_size)
 {
 }
 
@@ -31,6 +29,8 @@ JFH5Writer::~JFH5Writer()
 {
     close_file();
 }
+
+
 
 void JFH5Writer::open_run(const int64_t run_id, const uint32_t n_images)
 {
@@ -53,6 +53,7 @@ void JFH5Writer::close_run()
 
 void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
 {
+
     // Create file
     auto fcpl_id = H5Pcreate(H5P_FILE_ACCESS);
     if (fcpl_id == -1) {
@@ -217,5 +218,9 @@ void JFH5Writer::write_data(
 void JFH5Writer::write_meta(
         const int64_t run_id, const uint32_t index, const ImageMetadata& meta)
 {
+    if (run_id != current_run_id_) {
+        throw runtime_error("Invalid run_id.");
+    }
+
 
 }
