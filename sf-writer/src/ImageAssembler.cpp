@@ -86,7 +86,7 @@ void ImageAssembler::process(
 
         memcpy(
             &(frame_meta_buffer_[meta_offset]),
-            &(frame.metadata),
+            &(frame.meta),
             sizeof(ModuleFrame));
 
         meta_offset += meta_offset_step;
