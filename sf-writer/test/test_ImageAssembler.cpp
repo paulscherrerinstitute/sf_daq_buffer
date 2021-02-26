@@ -50,7 +50,7 @@ TEST(ImageAssembler, reconstruction)
     for (size_t i_module=0; i_module < n_modules; i_module++) {
 
         for (size_t i_pulse=0; i_pulse < BUFFER_BLOCK_SIZE; i_pulse++) {
-            auto& frame_meta = buffer_block->frame[i_pulse].metadata;
+            auto& frame_meta = buffer_block->frame[i_pulse].meta;
 
             frame_meta.pulse_id = 100 + i_pulse;
             frame_meta.daq_rec = 1000 + i_pulse;
