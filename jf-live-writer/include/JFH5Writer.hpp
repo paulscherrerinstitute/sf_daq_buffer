@@ -21,6 +21,7 @@ class JFH5Writer {
     int64_t current_run_id_ = NO_RUN_ID;
     uint32_t image_y_size_ = 0;
     uint32_t image_x_size_ = 0;
+    uint32_t bits_per_pixel_ = 0;
 
     // Open file specific variables.
     hid_t file_id_ = -1;

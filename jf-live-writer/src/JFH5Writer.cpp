@@ -30,30 +30,38 @@ JFH5Writer::~JFH5Writer()
     close_file();
 }
 
-
-
-void JFH5Writer::open_run(const int64_t run_id, const uint32_t n_images)
+void JFH5Writer::open_run(const int64_t run_id,
+                          const uint32_t n_images,
+                          const uint32_t image_y_size,
+                          const uint32_t image_x_size,
+                          const uint32_t bits_per_pixel)
 {
-    close_file();
+    close_run();
 
     const string output_folder = root_folder_ + "/" + OUTPUT_FOLDER_SYMLINK;
     // TODO: Maybe add leading zeros to filename?
     const string output_file = output_folder + to_string(run_id) + ".h5";
 
-    open_file(output_file, n_images);
-
     current_run_id_ = run_id;
+    image_y_size_ = image_y_size;
+    image_x_size_ = image_x_size;
+    bits_per_pixel_ = bits_per_pixel;
+
+    open_file(output_file, n_images);
 }
 
 void JFH5Writer::close_run()
 {
     close_file();
+
     current_run_id_ = NO_RUN_ID;
+    image_y_size_ = 0;
+    image_x_size_ = 0;
+    bits_per_pixel_ = 0;
 }
 
 void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
 {
-
     // Create file
     auto fcpl_id = H5Pcreate(H5P_FILE_ACCESS);
     if (fcpl_id == -1) {
@@ -113,8 +121,8 @@ void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
 //    }
 
     image_dataset_id_ = H5Dcreate(
-            data_group_id, "data", H5T_NATIVE_INT, image_space_id,
-            H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
+            data_group_id, "data", get_datatype(bits_per_pixel_),
+            image_space_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
     if (image_dataset_id_ < 0) {
         throw runtime_error("Cannot create image dataset.");
     }
