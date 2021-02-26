@@ -6,11 +6,9 @@ using namespace chrono;
 
 WriterStats::WriterStats(
         const string& detector_name,
-        const size_t stats_modulo,
-        const size_t image_n_bytes) :
+        const size_t stats_modulo) :
             detector_name_(detector_name),
             stats_modulo_(stats_modulo),
-            image_n_bytes_(image_n_bytes)
 {
    reset_counters();
 }
@@ -20,6 +18,7 @@ void WriterStats::reset_counters()
     image_counter_ = 0;
     total_buffer_write_us_ = 0;
     max_buffer_write_us_ = 0;
+    total_bytes_ = 0;
 }
 
 void WriterStats::start_image_write()
@@ -27,9 +26,17 @@ void WriterStats::start_image_write()
     stats_interval_start_ = steady_clock::now();
 }
 
+void WriterStats::setup_run(const StoreStream& meta)
+{
+    image_n_bytes_ = (meta.image_y_size *
+                      meta.image_x_size *
+                      meta.bits_per_pixel) / 8;
+}
+
 void WriterStats::end_image_write()
 {
     image_counter_++;
+    total_bytes_ += image_n_bytes_;
 
     uint32_t write_us_duration = duration_cast<microseconds>(
             steady_clock::now()-stats_interval_start_).count();
