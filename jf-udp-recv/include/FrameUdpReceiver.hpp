@@ -7,7 +7,7 @@
 #include "buffer_config.hpp"
 
 class FrameUdpReceiver {
-    const int source_id_;
+    const int module_id_;
 
     PacketUdpReceiver udp_receiver_;
 
@@ -27,7 +27,7 @@ class FrameUdpReceiver {
             const int n_packets, ModuleFrame& metadata, char* frame_buffer);
 
 public:
-    FrameUdpReceiver(const uint16_t port, const int source_id);
+    FrameUdpReceiver(const uint16_t port, const int module_id);
     virtual ~FrameUdpReceiver();
     uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
 };

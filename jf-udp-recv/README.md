@@ -63,7 +63,7 @@ struct ModuleFrame {
 #pragma pack(1)
 struct BufferBinaryFormat {
     const char FORMAT_MARKER = 0xBE;
-    ModuleFrame metadata;
+    ModuleFrame meta;
     char data[buffer_config::MODULE_N_BYTES];
 };
 #pragma pack(pop)
@@ -74,7 +74,7 @@ struct BufferBinaryFormat {
 Each frame is composed by:
 
 - **FORMAT\_MARKER** (0xBE) - a control byte to determine the validity of the frame.
-- **ModuleFrame** - frame metadata used in image assembly phase.
+- **ModuleFrame** - frame meta used in image assembly phase.
 - **Data** - assembled frame from a single module.
 
 Frames are written one after another to a specific offset in the file. The 
@@ -139,7 +139,7 @@ and the received data.
 
 - VerifyH5DataConsistency.py checks the consistency between the H5 file and 
 buffer.
-- BinaryBufferReader.py reads the buffer and prints metadata. The class inside 
+- BinaryBufferReader.py reads the buffer and prints meta. The class inside 
 can also be used in external scripts.
 
 ### ZMQ sending

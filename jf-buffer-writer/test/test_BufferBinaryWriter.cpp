@@ -12,10 +12,10 @@ TEST(BinaryWriter, basic_interaction)
     BufferBinaryWriter writer(module_name, detector_folder);
 
     BufferBinaryFormat frame_data;
-    frame_data.metadata.pulse_id = 1;
-    frame_data.metadata.frame_index = 2;
-    frame_data.metadata.daq_rec = 3;
-    frame_data.metadata.n_recv_packets = 4;
+    frame_data.meta.pulse_id = 1;
+    frame_data.meta.frame_index = 2;
+    frame_data.meta.daq_rec = 3;
+    frame_data.meta.n_recv_packets = 4;
 
     writer.write(5, &frame_data);
 
@@ -33,11 +33,11 @@ TEST(BinaryWriter, basic_interaction)
     ::read(read_fd, &read_data, sizeof(BufferBinaryFormat));
 
     ASSERT_EQ(frame_data.FORMAT_MARKER, read_data.FORMAT_MARKER);
-    ASSERT_EQ(frame_data.metadata.pulse_id, read_data.metadata.pulse_id);
-    ASSERT_EQ(frame_data.metadata.frame_index, read_data.metadata.frame_index);
-    ASSERT_EQ(frame_data.metadata.daq_rec, read_data.metadata.daq_rec);
-    ASSERT_EQ(frame_data.metadata.n_recv_packets,
-              read_data.metadata.n_recv_packets);
+    ASSERT_EQ(frame_data.meta.pulse_id, read_data.meta.pulse_id);
+    ASSERT_EQ(frame_data.meta.frame_index, read_data.meta.frame_index);
+    ASSERT_EQ(frame_data.meta.daq_rec, read_data.meta.daq_rec);
+    ASSERT_EQ(frame_data.meta.n_recv_packets,
+              read_data.meta.n_recv_packets);
 }
 
 TEST(BinaryWriter, test_format_marker)
@@ -49,10 +49,10 @@ TEST(BinaryWriter, test_format_marker)
     BufferBinaryWriter writer(module_name, detector_folder);
 
     BufferBinaryFormat frame_data;
-    frame_data.metadata.pulse_id = 1;
-    frame_data.metadata.frame_index = 2;
-    frame_data.metadata.daq_rec = 3;
-    frame_data.metadata.n_recv_packets = 4;
+    frame_data.meta.pulse_id = 1;
+    frame_data.meta.frame_index = 2;
+    frame_data.meta.daq_rec = 3;
+    frame_data.meta.n_recv_packets = 4;
 
     writer.write(5, &frame_data);
 

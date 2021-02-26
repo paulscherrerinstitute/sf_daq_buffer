@@ -15,6 +15,17 @@ struct ModuleFrame {
 };
 #pragma pack(pop)
 
+
+#pragma pack(push)
+#pragma pack(1)
+struct ImageMetadata {
+    uint64_t pulse_id;
+    uint64_t frame_index;
+    uint32_t daq_rec;
+    uint32_t is_good_image;
+};
+#pragma pack(pop)
+
 struct ModuleFrameBuffer {
     ModuleFrame module[JUNGFRAU_N_MODULES];
 };
@@ -23,7 +34,7 @@ struct ModuleFrameBuffer {
 #pragma pack(1)
 struct BufferBinaryFormat {
     const char FORMAT_MARKER = 0xBE;
-    ModuleFrame metadata;
+    ModuleFrame meta;
     char data[buffer_config::MODULE_N_BYTES];
 };
 #pragma pack(pop)

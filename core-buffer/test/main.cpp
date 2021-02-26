@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "test_buffer_utils.cpp"
 #include "test_bitshuffle.cpp"
+#include "test_RamBuffer.cpp"
 
 using namespace std;
 

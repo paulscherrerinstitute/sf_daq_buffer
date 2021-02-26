@@ -20,15 +20,17 @@ namespace buffer_config {
     const size_t FOLDER_MOD = 100000;
     // Extension of our file format.
     const std::string FILE_EXTENSION = ".bin";
-    // Number of pulses between each statistics print out.
-    const size_t STATS_MODULO = 100;
+    // Number of pulses between each statistics print out (buffer_writer, stream2vis...)
+    const size_t STATS_MODULO = 1000;
+    // Number of seconds after which statistics is print out (udp_recv)
+    const size_t STATS_TIME = 10;
     // If the RB is empty, how much time to wait before trying to read it again.
     const size_t RB_READ_RETRY_INTERVAL_MS = 5;
     // How many frames to read at once from file.
     const size_t BUFFER_BLOCK_SIZE = 100;
 
 
-    const size_t BUFFER_UDP_N_RECV_MSG = 64;
+    const size_t BUFFER_UDP_N_RECV_MSG = 128;
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // 8246 bytes for each UDP packet.
@@ -38,8 +40,12 @@ namespace buffer_config {
     const int BUFFER_UDP_US_TIMEOUT = 2 * 1000;
     // HWM for live stream from buffer.
     const int BUFFER_ZMQ_SNDHWM = 100;
+    // HWM for live stream from buffer.
+    const int BUFFER_ZMQ_RCVHWM = 100;
     // IPC address of the live stream.
     const std::string BUFFER_LIVE_IPC_URL = "ipc:///tmp/sf-live-";
+    // Number of image slots in ram buffer - 10 seconds should be enough
+    const int RAM_BUFFER_N_SLOTS = 100 * 10;
 }
 
 #endif //BUFFERCONFIG_HPP

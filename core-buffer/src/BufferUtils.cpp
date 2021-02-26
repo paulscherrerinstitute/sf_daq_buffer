@@ -2,13 +2,37 @@
 
 #include <sstream>
 #include <buffer_config.hpp>
+#include <zmq.h>
+#include <fstream>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
 
 using namespace std;
+using namespace buffer_config;
+
+string BufferUtils::get_image_filename(
+        const std::string& detector_folder,
+        const uint64_t pulse_id)
+{
+    uint64_t data_folder = pulse_id / buffer_config::FOLDER_MOD;
+    data_folder *= buffer_config::FOLDER_MOD;
+
+    uint64_t data_file = pulse_id / buffer_config::FILE_MOD;
+    data_file *= buffer_config::FILE_MOD;
+
+    stringstream folder;
+    folder << detector_folder << "/";
+    folder << data_folder << "/";
+    folder << data_file << buffer_config::FILE_EXTENSION;
+
+    return folder.str();
+}
 
 string BufferUtils::get_filename(
-        std::string detector_folder,
-        std::string module_name,
-        uint64_t pulse_id)
+        const std::string& detector_folder,
+        const std::string& module_name,
+        const uint64_t pulse_id)
 {
     uint64_t data_folder = pulse_id / buffer_config::FOLDER_MOD;
     data_folder *= buffer_config::FOLDER_MOD;
@@ -25,7 +49,7 @@ string BufferUtils::get_filename(
     return folder.str();
 }
 
-size_t BufferUtils::get_file_frame_index(uint64_t pulse_id)
+size_t BufferUtils::get_file_frame_index(const uint64_t pulse_id)
 {
     uint64_t file_base = pulse_id / buffer_config::FILE_MOD;
     file_base *= buffer_config::FILE_MOD;
@@ -60,4 +84,87 @@ void BufferUtils::create_destination_folder(const string& output_file)
         string create_folder_command("mkdir -p " + output_folder);
         system(create_folder_command.c_str());
     }
+}
+
+void* BufferUtils::connect_socket(
+        void* ctx, const string& detector_name, const string& stream_name)
+{
+    string ipc_address = BUFFER_LIVE_IPC_URL +
+                         detector_name + "-" +
+                         stream_name;
+
+    void* socket = zmq_socket(ctx, ZMQ_SUB);
+    if (socket == nullptr) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    int rcvhwm = BUFFER_ZMQ_RCVHWM;
+    if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    int linger = 0;
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    if (zmq_connect(socket, ipc_address.c_str()) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    if (zmq_setsockopt(socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    return socket;
+}
+
+void* BufferUtils::bind_socket(
+        void* ctx, const string& detector_name, const string& stream_name)
+{
+    string ipc_address = BUFFER_LIVE_IPC_URL +
+                         detector_name + "-" +
+                         stream_name;
+
+    void* socket = zmq_socket(ctx, ZMQ_PUB);
+
+    const int sndhwm = BUFFER_ZMQ_SNDHWM;
+    if (zmq_setsockopt(socket, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    const int linger = 0;
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    if (zmq_bind(socket, ipc_address.c_str()) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    return socket;
+}
+
+BufferUtils::DetectorConfig BufferUtils::read_json_config(
+        const std::string& filename)
+{
+    std::ifstream ifs(filename);
+    rapidjson::IStreamWrapper isw(ifs);
+    rapidjson::Document config_parameters;
+    config_parameters.ParseStream(isw);
+
+    return {
+            config_parameters["streamvis_stream"].GetString(),
+            config_parameters["streamvis_rate"].GetInt(),
+            config_parameters["live_stream"].GetString(),
+            config_parameters["live_rate"].GetInt(),
+            config_parameters["pedestal_file"].GetString(),
+            config_parameters["gain_file"].GetString(),
+            config_parameters["detector_name"].GetString(),
+            config_parameters["n_modules"].GetInt(),
+            config_parameters["start_udp_port"].GetInt(),
+            config_parameters["buffer_folder"].GetString(),
+            config_parameters["image_y_size"].GetInt(),
+            config_parameters["image_x_size"].GetInt()
+    };
 }

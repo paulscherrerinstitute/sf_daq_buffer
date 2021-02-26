@@ -7,8 +7,8 @@ using namespace buffer_config;
 
 FrameUdpReceiver::FrameUdpReceiver(
         const uint16_t port,
-        const int source_id) :
-            source_id_(source_id)
+        const int module_id) :
+            module_id_(module_id)
 {
     udp_receiver_.bind(port);
 
@@ -33,7 +33,7 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.pulse_id = packet_buffer_[i_packet].bunchid;
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
-    frame_metadata.module_id = (int64_t) source_id_;
+    frame_metadata.module_id = (int64_t) module_id_;
 }
 
 inline void FrameUdpReceiver::copy_packet_to_buffers(
@@ -54,18 +54,17 @@ inline uint64_t FrameUdpReceiver::process_packets(
         ModuleFrame& metadata,
         char* frame_buffer)
 {
-    for (
-            int i_packet=start_offset;
-            i_packet < packet_buffer_n_packets_;
-            i_packet++) {
+    for (int i_packet=start_offset;
+         i_packet < packet_buffer_n_packets_;
+         i_packet++) {
 
         // First packet for this frame.
         if (metadata.pulse_id == 0) {
             init_frame(metadata, i_packet);
 
         // Happens if the last packet from the previous frame gets lost.
-        // In the jungfrau_packet, pulse_id is called bunchid.
-        } else if (metadata.pulse_id != packet_buffer_[i_packet].bunchid) {
+        // In the jungfrau_packet, framenum is the trigger number (how many triggers from detector power-on) happened
+        } else if (metadata.frame_index != packet_buffer_[i_packet].framenum) {
             packet_buffer_loaded_ = true;
             // Continue on this packet.
             packet_buffer_offset_ = i_packet;
