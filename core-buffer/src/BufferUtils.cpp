@@ -164,7 +164,5 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["n_modules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
             config_parameters["buffer_folder"].GetString(),
-            config_parameters["image_y_size"].GetInt(),
-            config_parameters["image_x_size"].GetInt()
     };
 }
