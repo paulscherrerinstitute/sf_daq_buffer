@@ -3,7 +3,7 @@
     "streamvis_rate": 10,
     "live_stream": "tcp://0.0.0.0:9106",
     "live_rate": 10,
-    "detector_name": "Eiger",
+    "detector_name": "eiger",
     "n_modules": 1,
     "start_udp_port": 50200
 }

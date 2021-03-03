@@ -24,9 +24,9 @@ struct det_packet {
     uint64_t timestamp;
 
     uint16_t moduleID;
-    uint16_t xCoord;
-    uint16_t yCoord;
-    uint16_t zCoord;
+    uint16_t row;
+    uint16_t column;
+    uint16_t reserved;
 
     uint32_t debug;
     uint16_t roundRobin;

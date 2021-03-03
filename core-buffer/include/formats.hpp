@@ -22,6 +22,8 @@ struct ModuleFrame {
     uint64_t daq_rec;
     uint64_t n_recv_packets;
     uint64_t module_id;
+    uint16_t row;
+    uint16_t column;
 };
 #pragma pack(pop)
 

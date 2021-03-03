@@ -47,13 +47,18 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
     frame_metadata.module_id = (int64_t) module_id_;
-    // #ifdef DEBUG_OUTPUT
-    //     using namespace date;
-    //     cout << " [" << std::chrono::system_clock::now();
-    //     cout << "] [FrameUdpReceiver::init_frame] :";
-    //     cout << " Frame number: " << frame_metadata.frame_index << endl;
-    //     cout << endl;
-    // #endif
+    frame_metadata.row = (int16_t) packet_buffer_[i_packet].row;
+    frame_metadata.column = (int16_t) packet_buffer_[i_packet].column;
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [FrameUdpReceiver::init_frame] :";
+        cout << "module_id: " << module_id_;
+        cout << " || row: " << frame_metadata.row;
+        cout << " || column: " << frame_metadata.column;
+        cout << endl;
+    #endif
+
 }
 
 inline void FrameUdpReceiver::copy_packet_to_buffers(
@@ -67,13 +72,6 @@ inline void FrameUdpReceiver::copy_packet_to_buffers(
             DATA_BYTES_PER_PACKET);
 
     metadata.n_recv_packets++;
-    // #ifdef DEBUG_OUTPUT
-    //     using namespace date;
-    //     cout << " [" << std::chrono::system_clock::now();
-    //     cout << "] [FrameUdpReceiver::copy_packet_to_buffers] :";
-    //     cout << "buffer: n_recv_packets" << metadata.n_recv_packets;
-    //     cout << endl;
-    // #endif
 }
 
 inline uint64_t FrameUdpReceiver::process_packets(
@@ -100,6 +98,27 @@ inline uint64_t FrameUdpReceiver::process_packets(
         }
 
         copy_packet_to_buffers(metadata, frame_buffer, i_packet);
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            if (i_packet == 120){
+                cout << "Packet: " << i_packet;
+                cout << " || framenum " << packet_buffer_[i_packet].framenum;
+                cout << " || exptime " << packet_buffer_[i_packet].exptime;
+                cout << " || packetnum " << packet_buffer_[i_packet].packetnum;
+                cout << " || bunchid " << packet_buffer_[i_packet].bunchid ;
+                cout << " || timestamp " << packet_buffer_[i_packet].timestamp ;
+                cout << " || moduleID " << packet_buffer_[i_packet].moduleID ;
+                cout << " || x coord " << packet_buffer_[i_packet].row ;
+                cout << " || y coord " << packet_buffer_[i_packet].column ;
+                cout << " || reserved " << packet_buffer_[i_packet].reserved ;
+                cout << " || debug " << packet_buffer_[i_packet].debug ;
+                cout << " || roundRobin " << packet_buffer_[i_packet].roundRobin ;
+                cout << " || detectortype " << packet_buffer_[i_packet].detectortype ;
+                cout << " || headerVersion " << packet_buffer_[i_packet].headerVersion ;
+                cout << endl;
+            }
+        #endif
+
         
         // Last frame packet received. Frame finished.
         if (packet_buffer_[i_packet].packetnum ==
