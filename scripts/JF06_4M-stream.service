@@ -5,10 +5,10 @@ Description=stream service (to streamvis and live analysis) of JF06 (4M mode)
 PermissionsStartOnly=true
 Type=idle
 User=root
-ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF06_4M-stream.sh
+ExecStart=/usr/bin/sh /home/dbe/service_scripts/JF06_4M-stream.sh
 TimeoutStartSec=10
 Restart=on-failure
-RestartSec=10
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target

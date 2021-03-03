@@ -6,9 +6,11 @@ using namespace chrono;
 
 WriterStats::WriterStats(
         const string& detector_name,
-        const size_t stats_modulo) :
+        const size_t stats_modulo,
+        const size_t image_n_bytes) :
             detector_name_(detector_name),
-            stats_modulo_(stats_modulo)
+            stats_modulo_(stats_modulo),
+            image_n_bytes_(image_n_bytes)
 {
    reset_counters();
 }
@@ -43,10 +45,16 @@ void WriterStats::end_image_write()
 
 void WriterStats::print_stats()
 {
-    float avg_buffer_write_us = total_buffer_write_us_ / image_counter_;
+    const float avg_buffer_write_us = total_buffer_write_us_ / image_counter_;
 
-    uint64_t timestamp = time_point_cast<nanoseconds>(
+    const uint64_t timestamp = time_point_cast<nanoseconds>(
             system_clock::now()).time_since_epoch().count();
+
+    const uint64_t avg_throughput =
+            // bytes -> megabytes
+            (image_n_bytes_ / 1024 / 1024) /
+            // micro seconds -> seconds
+            (avg_buffer_write_us * 1000 * 1000);
 
     // Output in InfluxDB line protocol
     cout << "jf_buffer_writer";
@@ -54,8 +62,8 @@ void WriterStats::print_stats()
     cout << " ";
     cout << "n_written_images=" << image_counter_ << "i";
     cout << " ,avg_buffer_write_us=" << avg_buffer_write_us;
-    cout << ",max_buffer_write_us=" << max_buffer_write_us_ << "i";
-    cout << " ";
+    cout << " ,max_buffer_write_us=" << max_buffer_write_us_ << "i";
+    cout << " ,avg_throughput=" << avg_throughput;
     cout << timestamp;
     cout << endl;
 }

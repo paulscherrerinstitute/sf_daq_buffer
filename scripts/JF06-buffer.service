@@ -3,7 +3,7 @@ Description=All UDP-buffer instances of JF06
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/sh /home/writer/git/sf_daq_buffer/scripts/JF06-buffer-worker.sh
+ExecStart=/usr/bin/sh /home/dbe/service_scripts/JF06-buffer-worker.sh
 RemainAfterExit=yes
 
 [Install]

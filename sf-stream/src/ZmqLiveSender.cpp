@@ -10,6 +10,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include <iostream>
+//
 using namespace std;
 using namespace stream_config;
 
@@ -45,7 +47,6 @@ ZmqLiveSender::ZmqLiveSender(
             throw runtime_error(zmq_strerror(errno));
         }
     }
-
 }
 
 ZmqLiveSender::~ZmqLiveSender()

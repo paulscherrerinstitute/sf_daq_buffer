@@ -15,6 +15,24 @@
 using namespace std;
 using namespace buffer_config;
 
+string BufferUtils::get_image_filename(
+        const std::string& detector_folder,
+        const uint64_t pulse_id)
+{
+    uint64_t data_folder = pulse_id / buffer_config::FOLDER_MOD;
+    data_folder *= buffer_config::FOLDER_MOD;
+
+    uint64_t data_file = pulse_id / buffer_config::FILE_MOD;
+    data_file *= buffer_config::FILE_MOD;
+
+    stringstream folder;
+    folder << detector_folder << "/";
+    folder << data_folder << "/";
+    folder << data_file << buffer_config::FILE_EXTENSION;
+
+    return folder.str();
+}
+
 string BufferUtils::get_filename(
         const std::string& detector_folder,
         const std::string& module_name,
@@ -151,16 +169,6 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
-            // config_parameters["buffer_folder"].GetString()
-            ""
-            };
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << " [" << std::chrono::system_clock::now();
-        cout << "] [BufferUtils::read_json_config] Config:";
-        cout << det_config;
-        cout << endl;
-    #endif
-    return det_config;
+            config_parameters["buffer_folder"].GetString(),
+    };
 }

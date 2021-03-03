@@ -42,6 +42,10 @@ namespace BufferUtils
             const std::string& module_name,
             const uint64_t pulse_id);
 
+    std::string get_image_filename(
+            const std::string& detector_folder,
+            const uint64_t pulse_id);
+
     std::size_t get_file_frame_index(const uint64_t pulse_id);
 
     void update_latest_file(
