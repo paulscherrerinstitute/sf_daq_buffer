@@ -22,8 +22,6 @@ target_link_libraries(jf-live-writer
         jf-live-writer-lib
         zmq
         hdf5
-        hdf5_hl
-        hdf5_cpp
         rt
         )
 
