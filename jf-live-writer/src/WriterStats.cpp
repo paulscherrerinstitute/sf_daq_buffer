@@ -8,7 +8,7 @@ WriterStats::WriterStats(
         const string& detector_name,
         const size_t stats_modulo) :
             detector_name_(detector_name),
-            stats_modulo_(stats_modulo),
+            stats_modulo_(stats_modulo)
 {
    reset_counters();
 }
