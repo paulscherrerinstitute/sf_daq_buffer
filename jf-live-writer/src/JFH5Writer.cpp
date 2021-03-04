@@ -11,7 +11,6 @@
 
 extern "C"
 {
-    #include "H5DOpublic.h"
     #include <bitshuffle/bshuf_h5filter.h>
 }
 
@@ -21,13 +20,28 @@ using namespace live_writer_config;
 
 JFH5Writer::JFH5Writer(const BufferUtils::DetectorConfig config):
         root_folder_(config.buffer_folder),
-        detector_name_(config.detector_name),
+        detector_name_(config.detector_name)
 {
 }
 
 JFH5Writer::~JFH5Writer()
 {
     close_file();
+}
+
+hid_t JFH5Writer::get_datatype(const int bits_per_pixel)
+{
+    switch(bits_per_pixel) {
+        case 8:
+            return H5T_NATIVE_UINT8;
+        case 16:
+            return H5T_NATIVE_UINT16;
+        case 32:
+            return H5T_NATIVE_UINT32;
+        default:
+            throw runtime_error(
+                    "Unsupported bits per pixel:" + to_string(bits_per_pixel));
+    }
 }
 
 void JFH5Writer::open_run(const int64_t run_id,
@@ -46,6 +60,7 @@ void JFH5Writer::open_run(const int64_t run_id,
     image_y_size_ = image_y_size;
     image_x_size_ = image_x_size;
     bits_per_pixel_ = bits_per_pixel;
+    image_n_bytes_ = (image_y_size_ * image_x_size_ * bits_per_pixel_) / 8;
 
     open_file(output_file, n_images);
 }
@@ -58,6 +73,7 @@ void JFH5Writer::close_run()
     image_y_size_ = 0;
     image_x_size_ = 0;
     bits_per_pixel_ = 0;
+    image_n_bytes_ = 0;
 }
 
 void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
@@ -188,39 +204,33 @@ void JFH5Writer::write_data(
         throw runtime_error("Invalid run_id.");
     }
 
-//    hsize_t b_i_dims[3] = {BUFFER_BLOCK_SIZE,
-//                           MODULE_Y_SIZE * n_modules_,
-//                           MODULE_X_SIZE};
-//    H5::DataSpace b_i_space(3, b_i_dims);
-//    hsize_t b_i_count[] = {n_images_to_copy,
-//                           MODULE_Y_SIZE * n_modules_,
-//                           MODULE_X_SIZE};
-//    hsize_t b_i_start[] = {n_images_offset, 0, 0};
-//    b_i_space.selectHyperslab(H5S_SELECT_SET, b_i_count, b_i_start);
-//
-//    hsize_t f_i_dims[3] = {n_images_,
-//                           MODULE_Y_SIZE * n_modules_,
-//                           MODULE_X_SIZE};
-//    H5::DataSpace f_i_space(3, f_i_dims);
-//    hsize_t f_i_count[] = {n_images_to_copy,
-//                           MODULE_Y_SIZE * n_modules_,
-//                           MODULE_X_SIZE};
-//    hsize_t f_i_start[] = {data_write_index_, 0, 0};
-//    f_i_space.selectHyperslab(H5S_SELECT_SET, f_i_count, f_i_start);
-//
-//    image_dataset_.write(
-//            data, H5::PredType::NATIVE_UINT16, b_i_space, f_i_space);
+    const hsize_t ram_dims[3] = {1, image_y_size_, image_x_size_};
+    auto ram_ds = H5Screate_simple(3, ram_dims, nullptr);
+    if (ram_ds < 0) {
+        throw runtime_error("Cannot create image ram dataspace.");
+    }
 
-    hsize_t offset[] = {data_write_index_, 0, 0};
-    size_t data_offset = i_image * MODULE_N_BYTES * n_modules_;
+    auto file_ds = H5Dget_space(image_dataset_id_);
+    if (file_ds < 0) {
+        throw runtime_error("Cannot get image dataset file dataspace.");
+    }
 
-    H5DOwrite_chunk(
-            image_dataset_.getId(),
-            H5P_DEFAULT,
-            0,
-            offset,
-            MODULE_N_BYTES * n_modules_,
-            data + data_offset);
+    const hsize_t file_ds_start[] = {index, 0, 0};
+    const hsize_t file_ds_stride[] = {1, 1, 1};
+    const hsize_t file_ds_count[] = {1, image_y_size_, image_x_size_};
+    const hsize_t file_ds_block[] = {1, 1, 1};
+    if (H5Sselect_hyperslab(file_ds, H5S_SELECT_SET,
+            file_ds_start, file_ds_stride, file_ds_count, file_ds_block) < 0) {
+       throw runtime_error("Cannot select image dataset file hyperslab.");
+    }
+
+    if (H5Dwrite(image_dataset_id_, get_datatype(bits_per_pixel_),
+            ram_ds, file_ds, H5P_DEFAULT, data) < 0) {
+        throw runtime_error("Cannot write data to image dataset.");
+    }
+
+    H5Sclose(file_ds);
+    H5Sclose(ram_ds);
 }
 
 void JFH5Writer::write_meta(
@@ -230,5 +240,46 @@ void JFH5Writer::write_meta(
         throw runtime_error("Invalid run_id.");
     }
 
+    const hsize_t ram_dims[3] = {1, 1, 1};
+    auto ram_ds = H5Screate_simple(3, ram_dims, nullptr);
+    if (ram_ds < 0) {
+        throw runtime_error("Cannot create metadata ram dataspace.");
+    }
 
+    auto file_ds = H5Dget_space(pulse_dataset_id_);
+    if (file_ds < 0) {
+        throw runtime_error("Cannot get metadata dataset file dataspace.");
+    }
+
+    const hsize_t file_ds_start[] = {index, 0, 0};
+    const hsize_t file_ds_stride[] = {1, 1, 1};
+    const hsize_t file_ds_count[] = {1, 1, 1};
+    const hsize_t file_ds_block[] = {1, 1, 1};
+    if (H5Sselect_hyperslab(file_ds, H5S_SELECT_SET,
+            file_ds_start, file_ds_stride, file_ds_count, file_ds_block) < 0) {
+        throw runtime_error("Cannot select metadata dataset file hyperslab.");
+    }
+
+    if (H5Dwrite(pulse_dataset_id_, H5T_NATIVE_UINT64,
+            ram_ds, file_ds, H5P_DEFAULT, &(meta.pulse_id)) < 0) {
+        throw runtime_error("Cannot write data to pulse_id dataset.");
+    }
+
+    if (H5Dwrite(frame_dataset_id_, H5T_NATIVE_UINT64,
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta.frame_index)) < 0) {
+        throw runtime_error("Cannot write data to frame_index dataset.");
+    }
+
+    if (H5Dwrite(daq_rec_dataset_id_, H5T_NATIVE_UINT32,
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta.daq_rec)) < 0) {
+        throw runtime_error("Cannot write data to daq_rec dataset.");
+    }
+
+    if (H5Dwrite(is_good_dataset_id_, H5T_NATIVE_UINT32,
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta.is_good_image)) < 0) {
+        throw runtime_error("Cannot write data to is_good_image dataset.");
+    }
+
+    H5Sclose(file_ds);
+    H5Sclose(ram_ds);
 }
