@@ -44,19 +44,6 @@ RamBuffer::RamBuffer(
     meta_buffer_ = (ModuleFrame *) buffer_;
     // Image buffer start right after metadata buffer.
     image_buffer_ = (char*)buffer_ + (meta_bytes_ * n_slots_);
-
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << " [" << std::chrono::system_clock::now();
-        cout << "] [RamBuffer::RamBuffer] :";
-        cout << " Details of rambuffer:";
-        cout << "n_modules: " << n_modules_;
-        cout << " || meta_bytes: " << meta_bytes_;
-        cout << " || image_bytes: " << image_bytes_;
-        cout << " || buffer_bytes: " << buffer_bytes_;
-        cout << " || n_slots: " << n_slots_;
-        cout << endl;
-    #endif
 }
 
 RamBuffer::~RamBuffer()
@@ -124,8 +111,21 @@ void RamBuffer::assemble_image(
     auto is_pulse_init = false;
     auto is_good_image = true;
 
+    // for each module it collects the metadata from each frame
     for (int i_module=0; i_module <  n_modules_; i_module++) {
         ModuleFrame *frame_meta = src_meta + i_module;
+
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << " [" << std::chrono::system_clock::now();
+            cout << "] [RamBuffer::assemble_image] :";
+            cout << "module_id: " << i_module;
+            cout << " || frame index: " << frame_meta->frame_index;
+            cout << " || row: " << frame_meta->row;
+            cout << " || column: " << frame_meta->column;
+            cout << " || n_recv_packets: " << frame_meta->n_recv_packets;
+            cout << endl;
+        #endif
 
         auto is_good_frame =
                 frame_meta->n_recv_packets == N_PACKETS_PER_FRAME;
@@ -142,6 +142,7 @@ void RamBuffer::assemble_image(
             #endif
             continue;
         }
+        // in the first module will enter here and define image metadata
         if (!is_pulse_init) {
             if (frame_meta->frame_index != pulse_id) {
                 stringstream err_msg;
@@ -160,11 +161,18 @@ void RamBuffer::assemble_image(
 
                 throw runtime_error(err_msg.str());
             }
-
+            
             image_meta.pulse_id = frame_meta->pulse_id;
             image_meta.frame_index = frame_meta->frame_index;
             image_meta.daq_rec = frame_meta->daq_rec;
-
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [RamBuffer::assemble_image] :";
+                cout << " Defining image_meta";
+                cout << " || image_meta.frame_index " << image_meta.frame_index;
+                cout << endl;
+            #endif
             is_pulse_init = 1;
         }
 

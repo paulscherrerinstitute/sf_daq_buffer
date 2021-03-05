@@ -5,6 +5,8 @@
 #include <BufferUtils.hpp>
 #include <AssemblerStats.hpp>
 
+#include "date.h"
+#include <chrono>
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
 
@@ -40,6 +42,16 @@ int main (int argc, char *argv[])
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
 
     ImageMetadata meta;
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [Assembler] :";
+        cout << " Details of Assembler:";
+        cout << "detector_name: " << config.detector_name;
+        cout << "n_modules: " << config.n_modules;
+    #endif
+
     while (true) {
         auto pulse_and_sync = receiver.get_next_pulse_id();
         ram_buffer.assemble_image(pulse_and_sync.pulse_id, meta);

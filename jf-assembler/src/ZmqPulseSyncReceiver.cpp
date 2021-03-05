@@ -57,7 +57,7 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
             using namespace date;
             cout << " [" << std::chrono::system_clock::now();
             cout << "] [ZmqPulseSyncReceiver::get_next_pulse_id] modules_in_sync true";
-            cout << "] returning pulses[0]";
+            cout << "] returning pulses[0] (frame index):" << pulses[0];
             cout << endl;
         #endif
         return {pulses[0], 0};

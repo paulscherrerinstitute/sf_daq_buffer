@@ -157,15 +157,13 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
     rapidjson::Document config_parameters;
     config_parameters.ParseStream(isw);
 
-    BufferUtils::DetectorConfig det_config = {
+    return {
             config_parameters["streamvis_stream"].GetString(),
             config_parameters["streamvis_rate"].GetInt(),
             config_parameters["live_stream"].GetString(),
             config_parameters["live_rate"].GetInt(),
-            // config_parameters["pedestal_file"].GetString(),
-            "",
-            // config_parameters["gain_file"].GetString(),
-            "",
+            config_parameters["pedestal_file"].GetString(),
+            config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
