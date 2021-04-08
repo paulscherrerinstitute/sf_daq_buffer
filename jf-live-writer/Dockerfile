@@ -23,4 +23,4 @@ WORKDIR /
 RUN git clone --depth 1 --branch ${branch} https://github.com/paulscherrerinstitute/sf_daq_buffer.git
 RUN mkdir /sf_daq_buffer/build
 WORKDIR /sf_daq_buffer/build
-RUN cmake3 .. && make jf-live-writer
+RUN cmake3 -DBUILD_JF_LIVE_WRITER=ON .. && make jf-live-writer
