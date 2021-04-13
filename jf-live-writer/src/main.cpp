@@ -18,17 +18,14 @@ int main (int argc, char *argv[])
 {
     if (argc != 3) {
         cout << endl;
-        cout << "Usage: jf_live_writer [detector_json_filename]"
-                " [bits_per_pixel]" << endl;
+        cout << "Usage: jf_live_writer [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
-        cout << "\tbits_per_pixel: Number of bits in each pixel." << endl;
         cout << endl;
 
         exit(-1);
     }
 
     auto const config = BufferUtils::read_json_config(string(argv[1]));
-    auto const bits_per_pixel = atoi(argv[2]);
 
     MPI_Init(NULL, NULL);
 
@@ -45,11 +42,8 @@ int main (int argc, char *argv[])
 
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
 
-    const uint64_t image_n_bytes =
-            config.image_y_size * config.image_x_size * bits_per_pixel;
-
     JFH5Writer writer(config);
-    WriterStats stats(config.detector_name, STATS_MODULO, image_n_bytes);
+    WriterStats stats(config.detector_name, STATS_MODULO);
 
     StoreStream meta = {};
     while (true) {
@@ -61,6 +55,9 @@ int main (int argc, char *argv[])
                             meta.image_y_size,
                             meta.image_x_size,
                             meta.bits_per_pixel);
+
+            stats.setup_run(meta);
+
             continue;
         }
 

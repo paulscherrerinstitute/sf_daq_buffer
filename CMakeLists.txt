@@ -34,5 +34,8 @@ add_subdirectory("jf-buffer-writer")
 add_subdirectory("jf-assembler")
 add_subdirectory("sf-stream")
 add_subdirectory("sf-writer")
-#add_subdirectory("jf-live-writer")
+
+if(BUILD_JF_LIVE_WRITER)
+        add_subdirectory("jf-live-writer")
+endif()
 

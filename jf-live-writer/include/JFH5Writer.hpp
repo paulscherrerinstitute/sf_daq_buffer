@@ -15,13 +15,14 @@ class JFH5Writer {
     const std::string root_folder_;
     const std::string detector_name_;
 
-    static const int64_t NO_RUN_ID;
+    static const int64_t NO_RUN_ID = -1;
 
     // Run specific variables.
     int64_t current_run_id_ = NO_RUN_ID;
     uint32_t image_y_size_ = 0;
     uint32_t image_x_size_ = 0;
     uint32_t bits_per_pixel_ = 0;
+    uint32_t image_n_bytes_ = 0;
 
     // Open file specific variables.
     hid_t file_id_ = -1;
