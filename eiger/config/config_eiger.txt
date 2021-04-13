@@ -1,4 +1,3 @@
-detsize 1024 512
 
 hostname localhost:2050+localhost:2052+
 

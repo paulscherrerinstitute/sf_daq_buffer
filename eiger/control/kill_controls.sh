@@ -39,7 +39,7 @@ if (( ${STREAM} == 1 )); then
 fi
 
 if (( ${ASSEMBLER} == 1 )); then
-    echo "Killing stream..."
+    echo "Killing assembler..."
     ps aux | grep eiger_assembler | awk 'NR > 1 { print prev } { prev = $2 }' | xargs -I{} kill {}
 fi
 

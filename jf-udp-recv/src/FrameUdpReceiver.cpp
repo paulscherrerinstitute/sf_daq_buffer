@@ -47,8 +47,8 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.frame_index = packet_buffer_[i_packet].framenum;
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
     frame_metadata.module_id = (int64_t) module_id_;
-    frame_metadata.row = (int16_t) packet_buffer_[i_packet].row;
-    frame_metadata.column = (int16_t) packet_buffer_[i_packet].column;
+    frame_metadata.row = (int16_t) packet_buffer_[i_packet].xCoord;
+    frame_metadata.column = (int16_t) packet_buffer_[i_packet].yCoord;
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << " [" << std::chrono::system_clock::now();
@@ -98,27 +98,6 @@ inline uint64_t FrameUdpReceiver::process_packets(
         }
 
         copy_packet_to_buffers(metadata, frame_buffer, i_packet);
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            if (i_packet == 120){
-                cout << "Packet: " << i_packet;
-                cout << " || framenum " << packet_buffer_[i_packet].framenum;
-                cout << " || exptime " << packet_buffer_[i_packet].exptime;
-                cout << " || packetnum " << packet_buffer_[i_packet].packetnum;
-                cout << " || bunchid " << packet_buffer_[i_packet].bunchid ;
-                cout << " || timestamp " << packet_buffer_[i_packet].timestamp ;
-                cout << " || moduleID " << packet_buffer_[i_packet].moduleID ;
-                cout << " || x coord " << packet_buffer_[i_packet].row ;
-                cout << " || y coord " << packet_buffer_[i_packet].column ;
-                cout << " || reserved " << packet_buffer_[i_packet].reserved ;
-                cout << " || debug " << packet_buffer_[i_packet].debug ;
-                cout << " || roundRobin " << packet_buffer_[i_packet].roundRobin ;
-                cout << " || detectortype " << packet_buffer_[i_packet].detectortype ;
-                cout << " || headerVersion " << packet_buffer_[i_packet].headerVersion ;
-                cout << endl;
-            }
-        #endif
-
         
         // Last frame packet received. Frame finished.
         if (packet_buffer_[i_packet].packetnum ==
