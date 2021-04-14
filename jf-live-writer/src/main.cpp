@@ -16,7 +16,7 @@ using namespace live_writer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 2) {
         cout << endl;
         cout << "Usage: jf_live_writer [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
