@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, LIVE_ZMQ_IO_THREADS);
     auto receiver = BufferUtils::connect_socket(
-            ctx, config.detector_name, "broker-agent");
+            ctx, config.detector_name, "writer-agent");
 
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
 
