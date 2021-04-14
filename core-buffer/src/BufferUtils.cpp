@@ -7,6 +7,7 @@
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
+#include <iostream>
 
 using namespace std;
 using namespace buffer_config;
@@ -92,6 +93,10 @@ void* BufferUtils::connect_socket(
     string ipc_address = BUFFER_LIVE_IPC_URL +
                          detector_name + "-" +
                          stream_name;
+#ifdef DEBUG_OUTPUT
+    cout << "[BufferUtils::connect_socket]";
+    cout << " IPC address: " << ipc_address << endl;
+#endif
 
     void* socket = zmq_socket(ctx, ZMQ_SUB);
     if (socket == nullptr) {

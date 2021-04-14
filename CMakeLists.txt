@@ -7,8 +7,10 @@ set (SF_DAQ_BUFFER_VERSION "1.0.0")
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Download and unpack googletest at configure time
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DMY_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_OUTPUT")
 
+# Download and unpack googletest at configure time
 configure_file(googletest.in googletest-download/CMakeLists.txt)
 
 execute_process(
