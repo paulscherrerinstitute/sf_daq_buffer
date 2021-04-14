@@ -1,11 +1,7 @@
-#include "JFH5Writer.hpp"
-
-#include <sstream>
-#include <cstring>
 #include <H5version.h>
 #include <iostream>
 
-
+#include "JFH5Writer.hpp"
 #include "live_writer_config.hpp"
 #include "buffer_config.hpp"
 #include "formats.hpp"
@@ -19,7 +15,7 @@ using namespace std;
 using namespace buffer_config;
 using namespace live_writer_config;
 
-JFH5Writer::JFH5Writer(const BufferUtils::DetectorConfig config):
+JFH5Writer::JFH5Writer(const BufferUtils::DetectorConfig& config):
         root_folder_(config.buffer_folder),
         detector_name_(config.detector_name)
 {
@@ -140,7 +136,7 @@ void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
     }
 
     hsize_t image_dataset_dims[] = {n_images, image_y_size_, image_x_size_};
-    auto image_space_id = H5Screate_simple(3, image_dataset_dims, NULL);
+    auto image_space_id = H5Screate_simple(3, image_dataset_dims, nullptr);
     if (image_space_id < 0) {
         throw runtime_error("Cannot create image dataset space.");
     }
@@ -162,12 +158,12 @@ void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
 
     // Create metadata datasets.
     hsize_t meta_dataset_dims[] = {n_images};
-    auto meta_space_id = H5Screate_simple(1, meta_dataset_dims, NULL);
+    auto meta_space_id = H5Screate_simple(1, meta_dataset_dims, nullptr);
     if (meta_space_id < 0) {
         throw runtime_error("Cannot create meta dataset space.");
     }
 
-    auto create_meta_dataset = [&](string name, hid_t data_type) {
+    auto create_meta_dataset = [&](const string& name, hid_t data_type) {
         auto dataset_id = H5Dcreate(
                 data_group_id, name.c_str(), data_type, meta_space_id,
                 H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);

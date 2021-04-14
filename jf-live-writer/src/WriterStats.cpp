@@ -1,13 +1,14 @@
 #include <iostream>
+#include <utility>
 #include "WriterStats.hpp"
 
 using namespace std;
 using namespace chrono;
 
 WriterStats::WriterStats(
-        const string& detector_name,
+        string detector_name,
         const size_t stats_modulo) :
-            detector_name_(detector_name),
+            detector_name_(std::move(detector_name)),
             stats_modulo_(stats_modulo)
 {
    reset_counters();

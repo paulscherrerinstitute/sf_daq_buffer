@@ -1,14 +1,14 @@
 #include <iostream>
 #include <string>
 #include <zmq.h>
-#include <RamBuffer.hpp>
-#include <BufferUtils.hpp>
+#include <mpi.h>
+
+#include "RamBuffer.hpp"
+#include "BufferUtils.hpp"
 #include "live_writer_config.hpp"
 #include "WriterStats.hpp"
 #include "broker_format.hpp"
-#include <mpi.h>
-#include <JFH5Writer.hpp>
-
+#include "JFH5Writer.hpp"
 
 using namespace std;
 using namespace buffer_config;
@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
 
     auto const config = BufferUtils::read_json_config(string(argv[1]));
 
-    MPI_Init(NULL, NULL);
+    MPI_Init(nullptr, nullptr);
 
     int n_writers;
     MPI_Comm_size(MPI_COMM_WORLD, &n_writers);
@@ -80,6 +80,4 @@ int main (int argc, char *argv[])
             writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
         }
     }
-
-    MPI_Finalize();
 }
