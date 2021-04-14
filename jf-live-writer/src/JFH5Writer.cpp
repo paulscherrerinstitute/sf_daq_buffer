@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cstring>
 #include <H5version.h>
+#include <iostream>
 
 
 #include "live_writer_config.hpp"
@@ -62,11 +63,27 @@ void JFH5Writer::open_run(const int64_t run_id,
     bits_per_pixel_ = bits_per_pixel;
     image_n_bytes_ = (image_y_size_ * image_x_size_ * bits_per_pixel_) / 8;
 
+#ifdef DEBUG_OUTPUT
+    cout << "[JFH5Writer::open_run]";
+    cout << " run_id:" << current_run_id_;
+    cout << " output_file:" << output_file;
+    cout << " bits_per_pixel:" << bits_per_pixel_;
+    cout << " image_y_size:" << image_y_size_;
+    cout << " image_x_size:" << image_x_size_;
+    cout << " image_n_bytes:" << image_n_bytes_;
+    cout << endl;
+#endif
+
     open_file(output_file, n_images);
 }
 
 void JFH5Writer::close_run()
 {
+
+#ifdef DEBUG_OUTPUT
+    cout << "[JFH5Writer::close_run] run_id:" << current_run_id_ << endl;
+#endif
+
     close_file();
 
     current_run_id_ = NO_RUN_ID;
