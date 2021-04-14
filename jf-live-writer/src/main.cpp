@@ -16,7 +16,7 @@ using namespace live_writer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 2) {
         cout << endl;
         cout << "Usage: jf_live_writer [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, LIVE_ZMQ_IO_THREADS);
     auto receiver = BufferUtils::connect_socket(
-            ctx, config.detector_name, "broker-agent");
+            ctx, config.detector_name, "writer-agent");
 
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
 
