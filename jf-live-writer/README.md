@@ -103,7 +103,7 @@ The sequence must always follow:
 
 In case the sequence is broken (wrong send order from the writer agent or lost 
 messages, etc.) the writer will ignore the received message. An operational 
-state can be restored by send a **op\_code = 2** message.
+state can be restored by sending a **op\_code = 2** message.
 
 #### ImageMetadata
 This comes from jf_assembler without modifications for a particular 
