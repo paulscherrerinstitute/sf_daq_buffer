@@ -17,6 +17,7 @@ Documentation of individual components:
 - [sf-stream](sf-stream) (Live streaming of detector data)
 - [sf-writer](sf-writer) (Read from buffer and write H5)
 - [sf-utils](sf-utils) (Small utilities for debugging and testing)
+- [jf-live-writer](jf-live-writer) (Live writer to high performance detectors)
 
 ## Design goals
 
