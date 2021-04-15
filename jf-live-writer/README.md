@@ -105,6 +105,10 @@ In case the sequence is broken (wrong send order from the writer agent or lost
 messages, etc.) the writer will ignore the received message. An operational 
 state can be restored by sending a **op\_code = 2** message.
 
+Images are written only when op_code = 0, meaning that the start and stop 
+message are not used for writing data. This allows to send the stop message 
+in case we need to reset the writer status at any point.
+
 #### ImageMetadata
 This comes from jf_assembler without modifications for a particular 
 image. 
