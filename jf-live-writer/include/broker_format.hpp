@@ -3,8 +3,6 @@
 
 #include "formats.hpp"
 
-const static uint8_t OP_START = 1;
-const static uint8_t OP_END = 2;
 
 #pragma pack(push)
 #pragma pack(1)
@@ -16,7 +14,6 @@ struct StoreStream {
     uint32_t n_images;
     uint32_t image_y_size;
     uint32_t image_x_size;
-    uint32_t op_code;
     uint32_t bits_per_pixel;
 };
 #pragma pack(pop)
