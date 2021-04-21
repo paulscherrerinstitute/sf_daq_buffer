@@ -49,6 +49,11 @@ int main (int argc, char *argv[])
     while (true) {
         zmq_recv(receiver, &meta, sizeof(meta), 0);
 
+        if (meta.op_code == OP_END) {
+            writer.close_run();
+            continue;
+        }
+
         if (meta.op_code == OP_START) {
             writer.open_run(meta.run_id,
                             meta.n_images,
@@ -57,13 +62,6 @@ int main (int argc, char *argv[])
                             meta.bits_per_pixel);
 
             stats.setup_run(meta);
-
-            continue;
-        }
-
-        if (meta.op_code == OP_END) {
-            writer.close_run();
-            continue;
         }
 
         // Fair distribution of images among writers.
