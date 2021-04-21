@@ -43,25 +43,21 @@ int main (int argc, char *argv[])
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
 
     JFH5Writer writer(config);
-    WriterStats stats(config.detector_name, STATS_MODULO);
+    WriterStats stats(config.detector_name);
 
     StoreStream meta = {};
     while (true) {
         zmq_recv(receiver, &meta, sizeof(meta), 0);
 
-        if (meta.op_code == OP_END) {
-            writer.close_run();
-            continue;
-        }
-
-        if (meta.op_code == OP_START) {
+        // i_image == 0 -> we have a new run.
+        if (meta.i_image == 0) {
             writer.open_run(meta.run_id,
                             meta.n_images,
                             meta.image_y_size,
                             meta.image_x_size,
                             meta.bits_per_pixel);
 
-            stats.setup_run(meta);
+            stats.start_run(meta);
         }
 
         // Fair distribution of images among writers.
@@ -76,6 +72,13 @@ int main (int argc, char *argv[])
         // Only the first instance writes metadata.
         if (i_writer == 0) {
             writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
+        }
+
+        // i_image + 1 == meta.n_images -> we received the last image.
+        if (meta.i_image+1 == meta.n_images) {
+            writer.close_run();
+
+            stats.end_run();
         }
     }
 }

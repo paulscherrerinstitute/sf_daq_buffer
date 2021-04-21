@@ -9,7 +9,6 @@
 
 class WriterStats {
     const std::string detector_name_;
-    const size_t stats_modulo_;
 
     uint32_t image_n_bytes_{};
 
@@ -24,10 +23,9 @@ class WriterStats {
     void print_stats();
 
 public:
-    WriterStats(
-            std::string detector_name,
-            const size_t stats_modulo);
-    void setup_run(const StoreStream& meta);
+    explicit WriterStats(std::string detector_name);
+    void start_run(const StoreStream& meta);
+    void end_run();
     void start_image_write();
     void end_image_write();
 };
