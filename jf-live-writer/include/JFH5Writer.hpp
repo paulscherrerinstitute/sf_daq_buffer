@@ -1,5 +1,5 @@
-#ifndef SFWRITER_HPP
-#define SFWRITER_HPP
+#ifndef JF_LIVE_WRITER_HPP
+#define JF_LIVE_WRITER_HPP
 
 #include <memory>
 #include <string>
@@ -32,28 +32,28 @@ class JFH5Writer {
     hid_t daq_rec_dataset_id_ = -1;
     hid_t is_good_dataset_id_ = -1;
 
-    hid_t get_datatype(const int bits_per_pixel);
-    void open_file(const std::string& output_file, const uint32_t n_images);
+    static hid_t get_datatype(int bits_per_pixel);
+    void open_file(const std::string& output_file, uint32_t n_images);
     void close_file();
 
 public:
-    JFH5Writer(const BufferUtils::DetectorConfig config);
+    explicit JFH5Writer(const BufferUtils::DetectorConfig& config);
     ~JFH5Writer();
 
-    void open_run(const int64_t run_id,
-                  const uint32_t n_images,
-                  const uint32_t image_y_size,
-                  const uint32_t image_x_size,
-                  const uint32_t bits_per_pixel);
+    void open_run(int64_t run_id,
+                  uint32_t n_images,
+                  uint32_t image_y_size,
+                  uint32_t image_x_size,
+                  uint32_t bits_per_pixel);
     void close_run();
 
-    void write_data(const int64_t run_id,
-                    const uint32_t index,
+    void write_data(int64_t run_id,
+                    uint32_t index,
                     const char* data);
 
-    void write_meta(const int64_t run_id,
-                    const uint32_t index,
+    void write_meta(int64_t run_id,
+                    uint32_t index,
                     const ImageMetadata& meta);
 };
 
-#endif //SFWRITER_HPP
+#endif //JF_LIVE_WRITER_HPP
