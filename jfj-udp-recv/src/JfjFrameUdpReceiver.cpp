@@ -1,23 +1,23 @@
 #include <cstring>
-#include <jungfrau.hpp>
+#include <jungfraujoch.hpp>
 #include "JfjFrameUdpReceiver.hpp"
 
 using namespace std;
 using namespace buffer_config;
 
 JfjFrameUdpReceiver::JfjFrameUdpReceiver(const uint16_t port) {
-    udp_receiver_.bind(port);
+    m_udp_receiver.bind(port);
 }
 
 JfjFrameUdpReceiver::~JfjFrameUdpReceiver() {
-    udp_receiver_.disconnect();
+    m_udp_receiver.disconnect();
 }
 
-inline void JfjFrameUdpReceiver::init_frame(ImageMetadata& frame_metadata, const jfjoch_packet_t& c_packet) {
-        frame_metadata.pulse_id = c_packet.timestamp;
-        frame_metadata.frame_index = c_packet.framenum;
-        frame_metadata.daq_rec = (uint32_t) c_packet.debug;
-        frame_metadata.is_good_image = (int32_t) true;
+inline void JfjFrameUdpReceiver::init_frame(ImageMetadata& metadata, const jfjoch_packet_t& c_packet) {
+        metadata.pulse_id = c_packet.timestamp;
+        metadata.frame_index = c_packet.framenum;
+        metadata.daq_rec = (uint32_t) c_packet.debug;
+        metadata.is_good_image = (int32_t) true;
 }
 
 inline uint64_t JfjFrameUdpReceiver::process_packets(ImageMetadata& metadata, char* frame_buffer){
@@ -26,7 +26,7 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ImageMetadata& metadata, ch
         // Happens if the last packet from the previous frame gets lost.
         if (m_frame_index != m_buffer.peek_front().framenum) {
             m_frame_index = m_buffer.peek_front().framenum;
-            frame_metadata.is_good_image = (int32_t) false;
+            metadata.is_good_image = (int32_t) false;
             return metadata.pulse_id;
         }
 
@@ -38,12 +38,11 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ImageMetadata& metadata, ch
         this->init_frame(metadata, c_packet);
 
         // Copy data to frame buffer
-        size_t offset = JUNGFRAU_DATA_BYTES_PER_PACKET * c_packet.packetnum;
-        memcpy( (void*) (frame_buffer + offset), c_packet.data, JUNGFRAU_DATA_BYTES_PER_PACKET);
-        metadata.n_recv_packets++;
+        size_t offset = JFJOCH_DATA_BYTES_PER_PACKET * c_packet.packetnum;
+        memcpy( (void*) (frame_buffer + offset), c_packet.data, JFJOCH_DATA_BYTES_PER_PACKET);
 
         // Last frame packet received. Frame finished.
-        if (c_packet.packetnum == JFJ_N_PACKETS_PER_FRAME - 1){
+        if (c_packet.packetnum == JFJOCH_N_PACKETS_PER_FRAME - 1){
             return metadata.pulse_id;
         }
     }
@@ -54,10 +53,9 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ImageMetadata& metadata, ch
 }
 
 uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ImageMetadata& metadata, char* frame_buffer){
-    // Reset the metadata and frame buffer for the next frame.
+    // Reset the metadata and frame buffer for the next frame. (really needed?)
     metadata.pulse_id = 0;
-    metadata.n_recv_packets = 0;
-    memset(frame_buffer, 0, JUNGFRAU_DATA_BYTES_PER_FRAME);
+    memset(frame_buffer, 0, JFJOCH_DATA_BYTES_PER_PACKET);
 
     // Process leftover packages in the buffer
     if (!m_buffer.is_empty()) {

@@ -34,8 +34,8 @@ public:
     /**Diagnostics**/
     size_t size() const { return ( idx_write-idx_read ); }
     size_t capacity() const { return m_capacity; }
-    bool is_full() const { return (idx_write >= m_capacity); }
-    bool is_empty() const { return (idx_write <= idx_read); }
+    bool is_full() const { return bool(idx_write >= m_capacity); }
+    bool is_empty() const { return bool(idx_write <= idx_read); }
 
     /**Operators**/
     void reset(){ idx_write = 0; idx_read = 0; };		// Reset the buffer
@@ -43,15 +43,15 @@ public:
     mmsghdr& msgs(){ return m_msgs; };
 
     /**Element access**/
-    const T& pop_front();       //Destructive read
+    T& pop_front();             //Destructive read
     const T& peek_front();      //Non-destructive read
     void push_back(T item);     //Write new element to buffer
 
     /**Fill from UDP receiver**/
     template <typename TY>
-    void fill_fom(TY& recv){
+    void fill_from(TY& recv){
         std::lock_guard<std::mutex> g_guard(m_mutex);
-        this->idx_write = recv.receive_many(this->msgs(), this->capacity());
+        this->idx_write = recv.receive_many(m_msgs, this->capacity());
         this->idx_read = 0;
     }
 
@@ -80,7 +80,7 @@ private:
 	Standard read access to queues (i.e. progress the read pointer).
 	Throws 'std::length_error' if container is empty. **/
 template <typename T, size_t CAPACITY>
-const T& PacketBuffer<T, CAPACITY>::pop_front(){
+T& PacketBuffer<T, CAPACITY>::pop_front(){
     std::lock_guard<std::mutex> g_guard(m_mutex);
     if(this->is_empty()){ throw std::out_of_range("Attempted to read empty queue!"); }
     idx_read++;
