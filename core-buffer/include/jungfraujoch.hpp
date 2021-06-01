@@ -17,7 +17,7 @@ struct jfjoch_packet_t {
     uint32_t exptime;
     uint32_t packetnum;
 
-    double bunchid;
+    uint64_t bunchid;
     uint64_t timestamp;
 
     uint16_t moduleID;

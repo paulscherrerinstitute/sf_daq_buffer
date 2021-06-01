@@ -13,7 +13,6 @@ using namespace std;
 TEST(BufferUdpReceiver, simple_recv)
 {
     auto n_packets = JF_N_PACKETS_PER_FRAME;
-    int source_id = 1234;
     int n_frames = 5;
 
     uint16_t udp_port = MOCK_UDP_PORT;
@@ -21,7 +20,7 @@ TEST(BufferUdpReceiver, simple_recv)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    FrameUdpReceiver udp_receiver(udp_port, source_id);
+    JfjFrameUdpReceiver udp_receiver(udp_port);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -57,7 +56,6 @@ TEST(BufferUdpReceiver, simple_recv)
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
         ASSERT_EQ(metadata.n_recv_packets, n_packets);
-        ASSERT_EQ(metadata.module_id, source_id);
     }
 
     ::close(send_socket_fd);
@@ -66,7 +64,6 @@ TEST(BufferUdpReceiver, simple_recv)
 TEST(BufferUdpReceiver, missing_middle_packet)
 {
     auto n_packets = JF_N_PACKETS_PER_FRAME;
-    int source_id = 1234;
     int n_frames = 3;
 
     uint16_t udp_port = MOCK_UDP_PORT;
@@ -74,7 +71,7 @@ TEST(BufferUdpReceiver, missing_middle_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    FrameUdpReceiver udp_receiver(udp_port, source_id);
+    JfjFrameUdpReceiver udp_receiver(udp_port, source_id);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -115,7 +112,6 @@ TEST(BufferUdpReceiver, missing_middle_packet)
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
         ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
-        ASSERT_EQ(metadata.module_id, source_id);
     }
 
     ::close(send_socket_fd);
@@ -124,7 +120,6 @@ TEST(BufferUdpReceiver, missing_middle_packet)
 TEST(BufferUdpReceiver, missing_first_packet)
 {
     auto n_packets = JF_N_PACKETS_PER_FRAME;
-    int source_id = 1234;
     int n_frames = 3;
 
     uint16_t udp_port = MOCK_UDP_PORT;
@@ -132,7 +127,7 @@ TEST(BufferUdpReceiver, missing_first_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    FrameUdpReceiver udp_receiver(udp_port, source_id);
+    JfjFrameUdpReceiver udp_receiver(udp_port);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -173,7 +168,6 @@ TEST(BufferUdpReceiver, missing_first_packet)
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
         ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
-        ASSERT_EQ(metadata.module_id, source_id);
     }
 
     ::close(send_socket_fd);
@@ -182,7 +176,6 @@ TEST(BufferUdpReceiver, missing_first_packet)
 TEST(BufferUdpReceiver, missing_last_packet)
 {
     auto n_packets = JF_N_PACKETS_PER_FRAME;
-    int source_id = 1234;
     int n_frames = 3;
 
     uint16_t udp_port = MOCK_UDP_PORT;
@@ -190,7 +183,7 @@ TEST(BufferUdpReceiver, missing_last_packet)
     auto send_socket_fd = socket(AF_INET, SOCK_DGRAM, 0);
     ASSERT_TRUE(send_socket_fd >= 0);
 
-    FrameUdpReceiver udp_receiver(udp_port, source_id);
+    JfjFrameUdpReceiver udp_receiver(udp_port);
 
     auto handle = async(launch::async, [&](){
         for (int i_frame=0; i_frame < n_frames; i_frame++){
@@ -224,15 +217,13 @@ TEST(BufferUdpReceiver, missing_last_packet)
 
     // n_frames -1 because the last frame is not complete.
     for (int i_frame=0; i_frame < n_frames - 1; i_frame++) {
-        auto pulse_id = udp_receiver.get_frame_from_udp(
-                metadata, frame_buffer.get());
+        auto pulse_id = udp_receiver.get_frame_from_udp(metadata, frame_buffer.get());
 
         ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
         ASSERT_EQ(metadata.daq_rec, i_frame + 10000);
         // -1 because we skipped a packet.
         ASSERT_EQ(metadata.n_recv_packets, n_packets - 1);
-        ASSERT_EQ(metadata.module_id, source_id);
     }
 
     ::close(send_socket_fd);
