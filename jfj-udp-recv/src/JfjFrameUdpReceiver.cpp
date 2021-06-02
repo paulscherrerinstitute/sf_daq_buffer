@@ -1,9 +1,16 @@
 #include <cstring>
-#include <jungfraujoch.hpp>
 #include "JfjFrameUdpReceiver.hpp"
 
 using namespace std;
 using namespace buffer_config;
+
+std::ostream &operator<<(std::ostream &os, jfjoch_packet_t const &packet) { 
+    os << "Frame number: " << packet.framenum << std::endl;
+    os << "Packet number: " << packet.packetnum << std::endl;
+    os << "Bunch id: " << packet.bunchid << std::endl;
+    os << std::endl;
+    return os;
+}
 
 JfjFrameUdpReceiver::JfjFrameUdpReceiver(const uint16_t port) {
     m_udp_receiver.bind(port);
@@ -13,7 +20,9 @@ JfjFrameUdpReceiver::~JfjFrameUdpReceiver() {
     m_udp_receiver.disconnect();
 }
 
-inline void JfjFrameUdpReceiver::init_frame(ModuleFrame& metadata, const jfjoch_packet_t& c_packet) {       
+inline void JfjFrameUdpReceiver::init_frame(ModuleFrame& metadata, const jfjoch_packet_t& c_packet) {
+    // std::cout << c_packet;
+      
     metadata.pulse_id = c_packet.bunchid;
     metadata.frame_index = c_packet.framenum;
     metadata.daq_rec = (uint64_t) c_packet.debug;
@@ -26,6 +35,7 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
         // Happens if the last packet from the previous frame gets lost.
         if (m_frame_index != m_buffer.peek_front().framenum) {
             m_frame_index = m_buffer.peek_front().framenum;
+            std::cout << "Peeked pulse: " << metadata.pulse_id << std::endl;
             return metadata.pulse_id;
         }
 
@@ -48,7 +58,7 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
     }
 
     // We emptied the buffer.
-    m_buffer.reset();
+   // m_buffer.reset();
     return 0;
 }
 
@@ -56,8 +66,7 @@ uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ModuleFrame& metadata, char* fr
     // Reset the metadata and frame buffer for the next frame. (really needed?)
     metadata.pulse_id = 0;
     metadata.n_recv_packets = 0;
-    memset(frame_buffer, 0, JFJOCH_DATA_BYTES_PER_PACKET);
-
+    memset(frame_buffer, 0, JFJOCH_DATA_BYTES_PER_FRAME);
     // Process leftover packages in the buffer
     if (!m_buffer.is_empty()) {
         auto pulse_id = process_packets(metadata, frame_buffer);
@@ -66,7 +75,8 @@ uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ModuleFrame& metadata, char* fr
 
     while (true) {
         // Receive new packages (pass if none)...
-        m_buffer.fill_from(m_udp_receiver);
+        m_buffer.reset();
+        m_buffer.fill_from(m_udp_receiver);      
         if (m_buffer.is_empty()) { continue; }
 
         // ... and process them

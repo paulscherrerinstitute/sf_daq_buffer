@@ -18,8 +18,7 @@ int main (int argc, char *argv[]) {
 
     if (argc != 3) {
         cout << endl;
-        cout << "Usage: jfj_udp_recv [detector_json_filename]";
-        cout << endl;
+        cout << "Usage: jfj_udp_recv [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << endl;
 

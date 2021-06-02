@@ -9,4 +9,4 @@ set_target_properties(jfj-udp-recv PROPERTIES OUTPUT_NAME jf_udp_recv)
 target_link_libraries(jfj-udp-recv jfj-udp-recv-lib zmq rt)
 
 enable_testing()
-# add_subdirectory(test/)
+add_subdirectory(test/)

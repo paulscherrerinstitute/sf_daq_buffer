@@ -32,8 +32,8 @@ public:
     // ~PacketBuffer() {};
 
     /**Diagnostics**/
-    size_t size() const { return ( idx_write-idx_read ); }
-    size_t capacity() const { return m_capacity; }
+    int size() const { return ( idx_write-idx_read ); }
+    int capacity() const { return m_capacity; }
     bool is_full() const { return bool(idx_write >= m_capacity); }
     bool is_empty() const { return bool(idx_write <= idx_read); }
 
@@ -52,6 +52,8 @@ public:
     void fill_from(TY& recv){
         std::lock_guard<std::mutex> g_guard(m_mutex);
         this->idx_write = recv.receive_many(m_msgs, this->capacity());
+        // Returns -1 with errno=11 if no data received
+        if(idx_write==-1){ idx_write = 0; }
         this->idx_read = 0;
     }
 
@@ -62,8 +64,8 @@ private:
     /**Guards**/
     std::mutex m_mutex;
     /**Read and write index**/
-    size_t idx_write = 0;
-    size_t idx_read = 0;
+    int idx_write = 0;
+    int idx_read = 0;
 
     // C-structures as expected by <sockets.h>
     mmsghdr m_msgs[CAPACITY];

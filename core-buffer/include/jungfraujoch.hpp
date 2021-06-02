@@ -1,13 +1,13 @@
-#ifndef JUNGFRAUJOCH_H
-#define JUNGFRAUJOCH_H
+#ifndef JUNGFRAUJOCH_HPP
+#define JUNGFRAUJOCH_HPP
 
 #include <cstdint>
 
 #define JFJOCH_N_MODULES 32
 #define JFJOCH_BYTES_PER_PACKET 8240
 #define JFJOCH_DATA_BYTES_PER_PACKET 8192
-#define JFJOCH_N_PACKETS_PER_FRAME JFJOCH_N_MODULES * 128
-#define JFJOCH_DATA_BYTES_PER_FRAME JFJOCH_N_MODULES * 1048576
+#define JFJOCH_N_PACKETS_PER_FRAME (JFJOCH_N_MODULES * 128)
+#define JFJOCH_DATA_BYTES_PER_FRAME (JFJOCH_N_MODULES * 1048576)
 
 // 48 bytes + 8192 bytes = 8240 bytes
 #pragma pack(push)
@@ -17,7 +17,7 @@ struct jfjoch_packet_t {
     uint32_t exptime;
     uint32_t packetnum;
 
-    uint64_t bunchid;
+    int64_t bunchid;
     uint64_t timestamp;
 
     uint16_t moduleID;
