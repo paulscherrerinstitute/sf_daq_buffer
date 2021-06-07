@@ -51,7 +51,7 @@ int main (int argc, char *argv[]) {
         bool bad_pulse_id = false;
 
         if ( ( meta.frame_index != (frame_index_previous+1) ) ||
-             ( (pulse_id-pulse_id_previous) < 0 ) ||
+             ( (pulse_id-pulse_id_previous) <= 0 ) ||
              ( (pulse_id-pulse_id_previous) > 1000 ) ) {
 
             bad_pulse_id = true;
