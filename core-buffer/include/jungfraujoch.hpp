@@ -3,13 +3,13 @@
 
 #include <cstdint>
 
-#define JFJOCH_N_MODULES 32
+#define JFJOCH_N_MODULES 8
 #define JFJOCH_BYTES_PER_PACKET 8240
 #define JFJOCH_DATA_BYTES_PER_PACKET 8192
 #define JFJOCH_N_PACKETS_PER_FRAME (JFJOCH_N_MODULES * 128)
 #define JFJOCH_DATA_BYTES_PER_FRAME (JFJOCH_N_MODULES * 1048576)
 
-// 48 bytes + 8192 bytes = 8240 bytes
+// 48 bytes + 8192 bytes = 8240 bytes (below 9000 MTU)
 #pragma pack(push)
 #pragma pack(2)
 struct jfjoch_packet_t {
@@ -33,5 +33,4 @@ struct jfjoch_packet_t {
 };
 #pragma pack(pop)
 
-
-#endif
+#endif  // JUNGFRAUJOCH_HPP

@@ -52,6 +52,7 @@ public:
     void fill_from(TY& recv){
         std::lock_guard<std::mutex> g_guard(m_mutex);
         this->idx_write = recv.receive_many(m_msgs, this->capacity());
+        // std::cout << "Received " << this->idx_write << " frames" << std::endl;
         // Returns -1 with errno=11 if no data received
         if(idx_write==-1){ idx_write = 0; }
         this->idx_read = 0;

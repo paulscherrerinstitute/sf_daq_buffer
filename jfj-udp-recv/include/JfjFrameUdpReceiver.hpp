@@ -15,7 +15,8 @@
 **/
 class JfjFrameUdpReceiver {
     PacketUdpReceiver m_udp_receiver;
-    uint64_t m_frame_index;
+    bool is_initialized = false;
+    uint64_t m_frame_index = 0;
 
     PacketBuffer<jfjoch_packet_t, buffer_config::BUFFER_UDP_N_RECV_MSG> m_buffer;
 
