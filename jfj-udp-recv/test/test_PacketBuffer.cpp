@@ -28,18 +28,15 @@ class MockReceiver{
         uint64_t packet_per_frame = 512;
         uint64_t num_bunches = 100;
         uint64_t num_packets =50;
+        jfjoch_packet_t tmp;
 
         uint64_t receive_many(mmsghdr* msgs, const size_t n_msgs){
             // Receive 'num_packets numner of packets'
-            for(int ii=0; ii<num_packets; ii++){
-                std::cout << "Buffer length: " << msgs[ii].msg_hdr.msg_iov->iov_len << "\tExpected: " << sizeof(jfjoch_packet_t)  << std::endl;
-                
-                jfjoch_packet_t& refer = reinterpret_cast<jfjoch_packet_t&>(msgs[ii].msg_hdr.msg_iov->iov_base);
-                refer.framenum = idx_packet / packet_per_frame;
-                refer.bunchid = idx_packet / packet_per_frame;
-                refer.packetnum = idx_packet % packet_per_frame;
-                
-                std::cout << refer << "\n";
+            for(int ii=0; ii<num_packets; ii++){                
+                tmp.framenum = idx_packet / packet_per_frame;
+                tmp.bunchid = 1000 + idx_packet / packet_per_frame;
+                tmp.packetnum = idx_packet % packet_per_frame;
+                memcpy( msgs[ii].msg_hdr.msg_iov->iov_base, &tmp, sizeof(tmp));
                 idx_packet++;
             }
             return num_packets;
@@ -49,7 +46,6 @@ class MockReceiver{
 
 
 TEST(BufferUdpReceiver, packetbuffer_simple){
-    std::cout << "Testing PacketBuffer..." << std::endl;
 
     PacketBuffer<jfjoch_packet_t, 128> p_buffer;
     MockReceiver mockery;
@@ -63,12 +59,9 @@ TEST(BufferUdpReceiver, packetbuffer_simple){
     
     // First packet
     ASSERT_FALSE(p_buffer.is_empty());
-    ASSERT_EQ(p_buffer.size(), 25);
-
-    std::cout << "Current packet:\n" << p_buffer.peek_front();
+    ASSERT_EQ(p_buffer.size(), 25);  
     
-    
-    ASSERT_EQ(p_buffer.peek_front().bunchid, 7);
+    ASSERT_EQ(p_buffer.peek_front().bunchid, 1007);
     ASSERT_EQ(p_buffer.peek_front().packetnum, 13);
     prev_bunch = p_buffer.peek_front().bunchid;
     prev_packet = p_buffer.peek_front().packetnum;
@@ -80,6 +73,4 @@ TEST(BufferUdpReceiver, packetbuffer_simple){
     ASSERT_EQ(p_pop.packetnum, prev_packet);
     ASSERT_EQ(p_buffer.peek_front().bunchid, prev_bunch);
     ASSERT_EQ(p_buffer.peek_front().packetnum, prev_packet+1);
-    std::cout << "Done..." << std::endl;
-
 };

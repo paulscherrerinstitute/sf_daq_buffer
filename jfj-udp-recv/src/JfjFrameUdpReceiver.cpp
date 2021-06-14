@@ -62,8 +62,6 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
 
 uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
     // Reset the metadata and frame buffer for the next frame. (really needed?)
-    std::cout << "Asking for next frame..." << std::endl;
-
     metadata.pulse_id = 0;
     metadata.n_recv_packets = 0;
     memset(frame_buffer, 0, m_num_data_bytes);
@@ -78,9 +76,6 @@ uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ModuleFrame& metadata, char* fr
 
     while (true) {
         // Receive new packages (pass if none)...
-        std::cout << "Fetching new data..." << std::endl;
-
-        // m_buffer.reset();
         m_buffer.fill_from(m_udp_receiver);    
         if (m_buffer.is_empty()) { continue; }
 

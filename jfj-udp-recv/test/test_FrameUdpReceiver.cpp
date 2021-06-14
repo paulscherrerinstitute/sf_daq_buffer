@@ -187,7 +187,6 @@ TEST(BufferUdpReceiver, missing_last_packet){
     // n_frames -1 because the last frame is not complete.
     for (int i_frame=0; i_frame < n_frames - 1; i_frame++) {
         auto pulse_id = udp_receiver.get_frame_from_udp(metadata, frame_buffer.get());
-        std::cout << "Retrieved pulse_id: " << pulse_id << std::endl;
 
         ASSERT_EQ(i_frame + 1, pulse_id);
         ASSERT_EQ(metadata.frame_index, i_frame + 1000);
