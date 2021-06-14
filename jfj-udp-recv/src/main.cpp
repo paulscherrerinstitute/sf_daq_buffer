@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
     const auto config = read_json_config(string(argv[1]));
 
     const auto udp_port = config.start_udp_port;
-    JfjFrameUdpReceiver receiver(udp_port);
+    JfjFrameUdpReceiver receiver(udp_port, 8);
     RamBuffer buffer(config.detector_name, config.n_modules);
     FrameStats stats(config.detector_name, 0, STATS_TIME);
 
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
     // Might be better creating a structure for double buffering
     ModuleFrame frameMeta;
     ImageMetadata imageMeta;
-    char* dataBuffer = new char[JFJOCH_DATA_BYTES_PER_FRAME];
+    char* dataBuffer = new char[8 * JFJOCH_DATA_BYTES_PER_MODULE];
 
     uint64_t pulse_id_previous = 0;
     uint64_t frame_index_previous = 0;

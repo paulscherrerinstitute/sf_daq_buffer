@@ -4,15 +4,11 @@
 using namespace std;
 using namespace buffer_config;
 
-std::ostream &operator<<(std::ostream &os, jfjoch_packet_t const &packet) { 
-    os << "Frame number: " << packet.framenum << std::endl;
-    os << "Packet number: " << packet.packetnum << std::endl;
-    os << "Bunch id: " << packet.bunchid << std::endl;
-    os << std::endl;
-    return os;
-}
 
-JfjFrameUdpReceiver::JfjFrameUdpReceiver(const uint16_t port) {
+
+JfjFrameUdpReceiver::JfjFrameUdpReceiver(const uint16_t port, uint64_t n_modules): 
+        m_num_modules(n_modules), m_num_packets(n_modules*JFJOCH_N_PACKETS_PER_MODULE), 
+        m_num_data_bytes(n_modules*JFJOCH_DATA_BYTES_PER_MODULE) {
     m_udp_receiver.bind(port);
 }
 
@@ -20,9 +16,7 @@ JfjFrameUdpReceiver::~JfjFrameUdpReceiver() {
     m_udp_receiver.disconnect();
 }
 
-inline void JfjFrameUdpReceiver::init_frame(ModuleFrame& metadata, const jfjoch_packet_t& c_packet) {
-    // std::cout << c_packet;
-      
+inline void JfjFrameUdpReceiver::init_frame(ModuleFrame& metadata, const jfjoch_packet_t& c_packet) {     
     metadata.pulse_id = c_packet.bunchid;
     metadata.frame_index = c_packet.framenum;
     metadata.daq_rec = (uint64_t) c_packet.debug;
@@ -33,21 +27,18 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
 
     while(!m_buffer.is_empty()){
         // Happens if the last packet from the previous frame gets lost.
-        if (m_frame_index != m_buffer.peek_front().framenum) {
-            std::cout << "Metadata pulse: " << metadata.pulse_id << "\tIndex: " <<  m_frame_index << "\tCurrent one is: " << m_buffer.peek_front().framenum << std::endl;
-            
+        if (m_frame_index != m_buffer.peek_front().framenum) {           
             m_frame_index = m_buffer.peek_front().framenum;
-            if(this->is_initialized){
+            if(this->in_progress){
+                this->in_progress = false;
                 return metadata.pulse_id;
-            }else{
-                this->is_initialized = true;
             }
         }
 
         // Otherwise pop the queue (and set current frame index)
         jfjoch_packet_t& c_packet = m_buffer.pop_front();
-        std::cout << c_packet << std::endl;
         m_frame_index = c_packet.framenum;
+        this->in_progress = true;
 
         // Always copy metadata (otherwise problem when 0th packet gets lost)
         this->init_frame(metadata, c_packet);
@@ -58,7 +49,8 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
         metadata.n_recv_packets++;
 
         // Last frame packet received. Frame finished.
-        if (c_packet.packetnum == JFJOCH_N_PACKETS_PER_FRAME - 1){
+        if (c_packet.packetnum == m_num_packets - 1){
+            this->in_progress = false;
             return metadata.pulse_id;
         }
     }
@@ -70,33 +62,30 @@ inline uint64_t JfjFrameUdpReceiver::process_packets(ModuleFrame& metadata, char
 
 uint64_t JfjFrameUdpReceiver::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
     // Reset the metadata and frame buffer for the next frame. (really needed?)
+    std::cout << "Asking for next frame..." << std::endl;
+
     metadata.pulse_id = 0;
     metadata.n_recv_packets = 0;
-    memset(frame_buffer, 0, JFJOCH_DATA_BYTES_PER_FRAME);
+    memset(frame_buffer, 0, m_num_data_bytes);
+    
+    
     // Process leftover packages in the buffer
-    if (!m_buffer.is_empty()) {
-        std::cout << "Leftovers..." << std::endl;
+    if (!m_buffer.is_empty()) {       
         auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { 
-            std::cout << "Returning frame: " << pulse_id << std::endl;
-            return pulse_id; }
+        if (pulse_id != 0) { return pulse_id; }
     }
+
 
     while (true) {
         // Receive new packages (pass if none)...
-        std::cout << "Really new..." << std::endl;
+        std::cout << "Fetching new data..." << std::endl;
 
         // m_buffer.reset();
         m_buffer.fill_from(m_udp_receiver);    
-        std::cout << "Got " << m_buffer.size() << std::endl;  
-        if (m_buffer.is_empty()) { 
-            std::cout << "Empty..." << std::endl;
-            continue; }
+        if (m_buffer.is_empty()) { continue; }
 
         // ... and process them
         auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { 
-            std::cout << "Returning frame: " << pulse_id << std::endl;
-            return pulse_id; }
+        if (pulse_id != 0) { return pulse_id; }
     }
 }
