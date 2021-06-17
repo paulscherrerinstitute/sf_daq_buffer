@@ -31,8 +31,7 @@ public:
                      ModuleFrame &meta,
                      char *data) const;
     char* read_image(const uint64_t pulse_id) const;
-    void assemble_image(
-            const uint64_t pulse_id, ImageMetadata &image_meta) const;
+    void assemble_image(const uint64_t pulse_id, ImageMetadata &image_meta) const;
 };
 
 
