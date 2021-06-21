@@ -2,7 +2,7 @@ file(GLOB SOURCES src/*.cpp)
 
 add_library(jfj-combined-lib STATIC ${SOURCES})
 target_include_directories(jfj-combined-lib PUBLIC include/)
-target_link_libraries(jfj-combined-lib external core-buffer-lib)
+target_link_libraries(jfj-combined-lib external)
 
 add_executable(jfj-combined src/main.cpp)
 set_target_properties(jfj-combined PROPERTIES OUTPUT_NAME jfj_combined)

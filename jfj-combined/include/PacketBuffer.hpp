@@ -5,8 +5,13 @@
 #include <stdexcept>
 #include <iostream>
 #include <mutex>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <cstdint>
+#if defined(WIN32) || defined(_WIN32) || defined(MINGW32)
+    #include <winsock2.h>
+#else
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+#endif // defined
 
 
 /** Linear data buffer (NOT FIFO)

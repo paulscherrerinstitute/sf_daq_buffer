@@ -3,6 +3,7 @@
 
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
+#include "jungfraujoch.hpp"
 
 #pragma pack(push)
 #pragma pack(1)

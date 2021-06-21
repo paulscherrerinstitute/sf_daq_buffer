@@ -11,7 +11,7 @@
 #include <functional>
 #include <thread>
 
-#include "jungfraujoch.hpp"
+#include "../../core-buffer/include/formats.hpp"
 
 
 /** Frame cache
@@ -32,25 +32,25 @@ public:
 
 
     /** Emplace a specific frame and module **/
-    void emplace(uint64_t pulseID, uint64_t moduleID, char* ptr_source, ModuleFrame& ref_meta){
+    void emplace(uint64_t pulseID, uint64_t moduleID, BufferBinaryFormat& ref_frame){
         uint64_t idx = pulseID % m_capacity;
 
         // Wait for unlocking block
         while(m_vlock[idx]){ std::this_thread::yield(); }
 
         // Invalid cache line: Just start a new line
-        if(m_valid[idx]){ start_line(idx, ref_meta); }
+        if(m_valid[idx]){ start_line(idx, ref_frame.meta); }
 
         // A new frame is starting
-        if(ref_meta.frame_index != m_meta[idx].frame_index){
+        if(ref_frame.meta.frame_index != m_meta[idx].frame_index){
             flush_line(idx);
-            start_line(idx, ref_meta);
+            start_line(idx, ref_frame.meta);
         }
 
         m_fill[idx]++;
         char* ptr_dest = m_data[idx].data() + moduleID * m_blocksize;
-        std::memcpy(ptr_dest, (void*)ptr_source, m_blocksize);
-        std::memcpy(&m_meta[idx], (void*)&ref_meta, sizeof(ModuleFrame));
+        std::memcpy(ptr_dest, (void*)&ref_frame.data, m_blocksize);
+        std::memcpy(&m_meta[idx], (void*)&ref_frame.meta, sizeof(ModuleFrame));
     }
 
 

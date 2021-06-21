@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <formats.hpp>
+#include "../../core-buffer/include/formats.hpp"
 #include <chrono>
 
 #ifndef SF_DAQ_BUFFER_FRAMESTATS_HPP

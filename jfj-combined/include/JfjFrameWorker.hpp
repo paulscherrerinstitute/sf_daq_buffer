@@ -1,12 +1,11 @@
-#ifndef SF_DAQ_BUFFER_JFJ_UDPRECEIVER_HPP
-#define SF_DAQ_BUFFER_JFJ_UDPRECEIVER_HPP
+#ifndef SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP
+#define SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP
 
+#include <iostream>
 #include <functional>
+#include "../../core-buffer/include/formats.hpp"
 #include "PacketUdpReceiver.hpp"
-#include "formats.hpp"
-#include "buffer_config.hpp"
 #include "PacketBuffer.hpp"
-#include "jungfraujoch.hpp"
 
 /** JungfrauJoch UDP receiver
 
@@ -14,6 +13,7 @@
     NOTE: This design will not scale well for higher frame rates...
 **/
 class JfjFrameWorker {
+    std::string m_state = "INIT";
     PacketUdpReceiver m_udp_receiver;
     bool in_progress = false;
     uint64_t m_frame_index = 0;
@@ -21,19 +21,25 @@ class JfjFrameWorker {
     const uint64_t m_num_packets;
     const uint64_t m_num_data_bytes;
 
-    // PacketBuffer<jfjoch_packet_t, buffer_config::BUFFER_UDP_N_RECV_MSG> m_buffer;
     PacketBuffer<jfjoch_packet_t, 64> m_buffer;
 
-    inline void init_frame(ModuleFrame& frame_metadata, const jfjoch_packet_t& c_packet);
-    inline uint64_t process_packets(ModuleFrame& metadata, char* frame_buffer);
+    inline uint64_t process_packets(BufferBinaryFormat& buffer);
+    uint64_t get_frame(BufferBinaryFormat& buffer);
 
-    std::function<void(uint64_t, uint64_t, char*, ModuleFrame&)> f_push_callback;
+    std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> f_push_callback;
 public:
-    JfjFrameWorker(const uint16_t port, const uint32_t moduleID, 
-                   std::function<void(uint64_t, uint64_t, char*, ModuleFrame&)> callback);
+    JfjFrameWorker(const uint16_t port, const uint32_t moduleID,
+                   std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback);
     virtual ~JfjFrameWorker();
-    uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
+    std::string print() const;
     void run();
 };
 
-#endif //SF_DAQ_BUFFER_JFJ_UDPRECEIVER_HPP
+
+std::ostream& operator<<(std::ostream& os, const JfjFrameWorker& worker){
+    os << worker.print() << std::endl;
+    return os;
+}
+
+
+#endif //SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP
