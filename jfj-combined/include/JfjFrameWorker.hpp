@@ -1,6 +1,7 @@
 #ifndef SF_DAQ_BUFFER_JFJ_UDPRECEIVER_HPP
 #define SF_DAQ_BUFFER_JFJ_UDPRECEIVER_HPP
 
+#include <functional>
 #include "PacketUdpReceiver.hpp"
 #include "formats.hpp"
 #include "buffer_config.hpp"
@@ -16,7 +17,7 @@ class JfjFrameWorker {
     PacketUdpReceiver m_udp_receiver;
     bool in_progress = false;
     uint64_t m_frame_index = 0;
-    const uint64_t m_num_modules;
+    const uint64_t m_moduleID;
     const uint64_t m_num_packets;
     const uint64_t m_num_data_bytes;
 
@@ -26,11 +27,12 @@ class JfjFrameWorker {
     inline void init_frame(ModuleFrame& frame_metadata, const jfjoch_packet_t& c_packet);
     inline uint64_t process_packets(ModuleFrame& metadata, char* frame_buffer);
 
-    std::function<void(uint64_t index, uint32_t module, char* ptr_data, ModuleFrame* ptr_meta)> f_push_callback;
+    std::function<void(uint64_t, uint64_t, char*, ModuleFrame&)> f_push_callback;
 public:
-    JfjFrameUdpReceiver(const uint16_t port, std::function<void(uint64_t index, uint32_t module, char* ptr_data, ModuleFrame* ptr_meta)> callback);
-    virtual ~JfjFrameUdpReceiver();
-    std::generator<uint64_t> get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
+    JfjFrameWorker(const uint16_t port, const uint32_t moduleID, 
+                   std::function<void(uint64_t, uint64_t, char*, ModuleFrame&)> callback);
+    virtual ~JfjFrameWorker();
+    uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
     void run();
 };
 

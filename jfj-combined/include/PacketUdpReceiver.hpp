@@ -1,6 +1,7 @@
 #ifndef UDPRECEIVER_H
 #define UDPRECEIVER_H
 
+#include <cstdint>
 #if defined(WIN32) || defined(_WIN32) || defined(MINGW32)
     #include <winsock2.h>
 #else

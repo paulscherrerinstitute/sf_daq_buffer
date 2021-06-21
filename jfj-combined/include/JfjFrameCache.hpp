@@ -2,6 +2,7 @@
 #define FRAME_CACHE_HPP
 
 #include <cstddef>
+#include <cstring>
 #include <stdexcept>
 #include <iostream>
 #include <mutex>
@@ -31,25 +32,25 @@ public:
 
 
     /** Emplace a specific frame and module **/
-    void emplace(uint64_t pulseID, uint32_t moduleID, char* ptr_source, ModuleFrame* ptr_meta){
+    void emplace(uint64_t pulseID, uint64_t moduleID, char* ptr_source, ModuleFrame& ref_meta){
         uint64_t idx = pulseID % m_capacity;
 
         // Wait for unlocking block
         while(m_vlock[idx]){ std::this_thread::yield(); }
 
         // Invalid cache line: Just start a new line
-        if(m_valid[idx]){ start_line(idx, ptr_meta); }
+        if(m_valid[idx]){ start_line(idx, ref_meta); }
 
         // A new frame is starting
-        if(ptr_meta->frame_index != m_meta[idx].frame_index){
+        if(ref_meta.frame_index != m_meta[idx].frame_index){
             flush_line(idx);
-            start_line(idx, ptr_meta);
+            start_line(idx, ref_meta);
         }
 
         m_fill[idx]++;
         char* ptr_dest = m_data[idx].data() + moduleID * m_blocksize;
-        memcpy(ptr_dest, (void*)ptr_source, m_blocksize);
-        memcpy(&m_meta[idx], (void*)ptr_meta, sizeof(ModuleFrame));
+        std::memcpy(ptr_dest, (void*)ptr_source, m_blocksize);
+        std::memcpy(&m_meta[idx], (void*)&ref_meta, sizeof(ModuleFrame));
     }
 
 
@@ -71,11 +72,11 @@ public:
         }
     }
 
-    void start_line(uint64_t idx, ModuleFrame* ptr_meta){
+    void start_line(uint64_t idx, ModuleFrame& ref_meta){
         m_vlock[idx] = 1;
-        m_meta[idx].pulse_id = ptr_meta->pulse_id;
-        m_meta[idx].frame_index = ptr_meta->frame_index;
-        m_meta[idx].daq_rec = ptr_meta->daq_rec;
+        m_meta[idx].pulse_id = ref_meta.pulse_id;
+        m_meta[idx].frame_index = ref_meta.frame_index;
+        m_meta[idx].daq_rec = ref_meta.daq_rec;
         m_meta[idx].is_good_image = true;
         m_valid[idx] = 1;
         m_fill[idx] = 0;

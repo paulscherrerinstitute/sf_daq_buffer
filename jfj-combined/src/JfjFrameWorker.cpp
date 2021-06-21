@@ -6,9 +6,10 @@ using namespace buffer_config;
 
 
 
-JfjFrameWorker::JfjFrameWorker(const uint16_t port, std::function<void(uint64_t index, uint32_t module, char* ptr_data, ModuleFrame* ptr_meta)> callback):
-        m_num_modules(n_modules), m_num_packets(n_modules*JFJOCH_N_PACKETS_PER_MODULE),
-        m_num_data_bytes(n_modules*JFJOCH_DATA_BYTES_PER_MODULE), f_push_callback(callback) {
+JfjFrameWorker::JfjFrameWorker(const uint16_t port, const uint32_t moduleID,
+                               std::function<void(uint64_t, uint64_t, char*, ModuleFrame&)> callback):
+        m_moduleID(moduleID), m_num_packets(JFJOCH_N_PACKETS_PER_MODULE),
+        m_num_data_bytes(JFJOCH_DATA_BYTES_PER_MODULE), f_push_callback(callback) {
     m_udp_receiver.bind(port);
 }
 
@@ -60,36 +61,7 @@ inline uint64_t JfjFrameWorker::process_packets(ModuleFrame& metadata, char* fra
     return 0;
 }
 
-//uint64_t JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
-//    // Reset the metadata and frame buffer for the next frame. (really needed?)
-//    metadata.pulse_id = 0;
-//    metadata.n_recv_packets = 0;
-//    memset(frame_buffer, 0, m_num_data_bytes);
-//
-//
-//    // Process leftover packages in the buffer
-//    if (!m_buffer.is_empty()) {
-//        auto pulse_id = process_packets(metadata, frame_buffer);
-//        if (pulse_id != 0) { return pulse_id; }
-//    }
-//
-//
-//    while (true) {
-//        // Receive new packages (pass if none)...
-//        m_buffer.fill_from(m_udp_receiver);
-//        if (m_buffer.is_empty()) { continue; }
-//
-//        // ... and process them
-//        auto pulse_id = process_packets(metadata, frame_buffer);
-//        if (pulse_id != 0) { return pulse_id; }
-//    }
-//}
-//
-
-
-
-
-std::generator<uint64_t> JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
+uint64_t JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
     // Reset the metadata and frame buffer for the next frame. (really needed?)
     metadata.pulse_id = 0;
     metadata.n_recv_packets = 0;
@@ -99,7 +71,7 @@ std::generator<uint64_t> JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadat
     // Process leftover packages in the buffer
     if (!m_buffer.is_empty()) {
         auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { co_yield pulse_id; }
+        if (pulse_id != 0) { return pulse_id; }
     }
 
 
@@ -110,7 +82,7 @@ std::generator<uint64_t> JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadat
 
         // ... and process them
         auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { co_yield pulse_id; }
+        if (pulse_id != 0) { return pulse_id; }
     }
 }
 
@@ -127,7 +99,7 @@ void JfjFrameWorker::run(){
 
     while (true) {
         // NOTE: Needs to be pipelined for really high frame rates
-        auto pulse_id = co_await get_frame_from_udp(&frameMeta, dataBuffer);
+        auto pulse_id = get_frame_from_udp(frameMeta, dataBuffer);
 
         if(pulse_id>1000){
             f_push_callback(pulse_id, m_moduleID, dataBuffer, frameMeta);
