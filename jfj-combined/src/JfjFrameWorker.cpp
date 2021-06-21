@@ -87,7 +87,7 @@ uint64_t JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_b
 }
 
 void JfjFrameWorker::run(){
-
+    std::cout << "Running worker loop" << std::endl;
 
     // Might be better creating a structure for double buffering
     ModuleFrame frameMeta;
