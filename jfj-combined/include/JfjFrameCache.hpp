@@ -34,7 +34,8 @@ public:
     /** Emplace a specific frame and module **/
     void emplace(uint64_t pulseID, uint64_t moduleID, BufferBinaryFormat& ref_frame){
         uint64_t idx = pulseID % m_capacity;
-
+        std::cout << "  Emplace " << idx  << "( " <<  ref_frame.meta.frame_index << " to " << m_meta[idx].frame_index << " )" << std::endl;
+        
         // Wait for unlocking block
         while(m_vlock[idx]){ std::this_thread::yield(); }
 
@@ -43,10 +44,12 @@ public:
 
         // A new frame is starting
         if(ref_frame.meta.frame_index != m_meta[idx].frame_index){
+            std::cout << "  New frame " << std::endl;
             flush_line(idx);
             start_line(idx, ref_frame.meta);
         }
 
+        std::cout << "    fill/cpy" << std::endl;
         m_fill[idx]++;
         char* ptr_dest = m_data[idx].data() + moduleID * m_blocksize;
         std::memcpy(ptr_dest, (void*)&ref_frame.data, m_blocksize);

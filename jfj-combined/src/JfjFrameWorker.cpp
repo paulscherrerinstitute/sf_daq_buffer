@@ -20,7 +20,7 @@ JfjFrameWorker::~JfjFrameWorker() {
 
 
 inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
-    std::cout << "  Called process_packets()" << std::endl;
+    // std::cout << "  Called process_packets()" << std::endl;
 
     while(!m_buffer.is_empty()){
         // Happens if the last packet from the previous frame gets lost.
@@ -36,7 +36,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
         jfjoch_packet_t& c_packet = m_buffer.pop_front();
         m_frame_index = c_packet.framenum;
         this->in_progress = true;
-        std::cout << "    pp: " << c_packet.packetnum << std::endl;
+        //std::cout << "    pp: " << c_packet.packetnum << std::endl;
 
         // Always copy metadata (otherwise problem when 0th packet gets lost)
         buffer.meta.pulse_id = c_packet.bunchid;
@@ -51,7 +51,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 
         // Last frame packet received. Frame finished.
         if (c_packet.packetnum == JF_N_PACKETS_PER_FRAME - 1){
-            std::cout << "Finished pulse: " << buffer.meta.pulse_id << std::endl;
+            // std::cout << "Finished pulse: " << buffer.meta.pulse_id << std::endl;
             this->in_progress = false;
             return buffer.meta.pulse_id;
         }
@@ -62,7 +62,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 }
 
 uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
-    std::cout << "Called get_frame()" << std::endl;
+    // std::cout << "Called get_frame()" << std::endl;
     // Reset the metadata and frame buffer for the next frame. (really needed?)
     memset(&buffer, 0, sizeof(buffer));
 
