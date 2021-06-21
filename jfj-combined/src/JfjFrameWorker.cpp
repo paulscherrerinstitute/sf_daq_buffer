@@ -60,31 +60,31 @@ inline uint64_t JfjFrameWorker::process_packets(ModuleFrame& metadata, char* fra
     return 0;
 }
 
-uint64_t JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
-    // Reset the metadata and frame buffer for the next frame. (really needed?)
-    metadata.pulse_id = 0;
-    metadata.n_recv_packets = 0;
-    memset(frame_buffer, 0, m_num_data_bytes);
-
-
-    // Process leftover packages in the buffer
-    if (!m_buffer.is_empty()) {
-        auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { return pulse_id; }
-    }
-
-
-    while (true) {
-        // Receive new packages (pass if none)...
-        m_buffer.fill_from(m_udp_receiver);
-        if (m_buffer.is_empty()) { continue; }
-
-        // ... and process them
-        auto pulse_id = process_packets(metadata, frame_buffer);
-        if (pulse_id != 0) { return pulse_id; }
-    }
-}
-
+//uint64_t JfjFrameWorker::get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer){
+//    // Reset the metadata and frame buffer for the next frame. (really needed?)
+//    metadata.pulse_id = 0;
+//    metadata.n_recv_packets = 0;
+//    memset(frame_buffer, 0, m_num_data_bytes);
+//
+//
+//    // Process leftover packages in the buffer
+//    if (!m_buffer.is_empty()) {
+//        auto pulse_id = process_packets(metadata, frame_buffer);
+//        if (pulse_id != 0) { return pulse_id; }
+//    }
+//
+//
+//    while (true) {
+//        // Receive new packages (pass if none)...
+//        m_buffer.fill_from(m_udp_receiver);
+//        if (m_buffer.is_empty()) { continue; }
+//
+//        // ... and process them
+//        auto pulse_id = process_packets(metadata, frame_buffer);
+//        if (pulse_id != 0) { return pulse_id; }
+//    }
+//}
+//
 
 
 

@@ -30,7 +30,7 @@ class JfjFrameWorker {
 public:
     JfjFrameUdpReceiver(const uint16_t port, std::function<void(uint64_t index, uint32_t module, char* ptr_data, ModuleFrame* ptr_meta)> callback);
     virtual ~JfjFrameUdpReceiver();
-    uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
+    std::generator<uint64_t> get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
     void run();
 };
 
