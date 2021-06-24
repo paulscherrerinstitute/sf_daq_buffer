@@ -43,10 +43,10 @@ struct BufferBinaryFormat {
 
 struct ImageBinaryFormat {
     ImageMetadata meta;
-    std::vector<char> data;
-    ImageBinaryFormat(size_t H, size_t W, size_t D): data(H*W*D, 0) {};
-    size_t size(){ return data.size(); }
-    char* data(){ return data.data(); }
+    char* data = nullptr;
+    size_t size;
+    ImageBinaryFormat(size_t H, size_t W, size_t D): size(H*W*D) { data = (char*) malloc(H*W*D); };
+    ~ImageBinaryFormat(){ free(data); std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
 };
 
 

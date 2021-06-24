@@ -15,7 +15,7 @@ void dummy_sender(ImageBinaryFormat& image){
 
 int main (int argc, char *argv[]) {
     std::cout << "Creating frame cache..." << std::endl;
-    FrameCache cache(32, 3, JFJOCH_DATA_BYTES_PER_MODULE, &dummy_sender);
+    FrameCache cache(32, 1, 3, &dummy_sender);
 
     std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> push_cb =
         std::bind(&FrameCache::emplace, &cache, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
