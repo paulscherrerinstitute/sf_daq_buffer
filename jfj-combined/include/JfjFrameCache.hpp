@@ -16,24 +16,26 @@
 
 /** Frame cache
 
-	Reimplemented RamBuffer for the better handling of image assembly and concurrency.
+	Reimplemented RamBuffer for better concurrency.
 	The class operates on in-memory arrays via pointer/reference access. It uses a
 	linearly increasing pulseID index to provide some headroom for collecting frames
 	from multiple detectors.
 	**/
 class FrameCache{
 public:
-    FrameCache(uint64_t capacity, uint64_t line_size, uint64_t block_size, std::function<void(ImageMetadata*, std::vector<char>*)> callback):
-            m_capacity(capacity), m_linesize(line_size), m_blocksize(block_size), f_send(callback),
-            m_vlock(capacity), m_valid(capacity), m_fill(capacity), m_meta(capacity), m_data(capacity) {
-        // Reserve the data buffer
-        for(auto& it: m_data){ it.resize(m_linesize*m_blocksize); }
+    FrameCache(uint64_t _C, uint64_t _MX, uint64_t _MY, uint64_t _D, std::function<void(ImageBinaryFormat&)> callback):
+            m_CAP(_C), m_MX(_MX), m_MY(_MY), m_M(_MX*_MY), m_PX(1024*_MX), m_PY(512*_MY), m_D(_D),
+            m_buffer(_C, ImageBinaryFormat(512*_MY, 1024*_MX, 2)),
+            f_send(callback), m_vlock(_C), m_valid(_C), m_fill(_C, 0) {
     };
 
 
-    /** Emplace a specific frame and module **/
-    void emplace(uint64_t pulseID, uint64_t moduleID, BufferBinaryFormat& ref_frame){
-        uint64_t idx = pulseID % m_capacity;
+    /** Emplace
+
+    Place a recorded frame to it's corresponding module location.
+    This simultaneously handles buffering and assembly. **/
+    void emplace(uint64_t pulseID, uint64_t moduleIDX, BufferBinaryFormat& ref_frame){
+        uint64_t idx = pulseID % m_CAP;
 
         // Wait for unlocking block
         while(m_vlock[idx]){ std::this_thread::yield(); }
@@ -42,20 +44,19 @@ public:
         if(m_valid[idx]){ start_line(idx, ref_frame.meta); }
 
         // A new frame is starting
-        if(ref_frame.meta.frame_index != m_meta[idx].frame_index){
+        if(ref_frame.meta.frame_index != m_buffer[idx].meta.frame_index){
             flush_line(idx);
             start_line(idx, ref_frame.meta);
         }
 
         m_fill[idx]++;
-        char* ptr_dest = m_data[idx].data() + moduleID * m_blocksize;
+        char* ptr_dest = m_buffer[idx].data() + moduleIDX * m_blocksize;
         std::memcpy(ptr_dest, (void*)&ref_frame.data, m_blocksize);
-        std::memcpy(&m_meta[idx], (void*)&ref_frame.meta, sizeof(ModuleFrame));
+        std::memcpy(&m_buffer[idx].meta, (void*)&ref_frame.meta, sizeof(ModuleFrame));
     }
 
-
     void flush_all(){
-        for(int64_t idx=0; idx< m_capacity; idx++){
+        for(int64_t idx=0; idx< m_CAP; idx++){
             flush_line(idx);
         }
     }
@@ -84,17 +85,20 @@ public:
     }
 
 private:
-    const uint64_t m_capacity;
-    const uint64_t m_linesize;
-    const uint64_t m_blocksize;
+    const uint64_t m_CAP;
+    const uint64_t m_MX;
+    const uint64_t m_MY;
+    const uint64_t m_M;
+    const uint64_t m_H;
+    const uint64_t m_W;
+    const uint64_t m_D;
     std::function<void(ImageMetadata*, std::vector<char>*)> f_send;
 
     /** Main container and mutex guard **/
     std::vector<std::atomic<uint32_t>> m_vlock;
     std::vector<std::atomic<uint32_t>> m_valid;
     std::vector<std::atomic<uint32_t>> m_fill;
-    std::vector<ImageMetadata> m_meta;
-    std::vector<std::vector<char>> m_data;
+    std::vector<ImageBinaryFormat> m_buffer;
 };
 
 #endif // FRAME_CACHE_HPP

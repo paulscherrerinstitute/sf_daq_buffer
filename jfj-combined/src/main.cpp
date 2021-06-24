@@ -7,8 +7,8 @@
 #include "../include/JfjFrameWorker.hpp"
 
 
-void dummy_sender(ImageMetadata* meta, std::vector<char>* data){
-    std::cout << "Sending " << meta->frame_index << std::endl;
+void dummy_sender(ImageBinaryFormat& image){
+    std::cout << "Sending " << image.meta.frame_index << std::endl;
 }
 
 
