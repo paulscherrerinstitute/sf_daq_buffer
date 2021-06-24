@@ -18,8 +18,6 @@ class JfjFrameWorker {
     bool in_progress = false;
     uint64_t m_frame_index = 0;
     const uint64_t m_moduleID;
-    const uint64_t m_num_packets;
-    const uint64_t m_num_data_bytes;
 
     PacketBuffer<jfjoch_packet_t, 64> m_buffer;
 
@@ -36,10 +34,7 @@ public:
 };
 
 
-std::ostream& operator<<(std::ostream& os, const JfjFrameWorker& worker){
-    os << worker.print() << std::endl;
-    return os;
-}
+std::ostream& operator<<(std::ostream& os, const JfjFrameWorker& worker);
 
 
 #endif //SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP

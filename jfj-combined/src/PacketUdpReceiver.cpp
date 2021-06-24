@@ -1,10 +1,9 @@
 #include <netinet/in.h>
 #include <iostream>
 #include "PacketUdpReceiver.hpp"
-#include "jungfrau.hpp"
 #include <unistd.h>
 #include <cstring>
-#include "buffer_config.hpp"
+#include "../../core-buffer/include/buffer_config.hpp"
 
 using namespace std;
 using namespace buffer_config;

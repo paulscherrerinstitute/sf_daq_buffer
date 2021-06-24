@@ -45,10 +45,12 @@ public:
 
         // A new frame is starting
         if(ref_frame.meta.frame_index != m_buffer[idx].meta.frame_index){
+            std::cout << "  New frame " << std::endl;
             flush_line(idx);
             start_line(idx, ref_frame.meta);
         }
 
+        std::cout << "    fill/cpy" << std::endl;
         m_fill[idx]++;
         char* ptr_dest = m_buffer[idx].data() + moduleIDX * m_blocksize;
         std::memcpy(ptr_dest, (void*)&ref_frame.data, m_blocksize);

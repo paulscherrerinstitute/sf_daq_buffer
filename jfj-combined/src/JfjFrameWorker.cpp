@@ -8,11 +8,11 @@ using namespace buffer_config;
 
 JfjFrameWorker::JfjFrameWorker(const uint16_t port, const uint32_t moduleID,
                                std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback):
-        m_moduleID(moduleID), m_num_packets(JFJOCH_N_PACKETS_PER_MODULE),
-        m_num_data_bytes(JFJOCH_DATA_BYTES_PER_MODULE), f_push_callback(callback) {
+        m_moduleID(moduleID), f_push_callback(callback) {
     m_udp_receiver.bind(port);
     m_state = "ON";
 }
+
 
 JfjFrameWorker::~JfjFrameWorker() {
     m_udp_receiver.disconnect();
@@ -20,6 +20,7 @@ JfjFrameWorker::~JfjFrameWorker() {
 
 
 inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
+    // std::cout << "  Called process_packets()" << std::endl;
 
     while(!m_buffer.is_empty()){
         // Happens if the last packet from the previous frame gets lost.
@@ -35,21 +36,22 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
         jfjoch_packet_t& c_packet = m_buffer.pop_front();
         m_frame_index = c_packet.framenum;
         this->in_progress = true;
-
+        //std::cout << "    pp: " << c_packet.packetnum << std::endl;
 
         // Always copy metadata (otherwise problem when 0th packet gets lost)
         buffer.meta.pulse_id = c_packet.bunchid;
         buffer.meta.frame_index = c_packet.framenum;
         buffer.meta.daq_rec = c_packet.debug;
         buffer.meta.module_id = m_moduleID;
-
+        
         // Copy data to frame buffer
-        size_t offset = JFJOCH_DATA_BYTES_PER_PACKET * c_packet.packetnum;
-        memcpy( (void*) (&buffer.data + offset), c_packet.data, JFJOCH_DATA_BYTES_PER_PACKET);
+        size_t offset = JUNGFRAU_DATA_BYTES_PER_PACKET * c_packet.packetnum;
+        memcpy( (void*) (buffer.data + offset), c_packet.data, JUNGFRAU_DATA_BYTES_PER_PACKET);
         buffer.meta.n_recv_packets++;
 
         // Last frame packet received. Frame finished.
-        if (c_packet.packetnum == m_num_packets - 1){
+        if (c_packet.packetnum == JF_N_PACKETS_PER_FRAME - 1){
+            // std::cout << "Finished pulse: " << buffer.meta.pulse_id << std::endl;
             this->in_progress = false;
             return buffer.meta.pulse_id;
         }
@@ -60,6 +62,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 }
 
 uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
+    // std::cout << "Called get_frame()" << std::endl;
     // Reset the metadata and frame buffer for the next frame. (really needed?)
     memset(&buffer, 0, sizeof(buffer));
 
@@ -96,11 +99,13 @@ void JfjFrameWorker::run(){
             auto pulse_id = get_frame(buffer);
 
             if(pulse_id>10){
+                std::cout << "Pushing " << pulse_id << std::endl;
                 f_push_callback(pulse_id, m_moduleID, buffer);
             }
         }
     } catch (const std::exception& ex) {
         std::cout << "Exception in worker loop: " << ex.what() << std::endl;
+        m_state = "ERROR";
         throw;
     };
 
@@ -113,12 +118,9 @@ std::string JfjFrameWorker::print() const {
 }
 
 
-
-
-
-
-
-
-
+std::ostream& operator<<(std::ostream& os, const JfjFrameWorker& worker){
+    os << worker.print() << std::endl;
+    return os;
+}
 
 
