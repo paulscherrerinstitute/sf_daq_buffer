@@ -22,8 +22,8 @@ int main (int argc, char *argv[]) {
 
     std::cout << "Creating workers..." << std::endl;
     JfjFrameWorker W0(5005, 0, push_cb);
-    JfjFrameWorker W1(5006, 1, push_cb);
-    JfjFrameWorker W2(5007, 2, push_cb);
+    //JfjFrameWorker W1(5006, 1, push_cb);
+    // JfjFrameWorker W2(5007, 2, push_cb);
 
     std::thread T0(&JfjFrameWorker::run, &W0);
 
