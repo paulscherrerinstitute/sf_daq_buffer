@@ -45,7 +45,7 @@ struct ImageBinaryFormat {
     ImageMetadata meta;
     char* data = nullptr;
     const size_t size;
-    ImageBinaryFormat(size_t H, size_t W, size_t D): size(H*W*D) { data = (char*) calloc(8*H*W*D, sizeof(int)); };
+    ImageBinaryFormat(size_t H, size_t W, size_t D): size(H*W*D) { data = (char*) calloc(H*W*D, sizeof(int)); };
     ~ImageBinaryFormat(){ free(data); std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
 };
 
