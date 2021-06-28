@@ -6,12 +6,21 @@
 #include "../../core-buffer/include/formats.hpp"
 
 
-#define ASSERT_FALSE(expr, msg)   
+#define ASSERT_FALSE(expr, msg)                                                                                         \
     if(bool(expr)){                                                                                                     \
         std::string text = "ASSERTION called at " + std::string(__FILE__) + " line " + std::to_string(__LINE__) + "\n"; \
-        text = text + "Message:" + msg + "\nErrno: " + std::to_sting(errno);                                            \
+        text = text + "Reason: " + std::to_string(expr) + "\n";                                                         \
+        text = text + "Message:" + msg + "\nErrno: " + std::to_string(errno);                                           \
         throw std::runtime_error(text);                                                                                 \
     }                                                                                                                   \
+
+#define ASSERT_TRUE(expr, msg)                                                                                         \
+    if(!bool(expr)){                                                                                                     \
+        std::string text = "ASSERTION called at " + std::string(__FILE__) + " line " + std::to_string(__LINE__) + "\n"; \
+        text = text + "Reason: " + std::to_string(expr) + "\n";                                                         \
+        text = text + "Message:" + msg + "\nErrno: " + std::to_string(errno);                                           \
+        throw std::runtime_error(text);                                                                                 \
+    }       
 
 /** ZMQ Publisher
 
@@ -29,11 +38,10 @@ class ZmqPublisher {
         std::mutex g_zmq_socket;
             
     public:    
-        ZmqPublisher(const uint16_t port):
+        ZmqPublisher(uint16_t port) :
             m_port(port), m_address("tcp://*:" + std::to_string(port)), m_ctx(1), m_socket(m_ctx, ZMQ_PUB) {
             // Bind the socket
-            auto err = m_socket.bind(m_address.c_str();
-            ASSERT_FALSE( err, "Failed to bind ZMQ socket" )
+            m_socket.bind(m_address.c_str());
             std::cout << "Initialized ZMQ publisher at " << m_address << std::endl;
         };
                        
@@ -48,12 +56,16 @@ class ZmqPublisher {
 **/
 class ZmqImagePublisher: public ZmqPublisher {
     public:
+        ZmqImagePublisher(uint16_t port) : ZmqPublisher(port) {};
+
         void sendImage(ImageBinaryFormat& image){
             std::lock_guard<std::mutex> guard(g_zmq_socket);
-            int err = 0;
-            err |= m_socket.send(&image.meta, sizeof(image.meta), ZMQ_SNDMORE);
-            err |= m_socket.send(image.data, image.size, 0);
-            ASSERT_FALSE( err, "Failed to send image data" )
+            int len;
+            len = m_socket.send(&image.meta, sizeof(image.meta), ZMQ_SNDMORE);
+            ASSERT_TRUE( len >=0, "Failed to send image data" )
+            len = m_socket.send(image.data.data(), image.data.size(), 0);
+            ASSERT_TRUE( len >=0, "Failed to send image data" )
+
             std::cout << "Sent ZMQ stream of pulse: " << image.meta.pulse_id << std::endl;
         }
 };

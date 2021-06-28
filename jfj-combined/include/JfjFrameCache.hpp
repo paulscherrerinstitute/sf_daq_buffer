@@ -6,10 +6,12 @@
 #include <stdexcept>
 #include <iostream>
 #include <mutex>
+#include <shared_mutex>
 #include <vector>
 #include <atomic>
 #include <functional>
 #include <thread>
+#include <mutex>
 
 #include "../../core-buffer/include/formats.hpp"
 
@@ -25,8 +27,13 @@ class FrameCache{
 public:
     FrameCache(uint64_t _C, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
             m_CAP(_C), m_M(N_MOD),
-            m_buffer(_C, ImageBinaryFormat(512*9, 1024, sizeof(uint16_t))),
-            f_send(callback), m_vlock(_C), m_valid(_C), m_fill(_C) {
+            m_buffer(_C, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
+            f_send(callback), m_lock(_C), m_valid(_C) {
+        // Initialize buffer metadata
+        for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
+        
+        // Initialize Mutexes
+        for(auto& it: m_valid){ it = 0; }
     };
 
 
@@ -36,40 +43,25 @@ public:
     This simultaneously handles buffering and assembly. **/
     void emplace(uint64_t pulseID, uint64_t moduleIDX, BufferBinaryFormat& ref_frame){
         uint64_t idx = pulseID % m_CAP;
-        std::cout << "  Emplace: " << idx << std::endl;
-
-
-        // Wait for unlocking block
-        // while(m_vlock[idx]){ std::this_thread::yield(); }
-
-        // Invalid cache line: Just start a new line
-        //if(m_valid[idx]){ start_line(idx, ref_frame.meta); }
-
+        
         // A new frame is starting
-        std::cout << "  Pulse_ids: " << ref_frame.meta.pulse_id << "\t" << m_buffer[idx].meta.pulse_id << std::endl;
+        std::cout << "  Pulse_ids: " << ref_frame.meta.pulse_id << " (new)\t" << m_buffer[idx].meta.pulse_id << " (old)" << std::endl;
 
         if(ref_frame.meta.pulse_id != m_buffer[idx].meta.pulse_id){
-            std::cout << "NOT EQUAL" << std::endl;
-            flush_line(idx);
             start_line(idx, ref_frame.meta);
-        }
+        }        
+        
+        // Shared lock for concurrent PUT operations
+        std::shared_lock<std::shared_mutex> guard(m_lock[idx]);
 
-        std::cout << "    fill/cpy" << std::endl;
-        m_fill[idx]++;
-        char* ptr_dest = m_buffer[idx].data.data() + moduleIDX * m_blocksize;
-        //char* ptr_dest = m_buffer[idx].data;
-        std::cout << "  Root: " << (void*)m_buffer[idx].data.data() << "\tTarget:" << (void*)ptr_dest 
-            << "\tblocksize: " << m_blocksize << "\tcontainer: " << m_buffer[idx].data.size() << std::endl;
-
+        // Copy metadata (manually for now...)
         m_buffer[idx].meta.pulse_id = ref_frame.meta.pulse_id;
         m_buffer[idx].meta.frame_index = ref_frame.meta.frame_index;
         m_buffer[idx].meta.daq_rec = ref_frame.meta.daq_rec;
-        std::cout << "NI " << std::endl;
-        std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
-        // std::memcpy((void*)&ptr_dest[moduleIDX * m_blocksize], (void*)&ref_frame.data, m_blocksize);
         
-        std::cout << "    Fill ctr: " <<  m_fill[idx]  << std::endl;
-
+        // Calculate destination pointer (easier to debug)
+        char* ptr_dest = m_buffer[idx].data.data() + moduleIDX * m_blocksize;
+        std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
     }
 
     void flush_all(){
@@ -78,26 +70,29 @@ public:
         }
     }
 
+    // Flush and invalidate a line (incl. lock)
     void flush_line(uint64_t idx){
+        std::unique_lock<std::shared_mutex> guard(m_lock[idx]);
         if(m_valid[idx]){
-            std::cout << "Flushing line: " << idx << std::endl;
-            m_vlock[idx] = 1;
             f_send(m_buffer[idx]);
             m_valid[idx] = 0;
-            m_fill[idx] = 0;
-            m_vlock[idx] = 0;
         }
     }
 
+    // Flush and start a new line (incl. lock)
     void start_line(uint64_t idx, ModuleFrame& ref_meta){
-        m_vlock[idx] = 1;
+        // 0. Guard
+        std::unique_lock<std::shared_mutex> guard(m_lock[idx]);
+        // 1. Flush
+        if(m_valid[idx]){
+             f_send(m_buffer[idx]);
+        }
+        // 2. Init
         m_buffer[idx].meta.pulse_id = ref_meta.pulse_id;
         m_buffer[idx].meta.frame_index = ref_meta.frame_index;
         m_buffer[idx].meta.daq_rec = ref_meta.daq_rec;
         m_buffer[idx].meta.is_good_image = true;
-        m_valid[idx].exchange(1);
-        m_fill[idx] = 0;
-        m_vlock[idx] = 0;
+        m_valid[idx] = 1;
     }
 
 private:
@@ -107,9 +102,8 @@ private:
     std::function<void(ImageBinaryFormat&)> f_send;
 
     /** Main container and mutex guard **/
-    std::vector<std::atomic<uint32_t>> m_vlock;
+    std::vector<std::shared_mutex> m_lock;
     std::vector<std::atomic<uint32_t>> m_valid;
-    std::vector<std::atomic<uint32_t>> m_fill;
     std::vector<ImageBinaryFormat> m_buffer;
 };
 
