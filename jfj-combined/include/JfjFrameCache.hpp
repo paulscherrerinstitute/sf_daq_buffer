@@ -23,9 +23,9 @@
 	**/
 class FrameCache{
 public:
-    FrameCache(uint64_t _C, uint64_t _MX, uint64_t _MY, std::function<void(ImageBinaryFormat&)> callback):
-            m_CAP(_C), m_MX(_MX), m_MY(_MY), m_M(_MX*_MY), m_PX(1024*_MX), m_PY(512*_MY),
-            m_buffer(_C, ImageBinaryFormat(512*_MY, 1024*_MX, sizeof(uint16_t))),
+    FrameCache(uint64_t _C, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
+            m_CAP(_C), m_M(N_MOD),
+            m_buffer(_C, ImageBinaryFormat(512*9, 1024, sizeof(uint16_t))),
             f_send(callback), m_vlock(_C), m_valid(_C), m_fill(_C) {
     };
 
@@ -56,14 +56,17 @@ public:
 
         std::cout << "    fill/cpy" << std::endl;
         m_fill[idx]++;
-        char* ptr_dest = m_buffer[idx].data + moduleIDX * m_blocksize;
-                std::cout << "    target:" << (void*)ptr_dest << "\tsize: " << m_blocksize << std::endl;
+        //char* ptr_dest = m_buffer[idx].data + moduleIDX * m_blocksize;
+        char* ptr_dest = m_buffer[idx].data;
+        // std::cout << "  Root: " << (void*)m_buffer[idx].data << " ( " << m_buffer[idx].size << " )" << "\ttarget:" << (void*)ptr_dest << "\tsize: " << m_blocksize << std::endl;
+        std::cout << "Module: " << moduleIDX << std::endl;
 
         m_buffer[idx].meta.pulse_id = ref_frame.meta.pulse_id;
         m_buffer[idx].meta.frame_index = ref_frame.meta.frame_index;
         m_buffer[idx].meta.daq_rec = ref_frame.meta.daq_rec;
         std::cout << "NI " << std::endl;
-        std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
+        //std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
+        std::memcpy((void*)&ptr_dest[moduleIDX * m_blocksize], (void*)&ref_frame.data, m_blocksize);
         
         std::cout << "    Fill ctr: " <<  m_fill[idx]  << std::endl;
 
@@ -99,10 +102,6 @@ public:
 
 private:
     const uint64_t m_CAP;
-    const uint64_t m_PX;
-    const uint64_t m_PY;
-    const uint64_t m_MX;
-    const uint64_t m_MY;
     const uint64_t m_M;
     const uint64_t m_blocksize = 1024*512*sizeof(uint16_t);
     std::function<void(ImageBinaryFormat&)> f_send;

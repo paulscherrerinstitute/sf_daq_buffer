@@ -82,7 +82,7 @@ uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
         //std::cout << "New packages" << std::endl;
         m_buffer.fill_from(m_udp_receiver);
         if (m_buffer.is_empty()) { continue; }
-        std::cout << "\tGot " << m_buffer.size() << std::endl;
+        // std::cout << "\tGot " << m_buffer.size() << std::endl;
 
         // ... and process them
         auto pulse_id = process_packets(buffer);
