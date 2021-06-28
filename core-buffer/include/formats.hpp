@@ -4,6 +4,7 @@
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "jungfraujoch.hpp"
+#include <vector>
 
 #pragma pack(push)
 #pragma pack(1)
@@ -41,12 +42,12 @@ struct BufferBinaryFormat {
 #pragma pack(pop)
 
 
-struct ImageBinaryFormat {
+class ImageBinaryFormat {
+    public:
     ImageMetadata meta;
-    char* data = nullptr;
-    const size_t size;
-    ImageBinaryFormat(size_t H, size_t W, size_t D): size(H*W*D) { data = (char*) calloc(H*W*D, sizeof(int)); };
-    ~ImageBinaryFormat(){ free(data); std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
+    std::vector<char> data;
+    ImageBinaryFormat(size_t H, size_t W, size_t D): data(H*W*D, 0) {};
+    ~ImageBinaryFormat(){ std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
 };
 
 

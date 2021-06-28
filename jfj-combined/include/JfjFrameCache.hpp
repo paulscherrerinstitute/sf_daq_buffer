@@ -56,17 +56,17 @@ public:
 
         std::cout << "    fill/cpy" << std::endl;
         m_fill[idx]++;
-        //char* ptr_dest = m_buffer[idx].data + moduleIDX * m_blocksize;
-        char* ptr_dest = m_buffer[idx].data;
-        // std::cout << "  Root: " << (void*)m_buffer[idx].data << " ( " << m_buffer[idx].size << " )" << "\ttarget:" << (void*)ptr_dest << "\tsize: " << m_blocksize << std::endl;
-        std::cout << "Module: " << moduleIDX << std::endl;
+        char* ptr_dest = m_buffer[idx].data.data() + moduleIDX * m_blocksize;
+        //char* ptr_dest = m_buffer[idx].data;
+        std::cout << "  Root: " << (void*)m_buffer[idx].data.data() << "\tTarget:" << (void*)ptr_dest 
+            << "\tblocksize: " << m_blocksize << "\tcontainer: " << m_buffer[idx].data.size() << std::endl;
 
         m_buffer[idx].meta.pulse_id = ref_frame.meta.pulse_id;
         m_buffer[idx].meta.frame_index = ref_frame.meta.frame_index;
         m_buffer[idx].meta.daq_rec = ref_frame.meta.daq_rec;
         std::cout << "NI " << std::endl;
-        //std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
-        std::memcpy((void*)&ptr_dest[moduleIDX * m_blocksize], (void*)&ref_frame.data, m_blocksize);
+        std::memcpy((void*)ptr_dest, (void*)&ref_frame.data, m_blocksize);
+        // std::memcpy((void*)&ptr_dest[moduleIDX * m_blocksize], (void*)&ref_frame.data, m_blocksize);
         
         std::cout << "    Fill ctr: " <<  m_fill[idx]  << std::endl;
 
