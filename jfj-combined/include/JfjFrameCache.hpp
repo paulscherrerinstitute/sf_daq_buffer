@@ -45,8 +45,6 @@ public:
         uint64_t idx = pulseID % m_CAP;
         
         // A new frame is starting
-        std::cout << "  Pulse_ids: " << ref_frame.meta.pulse_id << " (new)\t" << m_buffer[idx].meta.pulse_id << " (old)" << std::endl;
-
         if(ref_frame.meta.pulse_id != m_buffer[idx].meta.pulse_id){
             start_line(idx, ref_frame.meta);
         }        

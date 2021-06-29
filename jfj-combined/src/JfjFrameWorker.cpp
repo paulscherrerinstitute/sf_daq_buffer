@@ -47,6 +47,10 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
         buffer.meta.module_id = m_moduleID;
         
         // Copy data to frame buffer
+        if(c_packet.packetnum >= JF_N_PACKETS_PER_FRAME){
+            std::cout << "Too high packet index: " << c_packet.packetnum << std::endl;
+            return 0;
+        } 
         size_t offset = JUNGFRAU_DATA_BYTES_PER_PACKET * c_packet.packetnum;
         memcpy( (void*) (buffer.data + offset), c_packet.data, JUNGFRAU_DATA_BYTES_PER_PACKET);
         buffer.meta.n_recv_packets++;
@@ -105,7 +109,6 @@ void JfjFrameWorker::run(){
             auto pulse_id = get_frame(buffer);
 
             if(pulse_id>10){
-                std::cout << "Pushing " << pulse_id << std::endl;
                 f_push_callback(pulse_id, m_moduleID, buffer);
             }
         }
