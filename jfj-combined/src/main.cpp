@@ -44,9 +44,9 @@ int main (int argc, char *argv[]) {
     std::cout << "Creating workers..." << std::endl;
     std::vector<JfjFrameWorker> vWorkers;
 
-    JfjFrameWorker W0(5005, 0, push_cb);
-    JfjFrameWorker W1(5006, 1, push_cb);
-    JfjFrameWorker W2(5007, 2, push_cb);
+    JfjFrameWorker W0(5005, "JOCH3M", 0, push_cb);
+    JfjFrameWorker W1(5006, "JOCH3M", 1, push_cb);
+    JfjFrameWorker W2(5007, "JOCH3M", 2, push_cb);
 
     std::cout << "Starting worker threads..." << std::endl;
     std::vector<std::thread> vThreads;
