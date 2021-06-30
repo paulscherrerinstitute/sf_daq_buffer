@@ -39,6 +39,10 @@ public:
                    std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback);
     virtual ~JfjFrameWorker();
     void run();
+    
+    // Copy semantics : OFF
+    JfjFrameWorker(JfjFrameWorker const &) = delete;
+    JfjFrameWorker& operator=(JfjFrameWorker const &) = delete;
 };
 
 #endif //SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP

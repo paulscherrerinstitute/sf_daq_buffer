@@ -22,7 +22,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 
     while(!m_buffer.is_empty()){
         // Happens if the last packet from the previous frame gets lost.
-        if (m_current_index != m_buffer.peek_front().bunchid) [[unlikely]] {
+        if (m_current_index != m_buffer.peek_front().bunchid) {
             m_current_index = m_buffer.peek_front().bunchid;
             if(this->in_progress){
                 this->in_progress = false;
@@ -34,14 +34,14 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
         jfjoch_packet_t& c_packet = m_buffer.pop_front();
 
         // Sanity check: rather throw than segfault...
-        if(c_packet.packetnum >= JF_N_PACKETS_PER_FRAME) [[unlikely]] {
+        if(c_packet.packetnum >= JF_N_PACKETS_PER_FRAME) {
             std::stringstream ss;
             ss << "Packet index '" << c_packet.packetnum << "' is out of range of " << JF_N_PACKETS_PER_FRAME << std::endl;
             throw std::range_error(ss.str());
         }
 
         // Start new frame
-        if(!this->in_progress) [[unlikely]] {
+        if(!this->in_progress) {
             m_current_index = c_packet.bunchid;
             this->in_progress = true;
 
@@ -58,7 +58,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
         buffer.meta.n_recv_packets++;
 
         // Last frame packet received. Frame finished.
-        if (c_packet.packetnum == JF_N_PACKETS_PER_FRAME - 1) [[unlikely]] {
+        if (c_packet.packetnum == JF_N_PACKETS_PER_FRAME - 1) {
             this->in_progress = false;
             return buffer.meta.pulse_id;
         }
@@ -77,7 +77,7 @@ uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
      do {
         // First make sure the buffer is drained of leftovers
         pulse_id = process_packets(buffer);
-        if (pulse_id != 0) [[likely]] { return pulse_id; }
+        if (pulse_id != 0) { return pulse_id; }
 
         // Then try to refill buffer...
         m_buffer.fill_from(m_udp_receiver);
@@ -96,7 +96,7 @@ void JfjFrameWorker::run(){
             auto pulse_id = get_frame(buffer);
             m_moduleStats.record_stats(buffer.meta, true);
 
-            if(pulse_id>10) [[likely]] {
+            if(pulse_id>10) {
                 f_push_callback(pulse_id, m_moduleID, buffer);
             }
         }

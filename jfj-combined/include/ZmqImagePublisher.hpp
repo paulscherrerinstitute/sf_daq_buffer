@@ -7,7 +7,7 @@
 
 
 #define ASSERT_FALSE(expr, msg)                                                                                         \
-    if(bool(expr)) [[unlikely]] {                                                                                                     \
+    if(bool(expr)) {                                                                                                     \
         std::string text = "ASSERTION called at " + std::string(__FILE__) + " line " + std::to_string(__LINE__) + "\n"; \
         text = text + "Reason: " + std::to_string(expr) + "\n";                                                         \
         text = text + "Message:" + msg + "\nErrno: " + std::to_string(errno);                                           \
@@ -15,7 +15,7 @@
     }                                                                                                                   \
 
 #define ASSERT_TRUE(expr, msg)                                                                                         \
-    if(!bool(expr)) [[unlikely]] {                                                                                                     \
+    if(!bool(expr)) {                                                                                                     \
         std::string text = "ASSERTION called at " + std::string(__FILE__) + " line " + std::to_string(__LINE__) + "\n"; \
         text = text + "Reason: " + std::to_string(expr) + "\n";                                                         \
         text = text + "Message:" + msg + "\nErrno: " + std::to_string(errno);                                           \
@@ -67,10 +67,8 @@ class ZmqImagePublisher: public ZmqPublisher {
             ASSERT_TRUE( len >=0, "Failed to send topic data" )
             len = m_socket.send(&image.meta, sizeof(image.meta), ZMQ_SNDMORE);
             ASSERT_TRUE( len >=0, "Failed to send meta data" )
-            // std::cout << "\tPT1 Sent " << len << "\n";
             len = m_socket.send(image.data.data(), image.data.size(), 0);
             ASSERT_TRUE( len >=0, "Failed to send image data" )
-            // std::cout << "\tPT1 Sent " << len << "\n";
 
             std::cout << "Sent ZMQ stream of pulse: " << image.meta.pulse_id << std::endl;
         }

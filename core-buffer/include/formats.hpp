@@ -1,10 +1,13 @@
 #ifndef SF_DAQ_BUFFER_FORMATS_HPP
 #define SF_DAQ_BUFFER_FORMATS_HPP
 
+#include <iostream> 
+#include <vector>
+
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
 #include "jungfraujoch.hpp"
-#include <vector>
+
 
 #pragma pack(push)
 #pragma pack(1)
