@@ -63,6 +63,6 @@ void FrameStats::print_stats(){
     ss << ",n_corrupted_pulse_ids=" << n_corrupted_pulse_id_ << "i";
     ss << " ";
     ss << timestamp;
-    ss << endl;
+    ss << std::endl;
     std::cout << ss.str();
 }

@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <zmq.h>
 
+#include "../../core-buffer/include/BufferUtils.hpp"
 #include "../../core-buffer/include/formats.hpp"
 #include "../include/JfjFrameCache.hpp"
 #include "../include/JfjFrameWorker.hpp"
@@ -11,16 +12,12 @@
 
 int main (int argc, char *argv[]) {
     if (argc != 2) {
-        cout << endl;
-        cout << "Usage: jf_buffer_writer [detector_json_filename]";
-        cout << endl;
-        cout << "\tdetector_json_filename: detector config file path." << endl;
-        cout << endl;
-
+        cout << "\nUsage: jf_buffer_writer [detector_json_filename]\n";
+        cout << "\tdetector_json_filename: detector config file path." << std::endl;
         exit(-1);
     }
 
-    const auto config = read_json_config(string(argv[1]));
+    const auto config = read_json_config(std::string(argv[1]));
 
 //    // Module name
 //    char mn[128];
