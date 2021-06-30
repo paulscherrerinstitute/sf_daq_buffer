@@ -1,0 +1,13 @@
+{
+  "streamvis_stream": "127.0.0.1",
+  "streamvis_rate": 2,
+  "live_stream": "127.0.0.1",
+  "live_rate": 2,
+  "live_rate": 2,
+  "pedestal_file": "/dev/null",
+  "gain_file": "/dev/null",
+  "detector_name": "JF",
+  "n_modules": 3,
+  "start_udp_port": 5100,
+  "buffer_folder": "."
+}

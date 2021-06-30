@@ -1,6 +1,7 @@
 #include <cstddef>
-#include "../../core-buffer/include/formats.hpp"
 #include <chrono>
+
+#include "../../core-buffer/include/formats.hpp"
 
 #ifndef SF_DAQ_BUFFER_FRAMESTATS_HPP
 #define SF_DAQ_BUFFER_FRAMESTATS_HPP

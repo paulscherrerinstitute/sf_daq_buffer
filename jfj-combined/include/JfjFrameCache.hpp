@@ -1,16 +1,11 @@
 #ifndef SF_DAQ_FRAME_CACHE_HPP
 #define SF_DAQ_FRAME_CACHE_HPP
 
-// #include <cstddef>
-// #include <stdexcept>
 #include <iostream>
 #include <cstring>
 #include <vector>
 #include <functional>
 #include <shared_mutex>
-// #include <atomic>
-// #include <thread>
-// #include <mutex>
 
 #include "../../core-buffer/include/formats.hpp"
 
