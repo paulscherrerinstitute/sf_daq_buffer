@@ -23,11 +23,11 @@ template <typename T, size_t CAPACITY>
 class PacketBuffer{
 public:
     PacketBuffer() {
+        // Initialize C-structures as expected by <sockets.h>
         for (int i = 0; i < CAPACITY; i++) {
             m_recv_buff_ptr[i].iov_base = (void*) &(m_container[i]);
             m_recv_buff_ptr[i].iov_len = sizeof(T);
 
-            // C-structure as expected by <sockets.h>
             m_msgs[i].msg_hdr.msg_iov = &m_recv_buff_ptr[i];
             m_msgs[i].msg_hdr.msg_iovlen = 1;
             m_msgs[i].msg_hdr.msg_name = &m_sock_from[i];
@@ -52,12 +52,11 @@ public:
     const T& peek_front();      //Non-destructive read
     void push_back(T item);     //Write new element to buffer
 
-    /**Fill from UDP receiver**/
+    /**Fill from UDP receiver (threadsafe)**/
     template <typename TY>
     void fill_from(TY& recv){
         std::lock_guard<std::mutex> g_guard(m_mutex);
         this->idx_write = recv.receive_many(m_msgs, this->capacity());
-        // std::cout << "Received " << this->idx_write << " frames" << std::endl;
         // Returns -1 with errno=11 if no data received
         if(idx_write==-1){ idx_write = 0; }
         this->idx_read = 0;
@@ -90,7 +89,7 @@ private:
 template <typename T, size_t CAPACITY>
 T& PacketBuffer<T, CAPACITY>::pop_front(){
     std::lock_guard<std::mutex> g_guard(m_mutex);
-    if(this->is_empty()){ throw std::out_of_range("Attempted to read empty queue!"); }
+    if(this->is_empty()) [[unlikely]] { throw std::out_of_range("Attempted to read empty queue!"); }
     idx_read++;
     return m_container[idx_read-1];
 }
@@ -101,7 +100,7 @@ T& PacketBuffer<T, CAPACITY>::pop_front(){
 template <typename T, size_t CAPACITY>
 const T& PacketBuffer<T, CAPACITY>::peek_front(){
     std::lock_guard<std::mutex> g_guard(m_mutex);
-	if(this->is_empty()){ throw std::out_of_range("Attempted to read empty queue!"); }
+	if(this->is_empty()) [[unlikely]] { throw std::out_of_range("Attempted to read empty queue!"); }
     return m_container[idx_read];
 }
 
@@ -110,7 +109,7 @@ const T& PacketBuffer<T, CAPACITY>::peek_front(){
 template <typename T, size_t CAPACITY>
 void PacketBuffer<T, CAPACITY>::push_back(T item){
     std::lock_guard<std::mutex> g_guard(m_mutex);
-    if(this->is_full()){ throw std::out_of_range("Attempted to write a full buffer!"); }
+    if(this->is_full()) [[unlikely]] { throw std::out_of_range("Attempted to write a full buffer!"); }
     m_container[idx_write] = item;
     idx_write++;
 }

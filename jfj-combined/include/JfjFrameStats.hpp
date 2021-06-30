@@ -7,6 +7,7 @@
 
 
 class FrameStats {
+private:
     const std::string detector_name_;
     const int module_id_;
     size_t stats_time_;
@@ -21,9 +22,7 @@ class FrameStats {
     void print_stats();
 
 public:
-    FrameStats(const std::string &detector_name,
-               const int module_id,
-               const size_t stats_time);
+    FrameStats(const std::string &detector_name, const int module_id, const size_t stats_time);
     void record_stats(const ModuleFrame &meta, const bool bad_pulse_id);
 };
 
