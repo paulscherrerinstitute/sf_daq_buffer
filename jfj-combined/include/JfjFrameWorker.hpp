@@ -6,6 +6,7 @@
 #include "../../core-buffer/include/formats.hpp"
 #include "PacketUdpReceiver.hpp"
 #include "PacketBuffer.hpp"
+#include "FrameStats.hpp"
 
 /** JungfrauJoch UDP receiver
 

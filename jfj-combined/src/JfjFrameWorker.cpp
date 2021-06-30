@@ -4,7 +4,7 @@
 
 
 JfjFrameWorker::JfjFrameWorker(const uint16_t port, std::string moduleName, const uint32_t moduleID, std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback):
-        m_moduleName(moduleName), m_moduleID(moduleID), m_moduleStats(modulename, moduleID, 10.0), f_push_callback(callback) {
+        m_moduleName(moduleName), m_moduleID(moduleID), m_moduleStats(moduleName, moduleID, 10.0), f_push_callback(callback) {
     m_udp_receiver.bind(port);
 }
 
@@ -35,7 +35,8 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 
         // Sanity check: rather throw than segfault...
         if(c_packet.packetnum >= JF_N_PACKETS_PER_FRAME) [[unlikely]] {
-            std::stringstream ss << "Packet index '" << c_packet.packetnum "' is out of range of " << JF_N_PACKETS_PER_FRAME << std::endl;
+            std::stringstream ss;
+            ss << "Packet index '" << c_packet.packetnum "' is out of range of " << JF_N_PACKETS_PER_FRAME << std::endl;
             throw std::range_error(ss.str());
         }
 
@@ -53,7 +54,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 
         // Copy data to frame buffer
         size_t offset = JUNGFRAU_DATA_BYTES_PER_PACKET * c_packet.packetnum;
-        memcpy( (void*) (buffer.data + offset), c_packet.data, JUNGFRAU_DATA_BYTES_PER_PACKET);
+        std::memcpy( (void*) (buffer.data + offset), c_packet.data, JUNGFRAU_DATA_BYTES_PER_PACKET);
         buffer.meta.n_recv_packets++;
 
         // Last frame packet received. Frame finished.
@@ -69,7 +70,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
 
 uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
     // Reset the metadata and frame buffer for the next frame
-    memset(&buffer, 0, sizeof(buffer));
+    std::memset(&buffer, 0, sizeof(buffer));
     uint64_t pulse_id = 0;
 
     // Hehehehe... do-while loop!
@@ -93,7 +94,7 @@ void JfjFrameWorker::run(){
         while (true) {
             // NOTE: Needs to be pipelined for really high frame rates
             auto pulse_id = get_frame(buffer);
-            m_stats.record_stats(buffer.meta, true);
+            m_moduleStats.record_stats(buffer.meta, true);
 
             if(pulse_id>10) [[likely]] {
                 f_push_callback(pulse_id, m_moduleID, buffer);
