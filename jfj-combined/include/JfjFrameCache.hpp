@@ -2,9 +2,9 @@
 #define SF_DAQ_FRAME_CACHE_HPP
 
 // #include <cstddef>
-// #include <cstring>
 // #include <stdexcept>
 #include <iostream>
+#include <cstring>
 #include <vector>
 #include <functional>
 #include <shared_mutex>
