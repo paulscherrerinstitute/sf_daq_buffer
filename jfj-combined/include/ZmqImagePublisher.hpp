@@ -70,7 +70,9 @@ class ZmqImagePublisher: public ZmqPublisher {
             len = m_socket.send(image.data.data(), image.data.size(), 0);
             ASSERT_TRUE( len >=0, "Failed to send image data" )
 
-            std::cout << "Sent ZMQ stream of pulse: " << image.meta.pulse_id << std::endl;
+            if(image.meta.pulse_id%100==0){
+                std::cout << "Sent ZMQ stream of pulse: " << image.meta.pulse_id << std::endl;
+            }
         }
 };
 

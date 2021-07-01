@@ -7,7 +7,14 @@
 #include "../../core-buffer/include/jungfrau.hpp"
 
 
-void MockDetector(uint16_t udp_port, int32_t moduleId, int32_t sleep_ms){
+inline void busy_sleep(std::chrono::microseconds t) {
+    // auto end = std::chrono::steady_clock::now() + t - overhead;
+    auto end = std::chrono::steady_clock::now() + t;
+    while(std::chrono::steady_clock::now() < end);
+}
+
+
+void MockDetector(uint16_t udp_port, int32_t moduleId, int32_t sleep_us){
     auto send_socket_fd = socket(AF_INET,SOCK_DGRAM,0);
     if(send_socket_fd < 0){std::cout << "Failed to create socket" << std::endl; exit(-1); };
 
@@ -35,7 +42,8 @@ void MockDetector(uint16_t udp_port, int32_t moduleId, int32_t sleep_ms){
             ::sendto(send_socket_fd, &send_udp_buffer, sizeof(send_udp_buffer), 0, (sockaddr*) &server_address, sizeof(server_address));
         }
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+        //std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
+        busy_sleep(std::chrono::microseconds(sleep_us));
         if(ff%1000==0){
             std::cout << "Sent " << ff << " frames" << std::endl;
             }
@@ -47,21 +55,21 @@ void MockDetector(uint16_t udp_port, int32_t moduleId, int32_t sleep_ms){
 
 int main (int argc, char *argv[]) {
     if (argc != 4) {
-        std::cout << "\nERROR\nUsage: jf_buffer_writer [num_modules] [start_port] [sleep_ms]\n";
+        std::cout << "\nERROR\nUsage: jf_buffer_writer [num_modules] [start_port] [sleep_us]\n";
         exit(-1);
     }
 
     int num_modules = atoi(argv[1]);
     int start_port = atoi(argv[2]);
-    int sleep_ms = atoi(argv[3]);
-    sleep_ms = (sleep_ms>=1) ? sleep_ms : 1;
+    int sleep_us = atoi(argv[3]);
+    sleep_us = (sleep_us>=1) ? sleep_us : 1;
     
 
     std::cout << "Starting worker threads..." << std::endl;
     std::vector<std::thread> vThreads;
     
     for(int mm=0; mm<num_modules; mm++){
-        vThreads.push_back( std::thread(&MockDetector, start_port+mm, mm, sleep_ms) );
+        vThreads.push_back( std::thread(&MockDetector, start_port+mm, mm, sleep_us) );
     }
     std::cout << "Threads are up and running..." << std::endl;
 
