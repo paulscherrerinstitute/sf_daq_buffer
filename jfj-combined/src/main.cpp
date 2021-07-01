@@ -33,7 +33,7 @@ int main (int argc, char *argv[]) {
         std::bind(&ZmqImagePublisher::sendImage, &pub, std::placeholders::_1);
 
     std::cout << "Creating frame cache..." << std::endl;
-    FrameCache cache(32, 3, zmq_publish);
+    FrameCache cache(128, 3, zmq_publish);
 
     std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> push_cb =
         std::bind(&FrameCache::emplace, &cache, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
