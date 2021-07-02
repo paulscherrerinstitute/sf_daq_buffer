@@ -23,12 +23,12 @@ void AssemblerStats::reset_counters()
 }
 
 void AssemblerStats::record_stats(
-        const ImageMetadata &meta, const uint32_t n_lost_pulses)
+        const ImageMetadata *meta, const uint32_t n_lost_pulses)
 {
     image_counter_++;
     n_sync_lost_images_ += n_lost_pulses;
 
-    if (!meta.is_good_image) {
+    if (!meta->is_good_image) {
         n_corrupted_images_++;
     }
 

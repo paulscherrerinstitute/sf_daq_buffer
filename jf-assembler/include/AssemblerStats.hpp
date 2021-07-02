@@ -21,7 +21,7 @@ public:
     AssemblerStats(const std::string &detector_name,
                    const size_t stats_modulo);
 
-    void record_stats(const ImageMetadata &meta, const uint32_t n_lost_pulses);
+    void record_stats(const ImageMetadata *meta, const uint32_t n_lost_pulses);
 };
 
 
