@@ -5,34 +5,29 @@
 #include "formats.hpp"
 
 class RamBuffer {
-    const std::string detector_name_;
+    const std::string buffer_name_;
     const int n_modules_;
-    const int n_submodules_;
     const int n_slots_;
-    const int bit_depth_;
-
-    const size_t n_packets_per_frame_;
-    const size_t data_bytes_per_frame_;
 
     const size_t meta_bytes_;
-    const size_t image_bytes_;
+    const size_t data_bytes_;
+    const size_t slot_bytes_;
     const size_t buffer_bytes_;
 
     int shm_fd_;
-    void* buffer_;
+    char* buffer_;
 
-    ModuleFrame* meta_buffer_;
-    char* image_buffer_;
-
-private:    
-    void assemble_eiger_image(ImageMetadata &image_meta, 
-            const int bit_depth, const size_t slot_n) const;
+private:
+    char* _get_meta_buffer(int slot_n, uint64_t module_id) const;
+    char* _get_frame_data_buffer(int slot_n, uint64_t module_id) const;
 
 public:
-    RamBuffer(const std::string& detector_name,
-              const int n_modules,
-              const int n_submodules,
-              const int bit_depth);
+    RamBuffer(const std::string& buffer_name,
+              size_t meta_n_bytes,
+              size_t data_n_bytes,
+              int n_modules,
+              int n_slots);
+
     ~RamBuffer();
 
     void write_frame(const ModuleFrame &src_meta, const char *src_data) const;
@@ -40,10 +35,14 @@ public:
                      const uint64_t module_id,
                      ModuleFrame &meta,
                      char *data) const;
-    char* read_image(const uint64_t pulse_id) const;
-    void assemble_image(
-            const uint64_t pulse_id, ImageMetadata &image_meta) const;
-    
+
+    char* get_frame_data(
+            const uint64_t image_id, const uint64_t module_id) const;
+    char* get_image_data(const uint64_t image_id) const;
+    char* get_frame_meta(
+            const uint64_t image_id, const uint64_t module_id) const;
+    char* get_image_meta(const uint64_t image_id) const;
+
     
 
 };
