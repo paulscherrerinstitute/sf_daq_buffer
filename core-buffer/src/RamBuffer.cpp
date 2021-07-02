@@ -18,7 +18,7 @@ RamBuffer::RamBuffer(const string& buffer_name,
                      const size_t meta_n_bytes,
                      const size_t data_n_bytes,
                      const int n_modules = 1,
-                     const int n_slots = buffer_config::RAM_BUFFER_N_SLOTS) :
+                     const int n_slots) :
         buffer_name_(buffer_name),
         n_modules_(n_modules),
         n_slots_(n_slots),
@@ -111,7 +111,7 @@ char* RamBuffer::get_frame_meta(
     return _get_meta_buffer(slot_n, module_id);
 }
 
-char* RamBuffer::get_image_meta(const uint64_t image_id) const
+char* RamBuffer::get_slot_meta(const uint64_t image_id) const
 {
     return get_frame_meta(image_id, 0);
 }
@@ -124,7 +124,7 @@ char* RamBuffer::get_frame_data(
     return _get_frame_data_buffer(slot_n, module_id);
 }
 
-char* RamBuffer::get_image_data(const uint64_t image_id) const
+char* RamBuffer::get_slot_data(const uint64_t image_id) const
 {
     return get_frame_data(image_id, 0);
 }

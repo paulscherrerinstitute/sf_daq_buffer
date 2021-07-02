@@ -26,7 +26,7 @@ public:
               size_t meta_n_bytes,
               size_t data_n_bytes,
               int n_modules,
-              int n_slots);
+              int n_slots=buffer_config::RAM_BUFFER_N_SLOTS);
 
     ~RamBuffer();
 
@@ -38,10 +38,10 @@ public:
 
     char* get_frame_data(
             const uint64_t image_id, const uint64_t module_id) const;
-    char* get_image_data(const uint64_t image_id) const;
+    char* get_slot_data(const uint64_t image_id) const;
     char* get_frame_meta(
             const uint64_t image_id, const uint64_t module_id) const;
-    char* get_image_meta(const uint64_t image_id) const;
+    char* get_slot_meta(const uint64_t image_id) const;
 
     
 
