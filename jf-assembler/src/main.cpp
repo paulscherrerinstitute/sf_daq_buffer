@@ -7,6 +7,7 @@
 
 #include "date.h"
 #include <chrono>
+#include <EigerAssembler.hpp>
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
  
@@ -52,20 +53,31 @@ int main (int argc, char *argv[])
         cout << endl;
     #endif
 
-    
+    EigerAssembler assembler(bit_depth);
+
+    RamBuffer frame_buffer(config.detector_name,
+            sizeof(ModuleFrame), MODULE_N_BYTES, config.n_modules);
+
+    RamBuffer image_buffer(config.detector_name + "_" + stream_name,
+            sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, n_receivers);
-    RamBuffer ram_buffer(config.detector_name, n_receivers, config.n_submodules, bit_depth);
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
     
-    ImageMetadata meta;
-
     while (true) {
         auto pulse_and_sync = receiver.get_next_pulse_id();
-        ram_buffer.assemble_image(pulse_and_sync.pulse_id, meta);
 
-        zmq_send(sender, &meta, sizeof(meta), 0);
+        auto* src_meta = frame_buffer.get_slot_meta(pulse_and_sync.pulse_id);
+        auto* src_data = frame_buffer.get_slot_data(pulse_and_sync.pulse_id);
 
-        stats.record_stats(meta, pulse_and_sync.n_lost_pulses);
+        auto* dst_meta = image_buffer.get_slot_meta(pulse_and_sync.pulse_id);
+        auto* dst_data = image_buffer.get_slot_data(pulse_and_sync.pulse_id);
+
+        assembler.assemble_image(src_meta, src_data, dst_meta, dst_data);
+
+        zmq_send(sender, dst_meta, sizeof(ImageMetadata), 0);
+
+        stats.record_stats(
+                (ImageMetadata*)dst_meta, pulse_and_sync.n_lost_pulses);
     }
 }
