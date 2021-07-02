@@ -40,5 +40,4 @@ struct det_packet {
 };
 #pragma pack(pop)
 
-
 #endif
