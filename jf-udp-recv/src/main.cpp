@@ -47,6 +47,7 @@ int main (int argc, char *argv[]) {
     auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
 
     ModuleFrame meta;
+    // TODO: This will not work. Only if Eiger sends in 16 bit. Use MODULE_N_PIXELS * bit_depth / 8
     char* data = new char[MODULE_N_BYTES];
 
     uint64_t pulse_id_previous = 0;
