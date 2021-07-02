@@ -57,7 +57,7 @@ int main (int argc, char *argv[])
     EigerAssembler assembler(config.n_submodules, bit_depth);
 
     RamBuffer frame_buffer(config.detector_name,
-            sizeof(ModuleFrame), MODULE_N_BYTES, config.n_modules);
+            sizeof(ModuleFrame), MODULE_N_PIXELS * bit_depth, config.n_modules);
 
     RamBuffer image_buffer(config.detector_name + "_" + stream_name,
             sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1);

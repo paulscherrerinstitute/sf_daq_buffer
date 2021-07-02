@@ -40,22 +40,22 @@ struct ModuleFrameBuffer {
     ModuleFrame module[N_MODULES];
 };
 
-#pragma pack(push)
-#pragma pack(1)
-struct BufferBinaryFormat {
-    const char FORMAT_MARKER = 0xBE;
-    ModuleFrame meta;
-    char data[MODULE_N_BYTES];
-};
-#pragma pack(pop)
+//#pragma pack(push)
+//#pragma pack(1)
+//struct BufferBinaryFormat {
+//    const char FORMAT_MARKER = 0xBE;
+//    ModuleFrame meta;
+//    char data[MODULE_N_BYTES];
+//};
+//#pragma pack(pop)
 
-#pragma pack(push)
-#pragma pack(1)
-struct BufferBinaryBlock
-{
-    BufferBinaryFormat frame[buffer_config::BUFFER_BLOCK_SIZE];
-    uint64_t start_pulse_id;
-};
-#pragma pack(pop)
+//#pragma pack(push)
+//#pragma pack(1)
+//struct BufferBinaryBlock
+//{
+//    BufferBinaryFormat frame[buffer_config::BUFFER_BLOCK_SIZE];
+//    uint64_t start_pulse_id;
+//};
+//#pragma pack(pop)
 
 #endif //SF_DAQ_BUFFER_FORMATS_HPP
