@@ -36,9 +36,9 @@ struct ImageMetadata {
 };
 #pragma pack(pop)
 
-struct ModuleFrameBuffer {
-    ModuleFrame module[N_MODULES];
-};
+//struct ModuleFrameBuffer {
+//    ModuleFrame module[N_MODULES];
+//};
 
 //#pragma pack(push)
 //#pragma pack(1)
