@@ -1,0 +1,13 @@
+detsize 1024 512
+hostname localhost:2070+localhost:2072+
+
+udp_dstmac 9c:dc:71:5f:28:10 
+udp_srcmac 9c:dc:71:5f:28:10
+
+udp_srcip 129.129.241.43
+udp_dstip 129.129.241.43
+
+0:udp_dstport 50250
+0:udp_dstport2 50251
+1:udp_dstport 50252
+1:udp_dstport2 50253

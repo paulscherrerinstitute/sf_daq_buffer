@@ -46,7 +46,6 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
     bool modules_in_sync = true;
     for (int i = 0; i < n_modules_; i++) {
         zmq_recv(sockets_[i], &pulses[i], sizeof(uint64_t), 0);
-
         if (pulses[0] != pulses[i]) {
             modules_in_sync = false;
         }
@@ -56,8 +55,8 @@ PulseAndSync ZmqPulseSyncReceiver::get_next_pulse_id() const
         #ifdef DEBUG_OUTPUT
             using namespace date;
             cout << " [" << std::chrono::system_clock::now();
-            cout << "] [ZmqPulseSyncReceiver::get_next_pulse_id] modules_in_sync true";
-            cout << "] returning pulses[0] (frame index):" << pulses[0];
+            cout << "] [ZmqPulseSyncReceiver::get_next_pulse_id]  ";
+            cout << "] (modules_in_sync) Frame index:" << pulses[0];
             cout << endl;
         #endif
         return {pulses[0], 0};

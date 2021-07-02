@@ -18,6 +18,7 @@ namespace BufferUtils
 
         const std::string detector_name;
         const int n_modules;
+        const int n_submodules;
         const int start_udp_port;
         const std::string buffer_folder;
 
@@ -31,6 +32,7 @@ namespace BufferUtils
                         << det_config.GAIN_FILENAME << ' '
                         << det_config.detector_name << ' '
                         << det_config.n_modules << ' '
+                        << det_config.n_submodules << ' '
                         << det_config.start_udp_port << ' '
                         << det_config.buffer_folder << ' ';
         }

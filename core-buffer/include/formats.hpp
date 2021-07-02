@@ -9,10 +9,7 @@
 #include "eiger.hpp"
 #endif
 
-#ifdef DEBUG_OUTPUT
-#define EIGER_DATA_BYTES_PER_PACKET_VALIDATION 262144
-#define JUNGFRAU_DATA_BYTES_PER_PACKET_VALIDATION 1048576
-#endif
+#define IS_BOTTOM(n) ((n%2 != 0) ? -1 : 1)
 
 #pragma pack(push)
 #pragma pack(1)
@@ -22,6 +19,7 @@ struct ModuleFrame {
     uint64_t daq_rec;
     uint64_t n_recv_packets;
     uint64_t module_id;
+    uint16_t bit_depth;
     uint16_t row;
     uint16_t column;
 };
@@ -47,7 +45,7 @@ struct ModuleFrameBuffer {
 struct BufferBinaryFormat {
     const char FORMAT_MARKER = 0xBE;
     ModuleFrame meta;
-    char data[buffer_config::MODULE_N_BYTES];
+    char data[MODULE_N_BYTES];
 };
 #pragma pack(pop)
 

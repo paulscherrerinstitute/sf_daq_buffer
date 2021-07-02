@@ -1,15 +1,20 @@
 #include <iostream>
 #include "FrameStats.hpp"
-
+#include "date.h"
 using namespace std;
 using namespace chrono;
 
 FrameStats::FrameStats(
         const std::string &detector_name,
+        const int n_modules,
         const int module_id,
+        const int bit_depth,
         const size_t stats_time) :
             detector_name_(detector_name),
+            n_modules_(n_modules),
             module_id_(module_id),
+            bit_depth_(bit_depth),
+            n_packets_per_frame_(bit_depth_ * MODULE_N_PIXELS / 8 / DATA_BYTES_PER_PACKET / n_modules),
             stats_time_(stats_time)
 {
    reset_counters();
@@ -31,9 +36,20 @@ void FrameStats::record_stats(const ModuleFrame &meta, const bool bad_pulse_id)
         n_corrupted_pulse_id_++;
     } 
 
-    if (meta.n_recv_packets < N_PACKETS_PER_FRAME) {
-        n_missed_packets_ += N_PACKETS_PER_FRAME - meta.n_recv_packets;
+    if (meta.n_recv_packets < n_packets_per_frame_) {
+        n_missed_packets_ += n_packets_per_frame_ - meta.n_recv_packets;
         n_corrupted_frames_++;
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << " [" << std::chrono::system_clock::now();
+            cout << "] [FrameStats::record_stats] :";
+            cout << " meta.frame "<< meta.frame_index;
+            cout << " || meta.n_recv_packets " << meta.n_recv_packets;
+            cout << " || n_missed_packets_ " << n_missed_packets_;
+            cout << endl;
+        #endif
+        
+        
     }
 
     frames_counter_++;

@@ -8,6 +8,9 @@
 
 class FrameUdpReceiver {
     const int module_id_;
+    const int bit_depth_;
+    const size_t n_packets_per_frame_;
+    const size_t data_bytes_per_frame_;
 
     PacketUdpReceiver udp_receiver_;
 
@@ -27,7 +30,7 @@ class FrameUdpReceiver {
             const int n_packets, ModuleFrame& metadata, char* frame_buffer);
 
 public:
-    FrameUdpReceiver(const uint16_t port, const int module_id);
+    FrameUdpReceiver(const int module_id, const uint16_t port, const int n_modules, const int n_submodules, const int bit_depth);
     virtual ~FrameUdpReceiver();
     uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
 };

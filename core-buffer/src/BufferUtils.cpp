@@ -94,13 +94,9 @@ void BufferUtils::create_destination_folder(const string& output_file)
 void* BufferUtils::connect_socket(
         void* ctx, const string& detector_name, const string& stream_name)
 {
-    string ipc_address = BUFFER_LIVE_IPC_URL +
+    string ipc_address = buffer_config::BUFFER_LIVE_IPC_URL +
                          detector_name + "-" +
                          stream_name;
-#ifdef DEBUG_OUTPUT
-    cout << "[BufferUtils::connect_socket]";
-    cout << " IPC address: " << ipc_address << endl;
-#endif
 
     void* socket = zmq_socket(ctx, ZMQ_SUB);
     if (socket == nullptr) {
@@ -171,6 +167,7 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
+            config_parameters["n_submodules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
             config_parameters["buffer_folder"].GetString(),
     };

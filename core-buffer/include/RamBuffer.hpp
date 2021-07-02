@@ -7,7 +7,12 @@
 class RamBuffer {
     const std::string detector_name_;
     const int n_modules_;
+    const int n_submodules_;
     const int n_slots_;
+    const int bit_depth_;
+
+    const size_t n_packets_per_frame_;
+    const size_t data_bytes_per_frame_;
 
     const size_t meta_bytes_;
     const size_t image_bytes_;
@@ -19,10 +24,15 @@ class RamBuffer {
     ModuleFrame* meta_buffer_;
     char* image_buffer_;
 
+private:    
+    void assemble_eiger_image(ImageMetadata &image_meta, 
+            const int bit_depth, const size_t slot_n) const;
+
 public:
     RamBuffer(const std::string& detector_name,
               const int n_modules,
-              const int n_slots=buffer_config::RAM_BUFFER_N_SLOTS);
+              const int n_submodules,
+              const int bit_depth);
     ~RamBuffer();
 
     void write_frame(const ModuleFrame &src_meta, const char *src_data) const;
@@ -33,6 +43,9 @@ public:
     char* read_image(const uint64_t pulse_id) const;
     void assemble_image(
             const uint64_t pulse_id, ImageMetadata &image_meta) const;
+    
+    
+
 };
 
 
