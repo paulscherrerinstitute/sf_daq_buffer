@@ -53,7 +53,8 @@ int main (int argc, char *argv[])
         cout << endl;
     #endif
 
-    EigerAssembler assembler(bit_depth);
+    // TODO: Is n_submodules here correct?
+    EigerAssembler assembler(config.n_submodules, bit_depth);
 
     RamBuffer frame_buffer(config.detector_name,
             sizeof(ModuleFrame), MODULE_N_BYTES, config.n_modules);
