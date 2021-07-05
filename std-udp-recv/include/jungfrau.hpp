@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+const std::string DETECTOR_TYPE = "jungfrau";
+
 #define N_MODULES 32
 #define BYTES_PER_PACKET 8240
 #define DATA_BYTES_PER_PACKET 8192

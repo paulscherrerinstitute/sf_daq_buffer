@@ -3,6 +3,10 @@
 
 #include <cstdint>
 
+#define IS_BOTTOM(n) ((n%2 != 0) ? -1 : 1)
+
+const std::string DETECTOR_TYPE = "eiger";
+
 #define N_MODULES 1
 #define BYTES_PER_PACKET 4144
 #define DATA_BYTES_PER_PACKET 4096
