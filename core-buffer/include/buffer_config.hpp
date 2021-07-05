@@ -24,7 +24,6 @@ namespace buffer_config {
     const size_t BUFFER_BLOCK_SIZE = 100;
 
 
-    const size_t BUFFER_UDP_N_RECV_MSG = 128;
     // Size of UDP recv buffer
     const int BUFFER_UDP_RCVBUF_N_SLOTS = 100;
     // 8246 bytes for each UDP packet.

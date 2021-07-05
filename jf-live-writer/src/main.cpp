@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
 
         // Fair distribution of images among writers.
         if (meta.i_image % n_writers == i_writer) {
-            char* data = ram_buffer.read_image(meta.image_metadata.pulse_id);
+            char* data = ram_buffer.get_slot_data(meta.image_metadata.pulse_id);
 
             stats.start_image_write();
             writer.write_data(meta.run_id, meta.i_image, data);

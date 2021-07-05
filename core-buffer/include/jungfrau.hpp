@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+const std::string DETECTOR_TYPE = "jungfrau";
+
 #define N_MODULES 32
 #define BYTES_PER_PACKET 8240
 #define DATA_BYTES_PER_PACKET 8192
@@ -39,6 +41,5 @@ struct det_packet {
     char data[DATA_BYTES_PER_PACKET];
 };
 #pragma pack(pop)
-
 
 #endif

@@ -6,18 +6,20 @@
 #include "formats.hpp"
 #include "buffer_config.hpp"
 
+#ifdef USE_EIGER
+    #include "eiger.hpp"
+#else
+    #include "jungfrau.hpp"
+#endif
+
 class FrameUdpReceiver {
-    const int module_id_;
-    const int bit_depth_;
-    const size_t n_packets_per_frame_;
-    const size_t data_bytes_per_frame_;
-
     PacketUdpReceiver udp_receiver_;
+    const int n_packets_per_frame_;
 
-    det_packet packet_buffer_[buffer_config::BUFFER_UDP_N_RECV_MSG];
-    iovec recv_buff_ptr_[buffer_config::BUFFER_UDP_N_RECV_MSG];
-    mmsghdr msgs_[buffer_config::BUFFER_UDP_N_RECV_MSG];
-    sockaddr_in sock_from_[buffer_config::BUFFER_UDP_N_RECV_MSG];
+    det_packet* const packet_buffer_;
+    iovec* const recv_buff_ptr_;
+    mmsghdr* const msgs_;
+    sockaddr_in* const sock_from_;
 
     bool packet_buffer_loaded_ = false;
     int packet_buffer_n_packets_ = 0;
@@ -30,9 +32,9 @@ class FrameUdpReceiver {
             const int n_packets, ModuleFrame& metadata, char* frame_buffer);
 
 public:
-    FrameUdpReceiver(const int module_id, const uint16_t port, const int n_modules, const int n_submodules, const int bit_depth);
+    FrameUdpReceiver(const uint16_t port, const int n_packets_per_frame);
     virtual ~FrameUdpReceiver();
-    uint64_t get_frame_from_udp(ModuleFrame& metadata, char* frame_buffer);
+    uint64_t get_frame_from_udp(ModuleFrame& meta, char* frame_buffer);
 };
 
 
