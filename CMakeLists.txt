@@ -32,12 +32,10 @@ add_subdirectory(
 
 add_subdirectory("core-buffer")
 add_subdirectory("std-udp-recv")
+add_subdirectory("std-udp-sync")
 #add_subdirectory("jf-buffer-writer")
 add_subdirectory("jf-assembler")
 add_subdirectory("sf-stream")
 #add_subdirectory("sf-writer")
-
-if(BUILD_JF_LIVE_WRITER)
-        add_subdirectory("jf-live-writer")
-endif()
+add_subdirectory("jf-live-writer")
 
