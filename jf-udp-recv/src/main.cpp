@@ -40,15 +40,15 @@ int main (int argc, char *argv[]) {
     const auto udp_port = config.start_udp_port + module_id;
     
     FrameUdpReceiver receiver(module_id, udp_port, n_receivers, config.n_submodules, bit_depth);
-    RamBuffer buffer(config.detector_name, n_receivers, config.n_submodules, bit_depth);
+    RamBuffer buffer(config.detector_name, sizeof(ModuleFrame), N_BYTES_PER_MODULE_FRAME(bit_depth), n_receivers,
+            buffer_config::RAM_BUFFER_N_SLOTS);
     FrameStats stats(config.detector_name, n_receivers, module_id, bit_depth, STATS_TIME);
 
     auto ctx = zmq_ctx_new();
     auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
 
     ModuleFrame meta;
-    // TODO: This will not work. Only if Eiger sends in 16 bit. Use MODULE_N_PIXELS * bit_depth / 8
-    char* data = new char[MODULE_N_BYTES];
+    char* data = new char[MODULE_N_PIXELS * bit_depth / 8];
 
     uint64_t pulse_id_previous = 0;
     uint64_t frame_index_previous = 0; 

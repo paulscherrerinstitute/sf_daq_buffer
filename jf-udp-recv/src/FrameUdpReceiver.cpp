@@ -84,9 +84,10 @@ inline void FrameUdpReceiver::copy_packet_to_buffers(
             (void*) (frame_buffer + frame_buffer_offset),
             packet_buffer_[i_packet].data,
             DATA_BYTES_PER_PACKET);
-    
+    if (i_packet == 0){
+        // cout << " BUFFER LOCATION " << (frame_buffer + frame_buffer_offset) << endl;
+    }
     metadata.n_recv_packets++;
-    // cout << "[ frame" << metadata.frame_index << "] NUMBER OF RECV PACKETS : " << metadata.n_recv_packets ;
 }
 
 inline uint64_t FrameUdpReceiver::process_packets(
@@ -122,9 +123,11 @@ inline uint64_t FrameUdpReceiver::process_packets(
                 using namespace date;
                 cout << " [" << std::chrono::system_clock::now();
                 cout << "] [FrameUdpReceiver::process_packets] :";
-                cout << " Frame " << metadata.frame_index << " || ";
-                cout << packet_buffer_[i_packet].packetnum << " packets received.";
-                cout << " PULSE ID "<<  metadata.pulse_id;
+                cout << " Frame " << metadata.frame_index;
+                cout << " || N_RECV_PACKETS " << metadata.n_recv_packets;
+                cout << " || PULSE ID "<<  metadata.pulse_id;
+                cout << " metadata.row " << metadata.row;
+                cout << " metadata.column " << metadata.column;
                 cout << endl;
             #endif
             // Buffer is loaded only if this is not the last message.

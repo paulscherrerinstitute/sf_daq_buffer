@@ -5,9 +5,10 @@
 #include <BufferUtils.hpp>
 #include <AssemblerStats.hpp>
 
-#include "date.h"
 #include <chrono>
-#include <EigerAssembler.hpp>
+
+#include "date.h"
+#include "EigerAssembler.hpp"
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
  
@@ -53,27 +54,38 @@ int main (int argc, char *argv[])
         cout << endl;
     #endif
 
-    // TODO: Is n_submodules here correct?
-    EigerAssembler assembler(config.n_submodules, bit_depth);
+    EigerAssembler assembler(n_receivers, bit_depth);
+
+    #ifdef DEBUG_OUTPUT
+        using namespace date;
+        cout << " [" << std::chrono::system_clock::now();
+        cout << "] [EigerAssembler] :";
+        cout << " Eiger details:";
+        cout << assembler;
+        cout << endl;
+    #endif
 
     RamBuffer frame_buffer(config.detector_name,
-            sizeof(ModuleFrame), MODULE_N_BYTES, config.n_modules);
+            sizeof(ModuleFrame), N_BYTES_PER_MODULE_FRAME(bit_depth), n_receivers,
+            buffer_config::RAM_BUFFER_N_SLOTS);
+    
 
     RamBuffer image_buffer(config.detector_name + "_" + stream_name,
-            sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1);
+            sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1,
+            buffer_config::RAM_BUFFER_N_SLOTS);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, n_receivers);
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
     
     while (true) {
         auto pulse_and_sync = receiver.get_next_pulse_id();
-
+        // metadata
         auto* src_meta = frame_buffer.get_slot_meta(pulse_and_sync.pulse_id);
         auto* src_data = frame_buffer.get_slot_data(pulse_and_sync.pulse_id);
-
+        // data
         auto* dst_meta = image_buffer.get_slot_meta(pulse_and_sync.pulse_id);
         auto* dst_data = image_buffer.get_slot_data(pulse_and_sync.pulse_id);
-
+        // assemble 
         assembler.assemble_image(src_meta, src_data, dst_meta, dst_data);
 
         zmq_send(sender, dst_meta, sizeof(ImageMetadata), 0);

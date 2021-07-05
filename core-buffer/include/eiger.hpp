@@ -2,6 +2,7 @@
 #define EIGER_H
 
 #include <cstdint>
+#include <stdint.h>
 
 #define N_MODULES 1
 #define BYTES_PER_PACKET 4144
@@ -27,6 +28,9 @@
 
 
 #define N_BYTES_PER_MODULE_LINE(bit_depth) ((MODULE_X_SIZE * bit_depth) / 8)
+#define N_BYTES_PER_MODULE_FRAME(bit_depth) ((131072 * bit_depth) / 8)
+
+
 // #define N_BYTES_PER_IMAGE_LINE(bit_depth, n_submodules) ((n_submodules / 2 * MODULE_X_SIZE * bit_depth) / 8)
 
 // DR 16

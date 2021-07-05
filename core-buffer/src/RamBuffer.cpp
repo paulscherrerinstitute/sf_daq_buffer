@@ -17,7 +17,7 @@ using namespace buffer_config;
 RamBuffer::RamBuffer(const string& buffer_name,
                      const size_t meta_n_bytes,
                      const size_t data_n_bytes,
-                     const int n_modules = 1,
+                     const int n_modules,
                      const int n_slots) :
         buffer_name_(buffer_name),
         n_modules_(n_modules),
@@ -66,8 +66,8 @@ RamBuffer::~RamBuffer()
 char* RamBuffer::_get_meta_buffer(
         int slot_n,
         uint64_t module_id) const
-{
-   return buffer_ + (slot_n * slot_bytes_) +
+{   
+    return buffer_ + (slot_n * slot_bytes_) +
           (module_id * meta_bytes_);
 }
 
@@ -96,6 +96,7 @@ void RamBuffer::write_frame(
         cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
         cout << " || src_meta.module_id " << src_meta.module_id;
+        cout << " || dst_meta " << &dst_meta;
         cout << endl;
     #endif
 
