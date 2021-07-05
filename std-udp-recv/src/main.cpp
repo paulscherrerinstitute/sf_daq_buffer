@@ -20,7 +20,6 @@ int main (int argc, char *argv[]) {
 
     if (argc != 4) {
         cout << endl;
-
         cout << "Usage: std_udp_recv [udp_recv_config_filename] [module_id] "
                 "[bit_depth]";
         cout << endl;

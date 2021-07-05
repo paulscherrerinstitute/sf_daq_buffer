@@ -9,13 +9,7 @@ target_link_libraries(std-udp-recv-lib
 
 add_executable(std-udp-recv src/main.cpp)
 
-if (USE_EIGER)
-        set (LIB_NAME_UDP_RECV "eiger_udp_recv")
-else()
-        set (LIB_NAME_UDP_RECV "jf_udp_recv")
-endif()
-
-set_target_properties(std-udp-recv PROPERTIES OUTPUT_NAME ${LIB_NAME_UDP_RECV})
+set_target_properties(std-udp-recv PROPERTIES OUTPUT_NAME std_udp_recv)
 
 target_link_libraries(std-udp-recv
         std-udp-recv-lib
