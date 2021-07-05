@@ -23,10 +23,15 @@ struct ModuleFrame {
 #pragma pack(push)
 #pragma pack(1)
 struct ImageMetadata {
-    uint64_t pulse_id;
-    uint64_t frame_index;
-    uint32_t daq_rec;
-    uint32_t is_good_image;
+    uint64_t id;
+    uint64_t height;
+    uint64_t width;
+    uint64_t dtype;
+    uint64_t encoding;
+    uint64_t source_id;
+    uint64_t status;
+    uint64_t user_1;
+    uint64_t user_2;
 };
 #pragma pack(pop)
 
