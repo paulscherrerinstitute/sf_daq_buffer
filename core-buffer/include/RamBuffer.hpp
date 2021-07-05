@@ -3,6 +3,7 @@
 
 #include <string>
 #include "formats.hpp"
+#include "buffer_config.hpp"
 
 class RamBuffer {
     const std::string buffer_name_;
