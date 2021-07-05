@@ -49,7 +49,7 @@ int main (int argc, char *argv[]) {
     const size_t FRAME_N_BYTES = MODULE_N_PIXELS * bit_depth / 8;
     const size_t N_PACKETS_PER_FRAME = FRAME_N_BYTES / DATA_BYTES_PER_PACKET;
 
-    FrameUdpReceiver receiver(udp_port);
+    FrameUdpReceiver receiver(udp_port, N_PACKETS_PER_FRAME);
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
                            FRAME_N_BYTES, config.n_modules);
     FrameStats stats(config.detector_name, module_id,
@@ -82,8 +82,7 @@ int main (int argc, char *argv[]) {
         frame_buffer.write_frame(meta, data);
         zmq_send(socket, &image_id, sizeof(image_id), 0);
 
-        const bool is_good_frame = meta.n_recv_packets == N_PACKETS_PER_FRAME;
-        stats.record_stats(meta, is_good_frame);
+        stats.record_stats(meta);
     }
 
     delete[] data;
