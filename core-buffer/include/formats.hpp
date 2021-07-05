@@ -1,9 +1,6 @@
 #ifndef SF_DAQ_BUFFER_FORMATS_HPP
 #define SF_DAQ_BUFFER_FORMATS_HPP
 
-#include "buffer_config.hpp"
-
-
 #pragma pack(push)
 #pragma pack(1)
 struct ModuleFrame {
