@@ -52,8 +52,8 @@ int main (int argc, char *argv[]) {
     FrameUdpReceiver receiver(udp_port);
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
                            FRAME_N_BYTES, config.n_modules);
-    FrameStats stats(config.detector_name, config.n_modules,
-                     module_id, bit_depth, STATS_TIME);
+    FrameStats stats(config.detector_name, module_id,
+            N_PACKETS_PER_FRAME, STATS_TIME);
 
     auto ctx = zmq_ctx_new();
     auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
