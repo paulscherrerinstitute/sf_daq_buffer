@@ -31,11 +31,12 @@ add_subdirectory(
         EXCLUDE_FROM_ALL)
 
 add_subdirectory("core-buffer")
+#add_subdirectory("std-stream-send")
 add_subdirectory("std-udp-recv")
 add_subdirectory("std-udp-sync")
 #add_subdirectory("jf-buffer-writer")
 add_subdirectory("jf-assembler")
-add_subdirectory("sf-stream")
+#add_subdirectory("sf-stream")
 #add_subdirectory("sf-writer")
 add_subdirectory("jf-live-writer")
 
