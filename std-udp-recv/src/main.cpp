@@ -8,12 +8,18 @@
 #include "FrameUdpReceiver.hpp"
 #include "BufferUtils.hpp"
 #include "FrameStats.hpp"
- 
+#include "UdpRecvConfig.hpp"
+
+#ifdef USE_EIGER
+    #include "eiger.hpp"
+#else
+    # include "jungfrau.hpp"
+#endif
+
 using namespace std;
 using namespace chrono;
 using namespace buffer_config;
 using namespace BufferUtils;
-
 
 
 int main (int argc, char *argv[]) {
@@ -30,46 +36,54 @@ int main (int argc, char *argv[]) {
         exit(-1);
     }
 
-    const auto config = UdpRecvConfig.from_json_file(string(argv[1]));
+    const auto config = UdpRecvConfig::from_json_file(string(argv[1]));
     const int module_id = atoi(argv[2]);
     const int bit_depth = atoi(argv[3]);
-    const int n_receivers = config.n_modules * config.n_submodules;
+
+    if (DETECTOR_TYPE != config.detector_type) {
+        throw runtime_error("UDP recv version for " + DETECTOR_TYPE +
+                            " but config for " + config.detector_type);
+    }
+
     const auto udp_port = config.start_udp_port + module_id;
-    
-    FrameUdpReceiver receiver(module_id, udp_port, n_receivers, config.n_submodules, bit_depth);
-    RamBuffer frame_buffer(config.detector_name, n_receivers, config.n_submodules, bit_depth);
-    FrameStats stats(config.detector_name, n_receivers, module_id, bit_depth, STATS_TIME);
+    const size_t FRAME_N_BYTES = MODULE_N_PIXELS * bit_depth / 8;
+    const size_t N_PACKETS_PER_FRAME = FRAME_N_BYTES / DATA_BYTES_PER_PACKET;
+
+    FrameUdpReceiver receiver(udp_port);
+    RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
+                           FRAME_N_BYTES, config.n_modules);
+    FrameStats stats(config.detector_name, config.n_modules,
+                     module_id, bit_depth, STATS_TIME);
 
     auto ctx = zmq_ctx_new();
     auto socket = bind_socket(ctx, config.detector_name, to_string(module_id));
 
     ModuleFrame meta;
-    char* data = new char[MODULE_N_PIXELS * bit_depth / 8];
+    meta.module_id = module_id;
+    meta.bit_depth = bit_depth;
 
-    uint64_t pulse_id_previous = 0;
-    uint64_t frame_index_previous = 0; 
-    
+    char* data = new char[FRAME_N_BYTES];
+
     while (true) {
+        // Reset the metadata and frame buffer for the next frame.
+        meta.frame_index = 0;
+        memset(data, 0, FRAME_N_BYTES);
 
-        auto pulse_id = receiver.get_frame_from_udp(meta, data);
+        receiver.get_frame_from_udp(meta, data);
 
-        bool bad_pulse_id = false;       
-        if ( ( meta.frame_index != (frame_index_previous+1) ) ||
-             ( (meta.frame_index-frame_index_previous) <= 0 ) ||
-             ( (meta.frame_index-frame_index_previous) > 1000 ) ){  
-            bad_pulse_id = true;
-        } else { 
-            frame_buffer.write_frame(meta, data);
+        // Assign the image_id based on the detector type.
+#ifdef USE_EIGER
+        const uint64_t image_id = meta.frame_index;
+#else
+        const uint64_t image_id = meta.pulse_id;
+#endif
+        meta.id = image_id;
 
-            zmq_send(socket, &pulse_id, sizeof(pulse_id), 0);
+        frame_buffer.write_frame(meta, data);
+        zmq_send(socket, &image_id, sizeof(image_id), 0);
 
-        }
-
-        stats.record_stats(meta, bad_pulse_id);
-
-        pulse_id_previous = pulse_id;
-        frame_index_previous = meta.frame_index;
-
+        const bool is_good_frame = meta.n_recv_packets == N_PACKETS_PER_FRAME;
+        stats.record_stats(meta, is_good_frame);
     }
 
     delete[] data;
