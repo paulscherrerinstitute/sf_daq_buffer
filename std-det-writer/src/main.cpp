@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 
-    JFH5Writer writer(config.detector_name, config.output_folder);
+    JFH5Writer writer(config.detector_name);
     WriterStats stats(config.detector_name);
 
     StoreStream meta = {};

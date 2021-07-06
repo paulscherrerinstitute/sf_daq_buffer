@@ -17,12 +17,10 @@ struct DetWriterConfig {
 
         return {
                 config_parameters["detector_name"].GetString(),
-                config_parameters["output_folder"].GetString()
         };
     }
 
     const std::string detector_name;
-    const std::string output_folder;
 };
 
 
