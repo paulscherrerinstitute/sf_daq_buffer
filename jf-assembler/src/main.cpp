@@ -11,7 +11,12 @@
 #include "EigerAssembler.hpp"
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
- 
+
+#ifdef USE_EIGER
+#include "eiger.hpp"
+#else
+#include "jungfrau.hpp"
+#endif
 
 using namespace std;
 using namespace buffer_config;
