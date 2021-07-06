@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, LIVE_ZMQ_IO_THREADS);
     auto receiver = BufferUtils::connect_socket(
-            ctx, config.detector_name, "writer-agent");
+            ctx, config.detector_name, "writer_agent");
 
     const size_t IMAGE_N_BYTES = 12;
     RamBuffer image_buffer(config.detector_name + "_assembler",
