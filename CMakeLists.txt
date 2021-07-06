@@ -38,5 +38,5 @@ add_subdirectory("std-udp-sync")
 add_subdirectory("jf-assembler")
 #add_subdirectory("sf-stream")
 #add_subdirectory("sf-writer")
-add_subdirectory("jf-live-writer")
+add_subdirectory("std-det-writer")
 

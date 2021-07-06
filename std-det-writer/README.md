@@ -1,4 +1,4 @@
-# jf-live-writer
+# std-det-writer
 
 This component is a PHDF5 based MPI writer for high performance detectors 
 that need more than 2GB/s of write speed. It parallelizes the HDF5 writing to 
