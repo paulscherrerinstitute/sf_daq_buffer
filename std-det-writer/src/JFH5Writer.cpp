@@ -42,11 +42,11 @@ hid_t JFH5Writer::get_datatype(const int bits_per_pixel)
 }
 
 void JFH5Writer::open_run(const string& output_file,
-                          const int64_t run_id,
-                          const uint32_t n_images,
-                          const uint32_t image_y_size,
-                          const uint32_t image_x_size,
-                          const uint32_t bits_per_pixel)
+                          const int run_id,
+                          const int n_images,
+                          const int image_y_size,
+                          const int image_x_size,
+                          const int dtype)
 {
     close_run();
 
@@ -233,7 +233,7 @@ void JFH5Writer::write_data(
 }
 
 void JFH5Writer::write_meta(
-        const int64_t run_id, const uint32_t index, const ImageMetadata& meta)
+        const int64_t run_id, const uint32_t index, const ImageMetadata* meta)
 {
     if (run_id != current_run_id_) {
         throw runtime_error("Invalid run_id.");
@@ -260,12 +260,12 @@ void JFH5Writer::write_meta(
     }
 
     if (H5Dwrite(image_id_dataset_, H5T_NATIVE_UINT64,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.id)) < 0) {
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta->id)) < 0) {
         throw runtime_error("Cannot write data to pulse_id dataset.");
     }
 
     if (H5Dwrite(status_dataset_, H5T_NATIVE_UINT64,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.status)) < 0) {
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta->status)) < 0) {
         throw runtime_error("Cannot write data to is_good_image dataset.");
     }
 

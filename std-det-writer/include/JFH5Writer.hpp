@@ -38,11 +38,11 @@ public:
     ~JFH5Writer();
 
     void open_run(const std::string& output_file,
-                  const int64_t run_id,
-                  const uint32_t n_images,
-                  const uint32_t image_y_size,
-                  const uint32_t image_x_size,
-                  const uint32_t bits_per_pixel);
+                  const int run_id,
+                  const int n_images,
+                  const int image_y_size,
+                  const int image_x_size,
+                  const int bits_per_pixel);
     void close_run();
 
     void write_data(const int64_t run_id,
@@ -51,7 +51,7 @@ public:
 
     void write_meta(const int64_t run_id,
                     const uint32_t index,
-                    const ImageMetadata& meta);
+                    const ImageMetadata* meta);
 };
 
 #endif //JF_LIVE_WRITER_HPP

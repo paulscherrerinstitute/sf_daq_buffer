@@ -54,11 +54,15 @@ int main (int argc, char *argv[])
 
         // i_image == 0 -> we have a new run.
         if (meta.i_image == 0) {
-            writer.open_run(meta.run_id,
+            auto image_meta = (ImageMetadata*)
+                    image_buffer.get_slot_meta(meta.image_id);
+
+            writer.open_run(meta.output_file,
+                            meta.run_id,
                             meta.n_images,
-                            meta.image_y_size,
-                            meta.image_x_size,
-                            meta.bits_per_pixel);
+                            image_meta->height,
+                            image_meta->width,
+                            image_meta->dtype);
 
             stats.start_run(meta);
         }
@@ -73,7 +77,7 @@ int main (int argc, char *argv[])
 
         // Fair distribution of images among writers.
         if (meta.i_image % n_writers == i_writer) {
-            char* data = image_buffer.get_slot_data(meta.image_metadata.id);
+            char* data = image_buffer.get_slot_data(meta.image_id);
 
             stats.start_image_write();
             writer.write_data(meta.run_id, meta.i_image, data);
@@ -82,7 +86,9 @@ int main (int argc, char *argv[])
 
         // Only the first instance writes metadata.
         if (i_writer == 0) {
-            writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
+            auto image_meta = (ImageMetadata*)
+                    image_buffer.get_slot_meta(meta.image_id);
+            writer.write_meta(meta.run_id, meta.i_image, image_meta);
         }
 
     }
