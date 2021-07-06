@@ -26,11 +26,9 @@ class JFH5Writer {
 
     // Open file specific variables.
     hid_t file_id_ = -1;
-    hid_t image_dataset_id_ = -1;
-    hid_t pulse_dataset_id_= -1;
-    hid_t frame_dataset_id_ = -1;
-    hid_t daq_rec_dataset_id_ = -1;
-    hid_t is_good_dataset_id_ = -1;
+    hid_t image_data_dataset_ = -1;
+    hid_t image_id_dataset_ = -1;
+    hid_t status_dataset_ = -1;
 
     static hid_t get_datatype(int bits_per_pixel);
     void open_file(const std::string& output_file, uint32_t n_images);

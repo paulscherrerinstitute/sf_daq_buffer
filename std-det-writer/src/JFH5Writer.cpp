@@ -149,10 +149,10 @@ void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
 //        throw runtime_error("Cannot set compression filter on dataset.");
 //    }
 
-    image_dataset_id_ = H5Dcreate(
+    image_data_dataset_ = H5Dcreate(
             data_group_id, "data", get_datatype(bits_per_pixel_),
             image_space_id, H5P_DEFAULT, dcpl_id, H5P_DEFAULT);
-    if (image_dataset_id_ < 0) {
+    if (image_data_dataset_ < 0) {
         throw runtime_error("Cannot create image dataset.");
     }
 
@@ -174,10 +174,8 @@ void JFH5Writer::open_file(const string& output_file, const uint32_t n_images)
         return dataset_id;
     };
 
-    pulse_dataset_id_ = create_meta_dataset("pulse_id", H5T_NATIVE_UINT64);
-    frame_dataset_id_ = create_meta_dataset("frame_index", H5T_NATIVE_UINT64);
-    daq_rec_dataset_id_ = create_meta_dataset("daq_rec", H5T_NATIVE_UINT32);
-    is_good_dataset_id_ = create_meta_dataset("is_good_frame", H5T_NATIVE_UINT8);
+    image_id_dataset_ = create_meta_dataset("image_id", H5T_NATIVE_UINT64);
+    status_dataset_ = create_meta_dataset("status", H5T_NATIVE_UINT64);
 
     H5Sclose(meta_space_id);
     H5Sclose(image_space_id);
@@ -191,20 +189,11 @@ void JFH5Writer::close_file()
         return;
     }
 
-    H5Dclose(image_dataset_id_);
-    image_dataset_id_ = -1;
+    H5Dclose(image_id_dataset_);
+    image_id_dataset_ = -1;
 
-    H5Dclose(pulse_dataset_id_);
-    pulse_dataset_id_ = -1;
-
-    H5Dclose(frame_dataset_id_);
-    frame_dataset_id_ = -1;
-
-    H5Dclose(daq_rec_dataset_id_);
-    daq_rec_dataset_id_ = -1;
-
-    H5Dclose(is_good_dataset_id_);
-    is_good_dataset_id_ = -1;
+    H5Dclose(status_dataset_);
+    status_dataset_ = -1;
 
     H5Fclose(file_id_);
     file_id_ = -1;
@@ -223,7 +212,7 @@ void JFH5Writer::write_data(
         throw runtime_error("Cannot create image ram dataspace.");
     }
 
-    auto file_ds = H5Dget_space(image_dataset_id_);
+    auto file_ds = H5Dget_space(image_data_dataset_);
     if (file_ds < 0) {
         throw runtime_error("Cannot get image dataset file dataspace.");
     }
@@ -237,8 +226,8 @@ void JFH5Writer::write_data(
        throw runtime_error("Cannot select image dataset file hyperslab.");
     }
 
-    if (H5Dwrite(image_dataset_id_, get_datatype(bits_per_pixel_),
-            ram_ds, file_ds, H5P_DEFAULT, data) < 0) {
+    if (H5Dwrite(image_data_dataset_, get_datatype(bits_per_pixel_),
+                 ram_ds, file_ds, H5P_DEFAULT, data) < 0) {
         throw runtime_error("Cannot write data to image dataset.");
     }
 
@@ -259,7 +248,7 @@ void JFH5Writer::write_meta(
         throw runtime_error("Cannot create metadata ram dataspace.");
     }
 
-    auto file_ds = H5Dget_space(pulse_dataset_id_);
+    auto file_ds = H5Dget_space(image_id_dataset_);
     if (file_ds < 0) {
         throw runtime_error("Cannot get metadata dataset file dataspace.");
     }
@@ -273,23 +262,13 @@ void JFH5Writer::write_meta(
         throw runtime_error("Cannot select metadata dataset file hyperslab.");
     }
 
-    if (H5Dwrite(pulse_dataset_id_, H5T_NATIVE_UINT64,
-            ram_ds, file_ds, H5P_DEFAULT, &(meta.pulse_id)) < 0) {
+    if (H5Dwrite(image_id_dataset_, H5T_NATIVE_UINT64,
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta.id)) < 0) {
         throw runtime_error("Cannot write data to pulse_id dataset.");
     }
 
-    if (H5Dwrite(frame_dataset_id_, H5T_NATIVE_UINT64,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.frame_index)) < 0) {
-        throw runtime_error("Cannot write data to frame_index dataset.");
-    }
-
-    if (H5Dwrite(daq_rec_dataset_id_, H5T_NATIVE_UINT32,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.daq_rec)) < 0) {
-        throw runtime_error("Cannot write data to daq_rec dataset.");
-    }
-
-    if (H5Dwrite(is_good_dataset_id_, H5T_NATIVE_UINT32,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.is_good_image)) < 0) {
+    if (H5Dwrite(status_dataset_, H5T_NATIVE_UINT64,
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta.status)) < 0) {
         throw runtime_error("Cannot write data to is_good_image dataset.");
     }
 
