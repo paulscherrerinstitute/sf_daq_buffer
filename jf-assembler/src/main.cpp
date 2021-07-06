@@ -4,13 +4,6 @@
 #include "date.h"
 #include <chrono>
 
-#ifdef USE_EIGER
-    #include "eiger.hpp"
-#else
-    #include "jungfrau.hpp"
-#endif
-
-
 #include <RamBuffer.hpp>
 #include <BufferUtils.hpp>
 #include <AssemblerStats.hpp>
@@ -18,7 +11,12 @@
 #include "EigerAssembler.hpp"
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
-#include "buffer_config.hpp"
+
+#ifdef USE_EIGER
+#include "eiger.hpp"
+#else
+#include "jungfrau.hpp"
+#endif
 
 using namespace std;
 using namespace buffer_config;
