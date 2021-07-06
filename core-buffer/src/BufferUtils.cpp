@@ -167,7 +167,6 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
             config_parameters["n_modules"].GetInt(),
-            config_parameters["n_submodules"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
             config_parameters["buffer_folder"].GetString(),
     };

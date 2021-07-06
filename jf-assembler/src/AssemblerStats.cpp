@@ -28,7 +28,7 @@ void AssemblerStats::record_stats(
     image_counter_++;
     n_sync_lost_images_ += n_lost_pulses;
 
-    if (!meta->is_good_image) {
+    if (meta->status != 0) {
         n_corrupted_images_++;
     }
 

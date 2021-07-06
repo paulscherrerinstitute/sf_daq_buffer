@@ -84,9 +84,9 @@ void RamBuffer::write_frame(
         const char *src_data) const
 {
     auto *dst_meta = (ModuleFrame*) get_frame_meta(
-            src_meta.pulse_id, src_meta.module_id);
+            src_meta.id, src_meta.module_id);
     auto *dst_data = get_frame_data(
-            src_meta.pulse_id, src_meta.module_id);
+            src_meta.id, src_meta.module_id);
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -96,7 +96,6 @@ void RamBuffer::write_frame(
         cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
         cout << " || src_meta.module_id " << src_meta.module_id;
-        cout << " || dst_meta " << &dst_meta;
         cout << endl;
     #endif
 

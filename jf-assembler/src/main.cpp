@@ -1,17 +1,24 @@
 #include <iostream>
 #include <string>
 #include <zmq.h>
+#include "date.h"
+#include <chrono>
+
+#ifdef USE_EIGER
+    #include "eiger.hpp"
+#else
+    #include "jungfrau.hpp"
+#endif
+
+
 #include <RamBuffer.hpp>
 #include <BufferUtils.hpp>
 #include <AssemblerStats.hpp>
 
-#include <chrono>
-
-#include "date.h"
 #include "EigerAssembler.hpp"
 #include "assembler_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
- 
+#include "buffer_config.hpp"
 
 using namespace std;
 using namespace buffer_config;
@@ -22,12 +29,15 @@ int main (int argc, char *argv[])
     if (argc != 3) {
         cout << endl;
         #ifndef USE_EIGER
-            cout << "Usage: jf_assembler [detector_json_filename] [bit_depth]" << endl;
+            cout << "Usage: jf_assembler [detector_json_filename] "
+            " [bit_depth]" << endl;
         #else
-            cout << "Usage: eiger_assembler [detector_json_filename] [bit_depth]" << endl;
+            cout << "Usage: eiger_assembler [detector_json_filename] "
+            " [bit_depth]" << endl;
         #endif
-        cout << "\tdetector_json_filename: detector config file path." << endl;
-        cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
+        cout << "\tdetector_json_filename: detector config file path.";
+        cout << endl;
+        cout << "\tbit_depth: bit depth of the image.";
         cout << endl;
 
         exit(-1);
@@ -41,7 +51,8 @@ int main (int argc, char *argv[])
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, ASSEMBLER_ZMQ_IO_THREADS);
     auto sender = BufferUtils::bind_socket(
             ctx, config.detector_name, stream_name);
-    const int n_receivers =  config.n_modules * config.n_submodules;
+    auto receiver_sync = BufferUtils::connect_socket(
+            ctx, config.detector_name, "sync");
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -50,11 +61,13 @@ int main (int argc, char *argv[])
         cout << " Details of Assembler:";
         cout << " detector_name: " << config.detector_name;
         cout << " || n_modules: " << config.n_modules;
-        cout << " || n_receivers: " << n_receivers;
         cout << endl;
     #endif
 
-    EigerAssembler assembler(n_receivers, bit_depth);
+    const size_t FRAME_N_BYTES = MODULE_N_PIXELS * bit_depth / 8;
+    const size_t N_PACKETS_PER_FRAME = FRAME_N_BYTES / DATA_BYTES_PER_PACKET;
+
+    EigerAssembler assembler(config.n_modules, bit_depth);
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
@@ -66,7 +79,7 @@ int main (int argc, char *argv[])
     #endif
 
     RamBuffer frame_buffer(config.detector_name,
-            sizeof(ModuleFrame), N_BYTES_PER_MODULE_FRAME(bit_depth), n_receivers,
+            sizeof(ModuleFrame), FRAME_N_BYTES, config.n_modules,
             buffer_config::RAM_BUFFER_N_SLOTS);
     
 
@@ -74,23 +87,34 @@ int main (int argc, char *argv[])
             sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1,
             buffer_config::RAM_BUFFER_N_SLOTS);
 
-    ZmqPulseSyncReceiver receiver(ctx, config.detector_name, n_receivers);
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
+
     
+    uint64_t image_id = 0;
+
     while (true) {
-        auto pulse_and_sync = receiver.get_next_pulse_id();
+        // receives the synced image id
+        zmq_recv(receiver_sync, &image_id, sizeof(image_id), 0);
+
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            cout << " [" << std::chrono::system_clock::now();
+            cout << "] [ASSEMBLER::receiver_sync] image_id: ";
+            cout << image_id;
+            cout << endl;
+        #endif
         // metadata
-        auto* src_meta = frame_buffer.get_slot_meta(pulse_and_sync.pulse_id);
-        auto* src_data = frame_buffer.get_slot_data(pulse_and_sync.pulse_id);
+        auto* src_meta = frame_buffer.get_slot_meta(image_id);
+        auto* src_data = frame_buffer.get_slot_data(image_id);
         // data
-        auto* dst_meta = image_buffer.get_slot_meta(pulse_and_sync.pulse_id);
-        auto* dst_data = image_buffer.get_slot_data(pulse_and_sync.pulse_id);
+        auto* dst_meta = image_buffer.get_slot_meta(image_id);
+        auto* dst_data = image_buffer.get_slot_data(image_id);
         // assemble 
         assembler.assemble_image(src_meta, src_data, dst_meta, dst_data);
 
         zmq_send(sender, dst_meta, sizeof(ImageMetadata), 0);
 
         stats.record_stats(
-                (ImageMetadata*)dst_meta, pulse_and_sync.n_lost_pulses);
+                (ImageMetadata*)dst_meta, assembler.get_last_img_status());
     }
 }

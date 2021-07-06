@@ -33,5 +33,5 @@ TEST(RamBuffer, simple_store)
     ASSERT_EQ(image_meta.pulse_id, frame_meta.pulse_id);
     ASSERT_EQ(image_meta.daq_rec, frame_meta.daq_rec);
     ASSERT_EQ(image_meta.frame_index, frame_meta.frame_index);
-    ASSERT_EQ(image_meta.is_good_image, 1);
+    ASSERT_EQ(image_meta.status, 0);
 }

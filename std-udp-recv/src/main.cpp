@@ -45,7 +45,8 @@ int main (int argc, char *argv[]) {
 
     FrameUdpReceiver receiver(udp_port, N_PACKETS_PER_FRAME);
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
-                           FRAME_N_BYTES, config.n_modules);
+                           FRAME_N_BYTES, config.n_modules,
+                           buffer_config::RAM_BUFFER_N_SLOTS);
     FrameStats stats(config.detector_name, module_id,
             N_PACKETS_PER_FRAME, STATS_TIME);
 
@@ -61,6 +62,7 @@ int main (int argc, char *argv[]) {
     while (true) {
         // Reset the metadata and frame buffer for the next frame.
         meta.frame_index = 0;
+        meta.n_recv_packets = 0;
         memset(data, 0, FRAME_N_BYTES);
 
         receiver.get_frame_from_udp(meta, data);

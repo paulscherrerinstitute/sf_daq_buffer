@@ -5,9 +5,9 @@
     "live_rate": 10,
     "pedestal_file": "",
     "gain_file": "",
-    "detector_name": "Eiger-16",
-    "n_modules": 1,
-    "n_submodules":4,
+    "detector_name": "eiger-16",
+    "detector_type": "eiger",
+    "n_modules": 4,
     "start_udp_port": 50200,
     "buffer_folder": ""
 }

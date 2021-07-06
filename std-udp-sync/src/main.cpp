@@ -43,18 +43,9 @@ int main (int argc, char *argv[])
 
     auto sender = BufferUtils::bind_socket(ctx, config.detector_name, "sync");
 
-    #ifdef DEBUG_OUTPUT
-        using namespace date;
-        cout << " [" << std::chrono::system_clock::now();
-        cout << "] [Assembler] :";
-        cout << " Details of Assembler:";
-        cout << " detector_name: " << config.detector_name;
-        cout << " || n_modules: " << config.n_modules;
-        cout << endl;
-    #endif
-
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
-                           FRAME_N_BYTES, config.n_modules);
+                           FRAME_N_BYTES, config.n_modules,
+                           buffer_config::RAM_BUFFER_N_SLOTS);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
     SyncStats stats(config.detector_name, SYNC_STATS_MODULO);

@@ -16,6 +16,10 @@ struct ModuleFrame {
 };
 #pragma pack(pop)
 
+// ImageMetadata status convention
+// 0 good image
+// 1 frames with missing packets
+// 2 frames with different ids
 
 #pragma pack(push)
 #pragma pack(1)
@@ -26,11 +30,10 @@ struct ImageMetadata {
     uint64_t dtype;
     uint64_t encoding;
     uint64_t source_id;
-    uint64_t status;
+    uint64_t status; 
     uint64_t user_1;
     uint64_t user_2;
 };
 #pragma pack(pop)
-
 
 #endif //SF_DAQ_BUFFER_FORMATS_HPP
