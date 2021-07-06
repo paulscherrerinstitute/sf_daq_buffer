@@ -40,7 +40,9 @@ int main (int argc, char *argv[])
     auto receiver = BufferUtils::connect_socket(
             ctx, config.detector_name, "writer-agent");
 
-    RamBuffer ram_buffer(config.detector_name, config.n_modules);
+    const size_t IMAGE_N_BYTES = 12;
+    RamBuffer image_buffer(config.detector_name + "_assembler",
+            sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 
     JFH5Writer writer(config);
     WriterStats stats(config.detector_name);
@@ -60,9 +62,17 @@ int main (int argc, char *argv[])
             stats.start_run(meta);
         }
 
+        // i_image == n_images -> end of run.
+        if (meta.i_image == meta.n_images) {
+            writer.close_run();
+
+            stats.end_run();
+            continue;
+        }
+
         // Fair distribution of images among writers.
         if (meta.i_image % n_writers == i_writer) {
-            char* data = ram_buffer.get_slot_data(meta.image_metadata.pulse_id);
+            char* data = ram_buffer.get_slot_data(meta.image_metadata.id);
 
             stats.start_image_write();
             writer.write_data(meta.run_id, meta.i_image, data);
@@ -74,11 +84,5 @@ int main (int argc, char *argv[])
             writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
         }
 
-        // i_image + 1 == meta.n_images -> we received the last image.
-        if (meta.i_image+1 == meta.n_images) {
-            writer.close_run();
-
-            stats.end_run();
-        }
     }
 }
