@@ -120,9 +120,10 @@ inline uint64_t FrameUdpReceiver::process_packets(
             #ifdef DEBUG_OUTPUT
                 using namespace date;
                 cout << " [" << std::chrono::system_clock::now();
-                cout << "] [frameudpreceiver::process_packets] :";
+                cout << "] [FrameUdpReceiver::process_packets] :";
                 cout << " frame " << metadata.frame_index << " || ";
-                cout << packet_buffer_[i_packet].packetnum << " packets received.";
+                cout << packet_buffer_[i_packet].packetnum+1;
+                cout << " packets received.";
                 cout << " pulse id "<<  metadata.pulse_id;
                 cout << endl;
             #endif
