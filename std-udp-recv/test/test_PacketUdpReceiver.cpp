@@ -1,5 +1,4 @@
 #include <netinet/in.h>
-#include <jungfrau.hpp>
 #include "gtest/gtest.h"
 #include "mock/udp.hpp"
 #include "PacketUdpReceiver.hpp"
@@ -7,7 +6,15 @@
 #include <thread>
 #include <chrono>
 
+#ifdef USE_EIGER
+#include "eiger.hpp"
+#else
+#include "jungfrau.hpp"
+#endif
+
 using namespace std;
+
+const int N_PACKETS_PER_FRAME = 128;
 
 TEST(PacketUdpReceiver, simple_recv)
 {
