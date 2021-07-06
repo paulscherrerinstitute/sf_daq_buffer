@@ -12,8 +12,8 @@ extern "C" {
 
 class JFH5Writer {
 
-    const std::string root_folder_;
     const std::string detector_name_;
+    const std::string root_folder_;
 
     static const int64_t NO_RUN_ID = -1;
 
@@ -35,7 +35,8 @@ class JFH5Writer {
     void close_file();
 
 public:
-    explicit JFH5Writer(const BufferUtils::DetectorConfig& config);
+    explicit JFH5Writer(
+            const std::string detector_name, const std::string root_folder);
     ~JFH5Writer();
 
     void open_run(int64_t run_id,

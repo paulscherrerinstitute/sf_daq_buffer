@@ -15,9 +15,10 @@ using namespace std;
 using namespace buffer_config;
 using namespace live_writer_config;
 
-JFH5Writer::JFH5Writer(const BufferUtils::DetectorConfig& config):
-        root_folder_(config.buffer_folder),
-        detector_name_(config.detector_name)
+JFH5Writer::JFH5Writer(
+        const std::string detector_name, const std::string root_folder):
+            detector_name_(detector_name),
+            root_folder_(root_folder)
 {
 }
 
