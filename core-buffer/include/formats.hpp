@@ -1,6 +1,8 @@
 #ifndef SF_DAQ_BUFFER_FORMATS_HPP
 #define SF_DAQ_BUFFER_FORMATS_HPP
 
+#define INVALID_FRAME_INDEX UINT64_C(-1)
+
 #pragma pack(push)
 #pragma pack(1)
 struct ModuleFrame {

@@ -17,16 +17,16 @@ struct StreamSendConfig {
 
         return {
                 config_parameters["detector_name"].GetString(),
-                config_parameters["detector_type"].GetString(),
                 config_parameters["n_modules"].GetInt(),
-                config_parameters["start_udp_port"].GetInt(),
+                config_parameters["image_n_pixels"].GetInt(),
+                config_parameters["stream_address"].GetString()
         };
     }
 
     const std::string detector_name;
-    const std::string detector_type;
     const int n_modules;
-    const int start_udp_port;
+    const int image_n_pixels;
+    const std::string stream_address;
 };
 
 

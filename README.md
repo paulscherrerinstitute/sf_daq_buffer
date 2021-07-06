@@ -104,6 +104,15 @@ ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 
 ### Warnings
 
+#### UDP recv tests failing
+
+In case unit tests for std-udp-recv are failing the most common cause of 
+problems is the rmem limit. Please increase your rmem_max to something large:
+
+```bash 
+echo 2147483646 > /proc/sys/net/core/rmem_max
+```
+
 #### Zeromq
 
 Zeromq version 4.1.4 (default on RH7) has a LINGER bug. Sometimes, the last 

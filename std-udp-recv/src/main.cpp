@@ -20,10 +20,10 @@ int main (int argc, char *argv[]) {
 
     if (argc != 4) {
         cout << endl;
-        cout << "Usage: std_udp_recv [udp_recv_config_filename] [module_id] "
+        cout << "Usage: std_udp_recv [detector_json_filename] [module_id] "
                 "[bit_depth]";
         cout << endl;
-        cout << "\tudp_recv_config_filename: detector config file path." << endl;
+        cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tmodule_id: id of the module for this process." << endl;
         cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
@@ -45,8 +45,7 @@ int main (int argc, char *argv[]) {
 
     FrameUdpReceiver receiver(udp_port, N_PACKETS_PER_FRAME);
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
-                           FRAME_N_BYTES, config.n_modules,
-                           buffer_config::RAM_BUFFER_N_SLOTS);
+                           FRAME_N_BYTES, config.n_modules, RAM_BUFFER_N_SLOTS);
     FrameStats stats(config.detector_name, module_id,
             N_PACKETS_PER_FRAME, STATS_TIME);
 
@@ -63,6 +62,7 @@ int main (int argc, char *argv[]) {
         // Reset the metadata and frame buffer for the next frame.
         meta.frame_index = 0;
         meta.n_recv_packets = 0;
+        // Reset the data buffer.
         memset(data, 0, FRAME_N_BYTES);
 
         receiver.get_frame_from_udp(meta, data);

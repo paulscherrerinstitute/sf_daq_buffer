@@ -89,7 +89,7 @@ int main (int argc, char *argv[])
 
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
 
-    
+
     uint64_t image_id = 0;
 
     while (true) {
