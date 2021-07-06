@@ -5,7 +5,6 @@
 #include <sstream>
 #include <unistd.h>
 #include "RamBuffer.hpp"
-#include "buffer_config.hpp"
 #include "date.h"
 #include <chrono>
 #include <iostream>
@@ -84,14 +83,15 @@ void RamBuffer::write_frame(
         const char *src_data) const
 {
     auto *dst_meta = (ModuleFrame*) get_frame_meta(
-            src_meta.pulse_id, src_meta.module_id);
+            src_meta.id, src_meta.module_id);
     auto *dst_data = get_frame_data(
-            src_meta.pulse_id, src_meta.module_id);
+            src_meta.id, src_meta.module_id);
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << " [" << std::chrono::system_clock::now();
         cout << "] [RamBuffer::write_frame] :";
+        cout << " || src_meta.id " << src_meta.id;
         cout << " || src_meta.frame_index " << src_meta.frame_index;
         cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
