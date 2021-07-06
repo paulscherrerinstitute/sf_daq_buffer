@@ -164,3 +164,18 @@ char* RamBuffer::read_image(const uint64_t pulse_id) const
 
     return src_data;
 }
+
+
+void RamBuffer::write_image(const ImageMetadata& src_meta, const char *src_data)
+{
+    const int slot_n = src_meta.id % n_slots_;
+    const int image_n_bytes = src_meta.height * src_meta.width * TypeMap[src_meta.dtype].size;
+
+    char *dst_data = image_buffer_ + (image_n_bytes * slot_n);
+
+    // Hope this won't segfault
+    memcpy(dst_data, src_data, image_n_bytes);
+}
+
+
+

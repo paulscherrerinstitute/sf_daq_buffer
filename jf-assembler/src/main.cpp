@@ -28,8 +28,7 @@ int main (int argc, char *argv[])
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, ASSEMBLER_ZMQ_IO_THREADS);
-    auto sender = BufferUtils::bind_socket(
-            ctx, config.detector_name, stream_name);
+    auto sender = BufferUtils::bind_socket(ctx, config.detector_name, stream_name);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
     RamBuffer ram_buffer(config.detector_name, config.n_modules);
