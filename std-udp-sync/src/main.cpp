@@ -10,10 +10,12 @@
 #include "sync_config.hpp"
 #include "ZmqPulseSyncReceiver.hpp"
 #include "UdpSyncConfig.hpp"
+#include "buffer_config.hpp"
  
 
 using namespace std;
 using namespace sync_config;
+using namespace buffer_config;
 
 #ifdef USE_EIGER
     #include "eiger.hpp"
@@ -54,7 +56,7 @@ int main (int argc, char *argv[])
     #endif
 
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
-                           FRAME_N_BYTES, config.n_modules);
+                           FRAME_N_BYTES, config.n_modules, RAM_BUFFER_N_SLOTS);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
     SyncStats stats(config.detector_name, SYNC_STATS_MODULO);
