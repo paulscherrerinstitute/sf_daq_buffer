@@ -1,6 +1,6 @@
-add_executable(jf-udp-recv-tests main.cpp)
+add_executable(std-udp-recv-tests main.cpp)
 
-target_link_libraries(jf-udp-recv-tests
+target_link_libraries(std-udp-recv-tests
         core-buffer-lib
         std-udp-recv-lib
         gtest
