@@ -45,7 +45,7 @@ int main (int argc, char *argv[]) {
 
     FrameUdpReceiver receiver(udp_port, N_PACKETS_PER_FRAME);
     RamBuffer frame_buffer(config.detector_name, sizeof(ModuleFrame),
-                           FRAME_N_BYTES, config.n_modules);
+                           FRAME_N_BYTES, config.n_modules, RAM_BUFFER_N_SLOTS);
     FrameStats stats(config.detector_name, module_id,
             N_PACKETS_PER_FRAME, STATS_TIME);
 
