@@ -7,7 +7,6 @@
 #include "BufferUtils.hpp"
 #include "live_writer_config.hpp"
 #include "WriterStats.hpp"
-#include "store_format.hpp"
 #include "JFH5Writer.hpp"
 #include "DetWriterConfig.hpp"
 
