@@ -20,10 +20,10 @@ int main (int argc, char *argv[]) {
 
     if (argc != 4) {
         cout << endl;
-        cout << "Usage: std_udp_recv [udp_recv_config_filename] [module_id] "
+        cout << "Usage: std_udp_recv [detector_json_filename] [module_id] "
                 "[bit_depth]";
         cout << endl;
-        cout << "\tudp_recv_config_filename: detector config file path." << endl;
+        cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tmodule_id: id of the module for this process." << endl;
         cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
