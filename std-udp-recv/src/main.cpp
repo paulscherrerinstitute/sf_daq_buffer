@@ -59,6 +59,9 @@ int main (int argc, char *argv[]) {
     char* data = new char[FRAME_N_BYTES];
 
     while (true) {
+        // Reset the metadata and frame buffer for the next frame.
+        meta.frame_index = 0;
+        meta.n_recv_packets = 0;
         // Reset the data buffer.
         memset(data, 0, FRAME_N_BYTES);
 

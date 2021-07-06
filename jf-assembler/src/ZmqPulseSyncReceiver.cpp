@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iostream>
 #include "date.h"
+#include "buffer_config.hpp"
 
 #include "assembler_config.hpp"
 

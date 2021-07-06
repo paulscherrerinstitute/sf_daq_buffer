@@ -29,8 +29,8 @@ RamBuffer::RamBuffer(const string& buffer_name,
 #ifdef DEBUG_OUTPUT
     using namespace date;
     cout << " [" << std::chrono::system_clock::now();
-    cout << "] [RamBuffer::RamBuffer] :";
-    cout << " || buffer_name_ " << buffer_name;
+    cout << "] [RamBuffer::RamBuffer] ";
+    cout << " buffer_name_ " << buffer_name;
     cout << " || n_modules_ " << n_modules_;
     cout << " || n_slots_ " << n_slots_;
     cout << " || meta_bytes_" << meta_bytes_;
@@ -90,13 +90,12 @@ void RamBuffer::write_frame(
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << " [" << std::chrono::system_clock::now();
-        cout << "] [RamBuffer::write_frame] :";
-        cout << " || src_meta.id " << src_meta.id;
+        cout << "] [RamBuffer::write_frame] ";
+        cout << " src_meta.id " << src_meta.id;
         cout << " || src_meta.frame_index " << src_meta.frame_index;
         cout << " || src_meta.n_recv_packets " << src_meta.n_recv_packets;
         cout << " || src_meta.daq_rec " << src_meta.daq_rec;
         cout << " || src_meta.module_id " << src_meta.module_id;
-        cout << " || dst_meta " << &dst_meta;
         cout << endl;
     #endif
 
