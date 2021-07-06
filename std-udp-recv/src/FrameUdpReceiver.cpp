@@ -56,15 +56,17 @@ inline void FrameUdpReceiver::init_frame(
     frame_metadata.daq_rec = (uint64_t) packet_buffer_[i_packet].debug;
     frame_metadata.pos_y = (int16_t) packet_buffer_[i_packet].row;
     frame_metadata.pos_x = (int16_t) packet_buffer_[i_packet].column;
+    frame_metadata.n_recv_packets = 0;
 
     #ifdef DEBUG_OUTPUT
         using namespace date;
         cout << " [" << std::chrono::system_clock::now();
         cout << "] [FrameUdpReceiver::init_frame] :";
-        cout << " || pos_y: " << frame_metadata.pos_x;
+        cout << " || pos_y: " << frame_metadata.pos_y;
         cout << " || pos_x: " << frame_metadata.pos_x;
         cout << " || pulse_id: " << frame_metadata.pulse_id;
         cout << " || frame_index: " << frame_metadata.frame_index;
+        cout << " || daq_rec: " << frame_metadata.daq_rec;
         cout << endl;
     #endif
 
@@ -95,7 +97,7 @@ inline uint64_t FrameUdpReceiver::process_packets(
          i_packet++) {
 
         // First packet for this frame.
-        if (metadata.frame_index == 0) {
+        if (metadata.frame_index == INVALID_FRAME_INDEX) {
             init_frame(metadata, i_packet);
 
         // Happens if the last packet from the previous frame gets lost.
@@ -136,25 +138,27 @@ inline uint64_t FrameUdpReceiver::process_packets(
                 packet_buffer_offset_ = 0;
             }
 
-            return metadata.pulse_id;
+            return metadata.frame_index;
         }
     }
     // We emptied the buffer.
     packet_buffer_loaded_ = false;
     packet_buffer_offset_ = 0;
 
-    return 0;
+    return INVALID_FRAME_INDEX;
 }
 
 uint64_t FrameUdpReceiver::get_frame_from_udp(
         ModuleFrame& meta, char* frame_buffer)
 {
+    meta.frame_index = INVALID_FRAME_INDEX;
+
     // Happens when last packet from previous frame was missed.
     if (packet_buffer_loaded_) {
 
         auto frame_index = process_packets(
                 packet_buffer_offset_, meta, frame_buffer);
-        if (frame_index != 0) {
+        if (frame_index != INVALID_FRAME_INDEX) {
             return frame_index;
         }
     }
@@ -170,7 +174,7 @@ uint64_t FrameUdpReceiver::get_frame_from_udp(
 
         auto frame_index = process_packets(0, meta, frame_buffer);
 
-        if (frame_index != 0) {
+        if (frame_index != INVALID_FRAME_INDEX) {
             return frame_index;
         }
     }
