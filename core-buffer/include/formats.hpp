@@ -26,13 +26,14 @@ struct ModuleFrame {
 #pragma pack(push)
 #pragma pack(1)
 struct ImageMetadata {
+    uint64_t version;
     uint64_t id;
     uint64_t height;
     uint64_t width;
-    uint64_t dtype;
-    uint64_t encoding;
-    uint64_t source_id;
-    uint64_t status; 
+    uint16_t  dtype;
+    uint16_t encoding;
+    uint16_t source_id;
+    uint16_t status;
     uint64_t user_1;
     uint64_t user_2;
 };
