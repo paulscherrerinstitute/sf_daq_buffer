@@ -9,6 +9,7 @@
 #include "WriterStats.hpp"
 #include "broker_format.hpp"
 #include "JFH5Writer.hpp"
+#include "DetWriterConfig.hpp"
 
 using namespace std;
 using namespace buffer_config;
@@ -18,14 +19,14 @@ int main (int argc, char *argv[])
 {
     if (argc != 2) {
         cout << endl;
-        cout << "Usage: jf_live_writer [detector_json_filename]" << endl;
+        cout << "Usage: std-det-writer [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    auto const config = BufferUtils::read_json_config(string(argv[1]));
+    auto const config = DetWriterConfig::from_json_file(string(argv[1]));
 
     MPI_Init(nullptr, nullptr);
 
@@ -44,7 +45,7 @@ int main (int argc, char *argv[])
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 
-    JFH5Writer writer(config);
+    JFH5Writer writer(config.detector_name, config.output_folder);
     WriterStats stats(config.detector_name);
 
     StoreStream meta = {};
@@ -72,7 +73,7 @@ int main (int argc, char *argv[])
 
         // Fair distribution of images among writers.
         if (meta.i_image % n_writers == i_writer) {
-            char* data = ram_buffer.get_slot_data(meta.image_metadata.id);
+            char* data = image_buffer.get_slot_data(meta.image_metadata.id);
 
             stats.start_image_write();
             writer.write_data(meta.run_id, meta.i_image, data);
