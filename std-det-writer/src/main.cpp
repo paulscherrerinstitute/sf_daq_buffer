@@ -7,9 +7,11 @@
 #include "BufferUtils.hpp"
 #include "live_writer_config.hpp"
 #include "WriterStats.hpp"
-#include "broker_format.hpp"
+#include "store_format.hpp"
 #include "JFH5Writer.hpp"
 #include "DetWriterConfig.hpp"
+
+#include "rapidjson/document.h"
 
 using namespace std;
 using namespace buffer_config;
@@ -46,49 +48,59 @@ int main (int argc, char *argv[])
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 
     JFH5Writer writer(config.detector_name);
-    WriterStats stats(config.detector_name);
+    WriterStats stats(config.detector_name, IMAGE_N_BYTES);
 
-    StoreStream meta = {};
+    char recv_buffer[8192];
     while (true) {
-        zmq_recv(receiver, &meta, sizeof(meta), 0);
+        zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
 
-        // i_image == 0 -> we have a new run.
-        if (meta.i_image == 0) {
-            auto image_meta = (ImageMetadata*)
-                    image_buffer.get_slot_meta(meta.image_id);
-
-            writer.open_run(meta.output_file,
-                            meta.run_id,
-                            meta.n_images,
-                            image_meta->height,
-                            image_meta->width,
-                            image_meta->dtype);
-
-            stats.start_run(meta);
+        rapidjson::Document document;
+        if (document.Parse(recv_buffer).HasParseError()) {
+            continue;
         }
 
+        const string output_file = document["output_file"].GetString();
+        const uint64_t image_id = document["image_id"].GetUint64();
+        const int run_id = document["run_id"].GetInt();
+        const int i_image = document["i_image"].GetInt();
+        const int n_images = document["n_images"].GetInt();
+
         // i_image == n_images -> end of run.
-        if (meta.i_image == meta.n_images) {
+        if (i_image == n_images) {
             writer.close_run();
 
             stats.end_run();
             continue;
         }
 
+        // i_image == 0 -> we have a new run.
+        if (i_image == 0) {
+            auto image_meta = (ImageMetadata*)
+                    image_buffer.get_slot_meta(image_id);
+
+            writer.open_run(output_file,
+                            run_id,
+                            n_images,
+                            image_meta->height,
+                            image_meta->width,
+                            image_meta->dtype);
+        }
+
+
         // Fair distribution of images among writers.
-        if (meta.i_image % n_writers == i_writer) {
-            char* data = image_buffer.get_slot_data(meta.image_id);
+        if (i_image % n_writers == i_writer) {
+            char* data = image_buffer.get_slot_data(image_id);
 
             stats.start_image_write();
-            writer.write_data(meta.run_id, meta.i_image, data);
+            writer.write_data(run_id, i_image, data);
             stats.end_image_write();
         }
 
         // Only the first instance writes metadata.
         if (i_writer == 0) {
             auto image_meta = (ImageMetadata*)
-                    image_buffer.get_slot_meta(meta.image_id);
-            writer.write_meta(meta.run_id, meta.i_image, image_meta);
+                    image_buffer.get_slot_meta(image_id);
+            writer.write_meta(run_id, i_image, image_meta);
         }
 
     }

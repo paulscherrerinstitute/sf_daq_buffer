@@ -1,7 +1,7 @@
 #include <cstddef>
 #include <formats.hpp>
 #include <chrono>
-#include "broker_format.hpp"
+#include "store_format.hpp"
 
 #ifndef SF_DAQ_BUFFER_FRAMESTATS_HPP
 #define SF_DAQ_BUFFER_FRAMESTATS_HPP
@@ -23,8 +23,8 @@ class WriterStats {
     void print_stats();
 
 public:
-    explicit WriterStats(std::string detector_name);
-    void start_run(const StoreStream& meta);
+    explicit WriterStats(std::string detector_name,
+            const uint64_t image_n_bytes);
     void end_run();
     void start_image_write();
     void end_image_write();
