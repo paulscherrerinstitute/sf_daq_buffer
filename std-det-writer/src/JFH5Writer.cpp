@@ -53,7 +53,8 @@ void JFH5Writer::open_run(const string& output_file,
     current_run_id_ = run_id;
     image_y_size_ = image_y_size;
     image_x_size_ = image_x_size;
-    bits_per_pixel_ = bits_per_pixel;
+    // The last digit in the enum value represents the number of bytes/pixel.
+    bits_per_pixel_ = (dtype % 10) * 8;
     image_n_bytes_ = (image_y_size_ * image_x_size_ * bits_per_pixel_) / 8;
 
 #ifdef DEBUG_OUTPUT
