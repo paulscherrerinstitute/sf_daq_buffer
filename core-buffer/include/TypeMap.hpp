@@ -1,6 +1,9 @@
 #ifndef SF_DAQ_BUFFER_TYPEMAP_HPP
 #define SF_DAQ_BUFFER_TYPEMAP_HPP
 
+#include <unordered_map>
+
+
 enum class TypeMap {
     VOID,
     CHAR,

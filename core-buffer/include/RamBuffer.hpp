@@ -28,7 +28,7 @@ public:
     void write_frame(const ModuleFrame &src_meta, const char *src_data) const;
     void read_frame(const uint64_t pulse_id, const uint64_t module_id, ModuleFrame &meta, char *data) const;
     char* read_image(const uint64_t pulse_id) const;
-    char* write_image(const ImageMetadata &src_meta, const char *src_data);
+    void write_image(const ImageMetadata &src_meta, const char *src_data);
     void assemble_image(const uint64_t pulse_id, ImageMetadata &image_meta) const;
 };
 

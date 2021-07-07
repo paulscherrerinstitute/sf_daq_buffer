@@ -125,35 +125,35 @@ void RamBuffer::assemble_image(
                 throw runtime_error(err_msg.str());
             }
 
-            image_meta.pulse_id = frame_meta->pulse_id;
-            image_meta.frame_index = frame_meta->frame_index;
-            image_meta.daq_rec = frame_meta->daq_rec;
+            image_meta.id = frame_meta->pulse_id;
+            image_meta.user_1 = frame_meta->frame_index;
+            image_meta.user_2 = frame_meta->daq_rec;
 
             is_pulse_init = 1;
         }
 
         if (is_good_image) {
-            if (frame_meta->pulse_id != image_meta.pulse_id) {
+            if (frame_meta->pulse_id != image_meta.id) {
                 is_good_image = false;
                 // TODO: Add some diagnostics in case this happens.
             }
 
-            if (frame_meta->frame_index != image_meta.frame_index) {
+            if (frame_meta->frame_index != image_meta.user_1) {
                 is_good_image = false;
             }
 
-            if (frame_meta->daq_rec != image_meta.daq_rec) {
+            if (frame_meta->daq_rec != image_meta.user_2) {
                 is_good_image = false;
             }
         }
     }
 
-    image_meta.is_good_image = is_good_image;
+    image_meta.status = is_good_image;
 
     if (!is_pulse_init) {
-        image_meta.pulse_id = 0;
-        image_meta.frame_index = 0;
-        image_meta.daq_rec = 0;
+        image_meta.id = 0;
+        image_meta.user_1 = 0;
+        image_meta.user_2 = 0;
     }
 }
 
