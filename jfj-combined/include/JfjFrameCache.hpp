@@ -27,7 +27,7 @@ public:
     FrameCache(uint64_t _C, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
             m_CAP(_C), m_M(N_MOD), m_valid(_C, 0), m_lock(_C),
             m_buffer(_C, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
-            f_send(callback), m_watchdog(500, m_flush_all) {
+            f_send(callback), m_watchdog(500, flush_all) {
         // Initialize buffer metadata
         for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
         m_watchdog.Start();
