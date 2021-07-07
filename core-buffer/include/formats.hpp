@@ -38,7 +38,7 @@ struct ImageMetadata {
 
     uint64_t user_1; // extra field for custom needs
     uint64_t user_2; // extra field for custom needs
-}
+};
 #pragma pack(pop)
 
 struct ModuleFrameBuffer {
