@@ -19,14 +19,12 @@ struct StreamSendConfig {
                 config_parameters["detector_name"].GetString(),
                 config_parameters["n_modules"].GetInt(),
                 config_parameters["image_n_pixels"].GetInt(),
-                config_parameters["stream_address"].GetString()
         };
     }
 
     const std::string detector_name;
     const int n_modules;
     const int image_n_pixels;
-    const std::string stream_address;
 };
 
 
