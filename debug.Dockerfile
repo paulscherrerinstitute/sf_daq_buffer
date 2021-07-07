@@ -8,9 +8,6 @@ RUN mkdir /sf_daq_buffer/build && \
     cmake3 .. && \
     make && \
     # Deploy the test config.
-    mkdir /config && \
-    cp /sf_daq_buffer/docker/example_detector.json /config
-
-
+    cp /sf_daq_buffer/docker/example_detector.json .
 
 WORKDIR /sf_daq_buffer/build
