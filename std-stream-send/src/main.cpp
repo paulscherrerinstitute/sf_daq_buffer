@@ -13,7 +13,7 @@ using namespace buffer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 4) {
         cout << endl;
         cout << "Usage: std_stream_send [detector_json_filename]"
                 " [bit_depth] [stream_address]" << endl;

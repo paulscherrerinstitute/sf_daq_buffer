@@ -18,7 +18,7 @@ using namespace live_writer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 2) {
+    if (argc != 3) {
         cout << endl;
         cout << "Usage: std-det-writer [detector_json_filename]"
                 " [bit_depth]" << endl;
