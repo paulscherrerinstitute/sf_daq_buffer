@@ -8,8 +8,8 @@
 #include <string>
 #include <fstream>
 
-struct UdpRecvConfig {
-    static UdpRecvConfig from_json_file(const std::string& filename) {
+struct DetWriterConfig {
+    static DetWriterConfig from_json_file(const std::string& filename) {
         std::ifstream ifs(filename);
         rapidjson::IStreamWrapper isw(ifs);
         rapidjson::Document config_parameters;
@@ -17,16 +17,12 @@ struct UdpRecvConfig {
 
         return {
                 config_parameters["detector_name"].GetString(),
-                config_parameters["detector_type"].GetString(),
-                config_parameters["n_modules"].GetInt(),
-                config_parameters["start_udp_port"].GetInt(),
+                config_parameters["image_n_pixels"].GetInt(),
         };
     }
 
     const std::string detector_name;
-    const std::string detector_type;
-    const int n_modules;
-    const int start_udp_port;
+    const int image_n_pixels;
 };
 
 

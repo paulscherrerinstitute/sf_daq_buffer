@@ -7,8 +7,10 @@
 #include "BufferUtils.hpp"
 #include "live_writer_config.hpp"
 #include "WriterStats.hpp"
-#include "broker_format.hpp"
 #include "JFH5Writer.hpp"
+#include "DetWriterConfig.hpp"
+
+#include "rapidjson/document.h"
 
 using namespace std;
 using namespace buffer_config;
@@ -16,16 +18,19 @@ using namespace live_writer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 2) {
+    if (argc != 3) {
         cout << endl;
-        cout << "Usage: jf_live_writer [detector_json_filename]" << endl;
+        cout << "Usage: std-det-writer [detector_json_filename]"
+                " [bit_depth]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
+        cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
 
         exit(-1);
     }
 
-    auto const config = BufferUtils::read_json_config(string(argv[1]));
+    auto const config = DetWriterConfig::from_json_file(string(argv[1]));
+    const int bit_depth = atoi(argv[2]);
 
     MPI_Init(nullptr, nullptr);
 
@@ -38,50 +43,66 @@ int main (int argc, char *argv[])
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, LIVE_ZMQ_IO_THREADS);
     auto receiver = BufferUtils::connect_socket(
-            ctx, config.detector_name, "writer-agent");
+            ctx, config.detector_name, "writer_agent");
 
-    const size_t IMAGE_N_BYTES = 12;
+    const size_t IMAGE_N_BYTES = config.image_n_pixels * bit_depth / 8;
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 
-    JFH5Writer writer(config);
-    WriterStats stats(config.detector_name);
+    JFH5Writer writer(config.detector_name);
+    WriterStats stats(config.detector_name, IMAGE_N_BYTES);
 
-    StoreStream meta = {};
+    char recv_buffer[8192];
     while (true) {
-        zmq_recv(receiver, &meta, sizeof(meta), 0);
+        zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
 
-        // i_image == 0 -> we have a new run.
-        if (meta.i_image == 0) {
-            writer.open_run(meta.run_id,
-                            meta.n_images,
-                            meta.image_y_size,
-                            meta.image_x_size,
-                            meta.bits_per_pixel);
-
-            stats.start_run(meta);
+        rapidjson::Document document;
+        if (document.Parse(recv_buffer).HasParseError()) {
+            continue;
         }
 
+        const string output_file = document["output_file"].GetString();
+        const uint64_t image_id = document["image_id"].GetUint64();
+        const int run_id = document["run_id"].GetInt();
+        const int i_image = document["i_image"].GetInt();
+        const int n_images = document["n_images"].GetInt();
+
         // i_image == n_images -> end of run.
-        if (meta.i_image == meta.n_images) {
+        if (i_image == n_images) {
             writer.close_run();
 
             stats.end_run();
             continue;
         }
 
+        // i_image == 0 -> we have a new run.
+        if (i_image == 0) {
+            auto image_meta = (ImageMetadata*)
+                    image_buffer.get_slot_meta(image_id);
+
+            writer.open_run(output_file,
+                            run_id,
+                            n_images,
+                            image_meta->height,
+                            image_meta->width,
+                            image_meta->dtype);
+        }
+
+
         // Fair distribution of images among writers.
-        if (meta.i_image % n_writers == i_writer) {
-            char* data = ram_buffer.get_slot_data(meta.image_metadata.id);
+        if (i_image % n_writers == i_writer) {
+            char* data = image_buffer.get_slot_data(image_id);
 
             stats.start_image_write();
-            writer.write_data(meta.run_id, meta.i_image, data);
+            writer.write_data(run_id, i_image, data);
             stats.end_image_write();
         }
 
         // Only the first instance writes metadata.
         if (i_writer == 0) {
-            writer.write_meta(meta.run_id, meta.i_image, meta.image_metadata);
+            auto image_meta = (ImageMetadata*)
+                    image_buffer.get_slot_meta(image_id);
+            writer.write_meta(run_id, i_image, image_meta);
         }
 
     }

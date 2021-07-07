@@ -13,12 +13,13 @@ using namespace buffer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 4) {
         cout << endl;
         cout << "Usage: std_stream_send [detector_json_filename]"
-                " [bit_depth]" << endl;
+                " [bit_depth] [stream_address]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
+        cout << "\tstream_address: address to bind the output stream." << endl;
         cout << endl;
 
         exit(-1);
@@ -26,6 +27,7 @@ int main (int argc, char *argv[])
 
     const auto config = StreamSendConfig::from_json_file(string(argv[1]));
     const int bit_depth = atoi(argv[2]);
+    const string stream_address = string(argv[3]);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
@@ -43,7 +45,7 @@ int main (int argc, char *argv[])
         throw runtime_error(zmq_strerror(errno));
     }
 
-    if (zmq_bind(sender, config.stream_address.c_str()) != 0) {
+    if (zmq_bind(sender, stream_address.c_str()) != 0) {
         throw runtime_error(zmq_strerror(errno));
     }
 

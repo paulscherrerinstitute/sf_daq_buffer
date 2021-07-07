@@ -94,7 +94,7 @@ void BufferUtils::create_destination_folder(const string& output_file)
 void* BufferUtils::connect_socket(
         void* ctx, const string& detector_name, const string& stream_name)
 {
-    string ipc_address = buffer_config::BUFFER_LIVE_IPC_URL +
+    string ipc_address = buffer_config::IPC_URL_BASE +
                          detector_name + "-" +
                          stream_name;
 
@@ -127,7 +127,7 @@ void* BufferUtils::connect_socket(
 void* BufferUtils::bind_socket(
         void* ctx, const string& detector_name, const string& stream_name)
 {
-    string ipc_address = BUFFER_LIVE_IPC_URL +
+    string ipc_address = IPC_URL_BASE +
                          detector_name + "-" +
                          stream_name;
 

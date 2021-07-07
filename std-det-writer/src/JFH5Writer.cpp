@@ -1,5 +1,6 @@
 #include <H5version.h>
 #include <iostream>
+#include <utility>
 
 #include "JFH5Writer.hpp"
 #include "live_writer_config.hpp"
@@ -15,10 +16,8 @@ using namespace std;
 using namespace buffer_config;
 using namespace live_writer_config;
 
-JFH5Writer::JFH5Writer(
-        const std::string detector_name, const std::string root_folder):
-            detector_name_(detector_name),
-            root_folder_(root_folder)
+JFH5Writer::JFH5Writer(std::string detector_name):
+    detector_name_(std::move(detector_name))
 {
 }
 
@@ -42,22 +41,20 @@ hid_t JFH5Writer::get_datatype(const int bits_per_pixel)
     }
 }
 
-void JFH5Writer::open_run(const int64_t run_id,
-                          const uint32_t n_images,
-                          const uint32_t image_y_size,
-                          const uint32_t image_x_size,
-                          const uint32_t bits_per_pixel)
+void JFH5Writer::open_run(const string& output_file,
+                          const int run_id,
+                          const int n_images,
+                          const int image_y_size,
+                          const int image_x_size,
+                          const int dtype)
 {
     close_run();
-
-    const string output_folder = root_folder_ + "/" + OUTPUT_FOLDER_SYMLINK;
-    // TODO: Maybe add leading zeros to filename?
-    const string output_file = output_folder + to_string(run_id) + ".h5";
 
     current_run_id_ = run_id;
     image_y_size_ = image_y_size;
     image_x_size_ = image_x_size;
-    bits_per_pixel_ = bits_per_pixel;
+    // The last digit in the enum value represents the number of bytes/pixel.
+    bits_per_pixel_ = (dtype % 10) * 8;
     image_n_bytes_ = (image_y_size_ * image_x_size_ * bits_per_pixel_) / 8;
 
 #ifdef DEBUG_OUTPUT
@@ -237,7 +234,7 @@ void JFH5Writer::write_data(
 }
 
 void JFH5Writer::write_meta(
-        const int64_t run_id, const uint32_t index, const ImageMetadata& meta)
+        const int64_t run_id, const uint32_t index, const ImageMetadata* meta)
 {
     if (run_id != current_run_id_) {
         throw runtime_error("Invalid run_id.");
@@ -264,12 +261,12 @@ void JFH5Writer::write_meta(
     }
 
     if (H5Dwrite(image_id_dataset_, H5T_NATIVE_UINT64,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.id)) < 0) {
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta->id)) < 0) {
         throw runtime_error("Cannot write data to pulse_id dataset.");
     }
 
     if (H5Dwrite(status_dataset_, H5T_NATIVE_UINT64,
-                 ram_ds, file_ds, H5P_DEFAULT, &(meta.status)) < 0) {
+                 ram_ds, file_ds, H5P_DEFAULT, &(meta->status)) < 0) {
         throw runtime_error("Cannot write data to is_good_image dataset.");
     }
 

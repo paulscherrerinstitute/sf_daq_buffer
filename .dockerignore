@@ -2,3 +2,8 @@ cmake-build-*/
 docker/
 docs/
 scripts/
+
+debug.Dockerfile
+
+# Include files:
+!docker/example_detector.json

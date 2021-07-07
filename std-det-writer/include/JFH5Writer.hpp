@@ -13,7 +13,6 @@ extern "C" {
 class JFH5Writer {
 
     const std::string detector_name_;
-    const std::string root_folder_;
 
     static const int64_t NO_RUN_ID = -1;
 
@@ -35,24 +34,24 @@ class JFH5Writer {
     void close_file();
 
 public:
-    explicit JFH5Writer(
-            const std::string detector_name, const std::string root_folder);
+    JFH5Writer(std::string  detector_name);
     ~JFH5Writer();
 
-    void open_run(int64_t run_id,
-                  uint32_t n_images,
-                  uint32_t image_y_size,
-                  uint32_t image_x_size,
-                  uint32_t bits_per_pixel);
+    void open_run(const std::string& output_file,
+                  const int run_id,
+                  const int n_images,
+                  const int image_y_size,
+                  const int image_x_size,
+                  const int bits_per_pixel);
     void close_run();
 
-    void write_data(int64_t run_id,
-                    uint32_t index,
+    void write_data(const int64_t run_id,
+                    const uint32_t index,
                     const char* data);
 
-    void write_meta(int64_t run_id,
-                    uint32_t index,
-                    const ImageMetadata& meta);
+    void write_meta(const int64_t run_id,
+                    const uint32_t index,
+                    const ImageMetadata* meta);
 };
 
 #endif //JF_LIVE_WRITER_HPP

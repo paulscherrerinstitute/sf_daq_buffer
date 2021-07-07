@@ -5,8 +5,9 @@
 using namespace std;
 using namespace chrono;
 
-WriterStats::WriterStats(string detector_name) :
-    detector_name_(std::move(detector_name))
+WriterStats::WriterStats(string detector_name, size_t image_n_bytes) :
+    detector_name_(std::move(detector_name)),
+    image_n_bytes_(image_n_bytes)
 {
    reset_counters();
 }
@@ -34,13 +35,6 @@ void WriterStats::end_image_write()
 
     total_buffer_write_us_ += write_us_duration;
     max_buffer_write_us_ = max(max_buffer_write_us_, write_us_duration);
-}
-
-void WriterStats::start_run(const StoreStream& meta)
-{
-    image_n_bytes_ = (meta.image_y_size *
-                      meta.image_x_size *
-                      meta.bits_per_pixel) / 8;
 }
 
 void WriterStats::end_run()
