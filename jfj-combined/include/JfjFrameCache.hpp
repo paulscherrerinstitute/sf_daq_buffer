@@ -8,26 +8,29 @@
 #include <shared_mutex>
 
 #include "../../core-buffer/include/formats.hpp"
+#include "Watchdog.hpp"
 
 
 /** Frame cache
 
-	Reimplemented RamBuffer that handles concurrency internally via mutexes.
+	Reimplemented threadsafe RamBuffer that handles concurrency internally via mutexes.
 	The class operates on in-memory arrays via pointer/reference access. It uses a
-	linearly increasing pulseID index to provide some headroom for collecting frames
-	from multiple detectors.
+	linearly increasing pulseID index for cache addressing. The standard placement method
+	ensures that no data corruption occurs, lines are always flushed before overwrite.
+	A large-enough buffer should ensure that there is sufficient time to retrieve all
+	data from all detector modules.
+
+	TODO: The class is header-only for future template-refactoring.
 	**/
 class FrameCache{
 public:
     FrameCache(uint64_t _C, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
-            m_CAP(_C), m_M(N_MOD),
+            m_CAP(_C), m_M(N_MOD), m_valid(_C, 0), m_lock(_C),
             m_buffer(_C, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
-            f_send(callback), m_lock(_C), m_valid(_C, 0) {
+            f_send(callback), m_watchdog(500, m_flush_all) {
         // Initialize buffer metadata
         for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
-
-        // Initialize Mutexes
-        //for(auto& it: m_valid){ it = 0; }
+        m_watchdog.Start();
     };
 
 
@@ -35,9 +38,13 @@ public:
 
     Place a recorded frame to it's corresponding module location.
     This simultaneously handles buffering, assembly and flushing.
-    Also handles concurrency (shared and unique mutexes).   **/
+    Also handles concurrency (shared and unique mutexes).
+
+    NOTE: Forced flushing is performed by the current thread.
+    **/
     void emplace(uint64_t pulseID, uint64_t moduleIDX, BufferBinaryFormat& inc_frame){
-        uint64_t idx = pulseID % m_CAP;
+        // Cache-line index
+        const uint64_t idx = pulseID % m_CAP;
 
         // A new frame is starting
         if(inc_frame.meta.pulse_id != m_buffer[idx].meta.pulse_id){
@@ -103,6 +110,9 @@ private:
     std::vector<uint32_t> m_valid;
     std::vector<std::shared_mutex> m_lock;
     std::vector<ImageBinaryFormat> m_buffer;
+
+    /** Watchdog timer **/
+    Watchdog m_watchdog;
 };
 
 #endif // SF_DAQ_FRAME_CACHE_HPP
