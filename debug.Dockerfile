@@ -4,7 +4,13 @@ COPY . /sf_daq_buffer/
 
 RUN mkdir /sf_daq_buffer/build && \
     cd /sf_daq_buffer/build && \
+    # Build the project
     cmake3 .. && \
-    make std-det-writer
+    make && \
+    # Deploy the test config.
+    mkdir /config && \
+    cp /sf_daq_buffer/docker/example_detector.json /config
+
+
 
 WORKDIR /sf_daq_buffer/build
