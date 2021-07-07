@@ -20,14 +20,17 @@ int main (int argc, char *argv[])
 {
     if (argc != 2) {
         cout << endl;
-        cout << "Usage: std-det-writer [detector_json_filename]" << endl;
+        cout << "Usage: std-det-writer [detector_json_filename]"
+                " [bit_depth]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
+        cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
 
         exit(-1);
     }
 
     auto const config = DetWriterConfig::from_json_file(string(argv[1]));
+    const int bit_depth = atoi(argv[2]);
 
     MPI_Init(nullptr, nullptr);
 
@@ -42,7 +45,7 @@ int main (int argc, char *argv[])
     auto receiver = BufferUtils::connect_socket(
             ctx, config.detector_name, "writer_agent");
 
-    const size_t IMAGE_N_BYTES = 12;
+    const size_t IMAGE_N_BYTES = config.image_n_pixels * bit_depth / 8;
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1, RAM_BUFFER_N_SLOTS);
 

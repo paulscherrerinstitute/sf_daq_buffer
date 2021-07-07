@@ -17,10 +17,12 @@ struct DetWriterConfig {
 
         return {
                 config_parameters["detector_name"].GetString(),
+                config_parameters["image_n_pixels"].GetInt(),
         };
     }
 
     const std::string detector_name;
+    const int image_n_pixels;
 };
 
 
