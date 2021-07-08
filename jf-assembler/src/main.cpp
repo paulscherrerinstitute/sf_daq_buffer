@@ -45,6 +45,7 @@ int main (int argc, char *argv[])
     const int bit_depth = atoi(argv[2]);
     auto const stream_name = "assembler";
 
+    const size_t IMAGE_N_BYTES = config.image_n_pixels * bit_depth / 8;
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, ASSEMBLER_ZMQ_IO_THREADS);
     auto sender = BufferUtils::bind_socket(
@@ -82,7 +83,7 @@ int main (int argc, char *argv[])
     
 
     RamBuffer image_buffer(config.detector_name + "_" + stream_name,
-            sizeof(ImageMetadata), assembler.get_image_n_bytes(), 1,
+            sizeof(ImageMetadata), IMAGE_N_BYTES, 1,
             buffer_config::RAM_BUFFER_N_SLOTS);
 
     AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);

@@ -64,9 +64,11 @@ void EigerAssembler::assemble_image(const char* src_meta,
             // init good image status = 0 
             image_meta->status = 0;
             image_meta->id = frame_meta->id;
-            // todo fill rest of image metadata
-            // image_meta->height 
-            // image_meta->width 
+            image_meta->height = n_modules_ / 2 * MODULE_Y_SIZE + GAP_Y_MODULE_PIXELS;
+            image_meta->width = n_modules_ / 2 * MODULE_X_SIZE + GAP_X_MODULE_PIXELS;
+            image_meta->dtype = (bit_depth_ <= 8) ? 1 : bit_depth_ / 8;
+            image_meta->encoding = 0;
+            image_meta->source_id = 0;
             is_pulse_init = 1;
         }
 

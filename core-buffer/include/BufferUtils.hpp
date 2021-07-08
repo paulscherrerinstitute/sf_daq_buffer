@@ -9,30 +9,26 @@ namespace BufferUtils
 {
 
     struct DetectorConfig {
-        const std::string streamvis_address;
-        const int reduction_factor_streamvis;
-        const std::string live_analysis_address;
-        const int reduction_factor_live_analysis;
-        const std::string PEDE_FILENAME;
-        const std::string GAIN_FILENAME;
-
+        // const std::string streamvis_address;
+        // const int reduction_factor_streamvis;
+        // const std::string live_analysis_address;
+        // const int reduction_factor_live_analysis;
+        // const std::string PEDE_FILENAME;
+        // const std::string GAIN_FILENAME;
+        // const std::string buffer_folder;
         const std::string detector_name;
+        const std::string detector_type;
         const int n_modules;
+        const int image_n_pixels;
         const int start_udp_port;
-        const std::string buffer_folder;
+        
 
         friend std::ostream& operator <<(std::ostream& os, DetectorConfig const& det_config)
         {
-                return os << det_config.streamvis_address << ' '
-                        << det_config.reduction_factor_streamvis << ' '
-                        << det_config.live_analysis_address << ' '
-                        << det_config.reduction_factor_live_analysis << ' '
-                        << det_config.PEDE_FILENAME << ' '
-                        << det_config.GAIN_FILENAME << ' '
-                        << det_config.detector_name << ' '
+                return os << det_config.detector_name << ' '
+                        << det_config.detector_type << ' '
                         << det_config.n_modules << ' '
-                        << det_config.start_udp_port << ' '
-                        << det_config.buffer_folder << ' ';
+                        << det_config.start_udp_port << ' ';
         }
     };
 

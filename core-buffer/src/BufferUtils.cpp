@@ -97,7 +97,7 @@ void* BufferUtils::connect_socket(
     string ipc_address = buffer_config::IPC_URL_BASE +
                          detector_name + "-" +
                          stream_name;
-
+    
     void* socket = zmq_socket(ctx, ZMQ_SUB);
     if (socket == nullptr) {
         throw runtime_error(zmq_strerror(errno));
@@ -159,15 +159,10 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
     config_parameters.ParseStream(isw);
 
     return {
-            config_parameters["streamvis_stream"].GetString(),
-            config_parameters["streamvis_rate"].GetInt(),
-            config_parameters["live_stream"].GetString(),
-            config_parameters["live_rate"].GetInt(),
-            config_parameters["pedestal_file"].GetString(),
-            config_parameters["gain_file"].GetString(),
             config_parameters["detector_name"].GetString(),
+            config_parameters["detector_type"].GetString(),
             config_parameters["n_modules"].GetInt(),
+            config_parameters["image_n_pixels"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
-            config_parameters["buffer_folder"].GetString(),
     };
 }

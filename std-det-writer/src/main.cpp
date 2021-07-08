@@ -20,7 +20,7 @@ int main (int argc, char *argv[])
 {
     if (argc != 3) {
         cout << endl;
-        cout << "Usage: std-det-writer [detector_json_filename]"
+        cout << "Usage: std_det_writer [detector_json_filename]"
                 " [bit_depth]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
@@ -55,18 +55,18 @@ int main (int argc, char *argv[])
     char recv_buffer[8192];
     while (true) {
         zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
-
+        
         rapidjson::Document document;
         if (document.Parse(recv_buffer).HasParseError()) {
             continue;
         }
-
+        
         const string output_file = document["output_file"].GetString();
-        const uint64_t image_id = document["image_id"].GetUint64();
+        const uint64_t image_id = document["image_metadata"]["id"].GetUint64();
         const int run_id = document["run_id"].GetInt();
         const int i_image = document["i_image"].GetInt();
         const int n_images = document["n_images"].GetInt();
-
+        
         // i_image == n_images -> end of run.
         if (i_image == n_images) {
             writer.close_run();

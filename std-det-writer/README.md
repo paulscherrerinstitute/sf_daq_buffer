@@ -121,7 +121,7 @@ provided docker container. You need to start building it
 from the project **root**:
 
 ```bash
-docker build -f jf-live-writer/debug.Dockerfile -t jf-live-writer .
+docker build -f std-det-writer/debug.Dockerfile -t std-det-writer .
 ```
 (Running this command from the project root is mandatory as the entire project 
 folder needs to be part of the build context.)
@@ -153,7 +153,7 @@ Please follow instructions below on how to do that manually.
 ```
 wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz
 tar -xzf hdf5-1.12.0.tar.gz
-cd hdf5-1.10.7
+cd hdf5-1.12.0
 ./configure --enable-parallel 
 make install
 sudo ln -v -s `pwd`/hdf5/lib/* /usr/lib64/

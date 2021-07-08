@@ -1,13 +1,7 @@
 {
-    "streamvis_stream": "tcp://0.0.0.0:9006",
-    "streamvis_rate": 10,
-    "live_stream": "tcp://0.0.0.0:9106",
-    "live_rate": 10,
-    "pedestal_file": "",
-    "gain_file": "",
-    "detector_name": "eiger-16",
+    "detector_name": "cSAXS.EG01V01",
     "detector_type": "eiger",
     "n_modules": 4,
-    "start_udp_port": 50200,
-    "buffer_folder": ""
+    "image_n_pixels": 527364,
+    "start_udp_port": 50200
 }
