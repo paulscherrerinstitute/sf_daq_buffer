@@ -187,6 +187,9 @@ void JFH5Writer::close_file()
         return;
     }
 
+    H5Dclose(image_data_dataset_);
+    image_data_dataset_ = -1;
+
     H5Dclose(image_id_dataset_);
     image_id_dataset_ = -1;
 
