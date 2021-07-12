@@ -9,10 +9,13 @@ ENV LD_LIBRARY_PATH="/usr/lib64/mpich/lib:${LD_LIBRARY_PATH}"
 SHELL ["scl", "enable", "devtoolset-9"]
 
 RUN wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz && \
-    tar -xzf hdf5-1.12.0.tar.gz
-
-WORKDIR /hdf5-1.12.0
-RUN ./configure --enable-parallel && make install
-RUN ln -v -s `pwd`/hdf5/lib/* /usr/lib64/ && \
+    tar -xzf hdf5-1.12.0.tar.gz && \
+    cd /hdf5-1.12.0 && \
+    ./configure --enable-parallel && make install && \
+    ln -v -s `pwd`/hdf5/lib/* /usr/lib64/ && \
     ln -v -s `pwd`/hdf5/include/* /usr/include/ && \
-    ln -v -s /usr/include/mpich-x86_64/* /usr/include/
+    ln -v -s /usr/include/mpich-x86_64/* /usr/include/ && \
+    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    /opt/conda/bin/conda clean -tipsy
