@@ -29,7 +29,6 @@
     It also has an internal mutex that can be used for thread-safe
     access to the underlying connection;
 **/
-template <size_t ZMQ_PUB_IO_THREADS>
 class ZmqPublisher {
     protected:
         const uint16_t m_port;
@@ -39,8 +38,8 @@ class ZmqPublisher {
         std::mutex g_zmq_socket;
 
     public:
-        ZmqPublisher(std::string ip, uint16_t port) :
-            m_port(port), m_address("tcp://*:" + std::to_string(port)), m_ctx(ZMQ_PUB_IO_THREADS), m_socket(m_ctx, ZMQ_PUB) {
+        ZmqPublisher(std::string ip, uint16_t port, uint32_t n_threads) :
+            m_port(port), m_address("tcp://*:" + std::to_string(port)), m_ctx(n_threads), m_socket(m_ctx, ZMQ_PUB) {
             // Bind the socket
             m_socket.bind(m_address.c_str());
             std::cout << "Initialized ZMQ publisher at " << m_address << std::endl;
@@ -55,10 +54,9 @@ class ZmqPublisher {
     Specialized publisher to send 'ImageBinaryFormat' data format as
     multipart message. It also takes care of thread safety.
 **/
-template <size_t ZMQ_PUB_IO_THREADS>
-class ZmqImagePublisher: public ZmqPublisher<ZMQ_PUB_IO_THREADS> {
+class ZmqImagePublisher: public ZmqPublisher {
     public:
-        ZmqImagePublisher(std::string ip, uint16_t port) : ZmqPublisher(ip, port) {};
+        ZmqImagePublisher(std::string ip, uint16_t port, uint32_t n_threads) : ZmqPublisher(ip, port, n_threads) {};
         const std::string topic = "IMAGEDATA";
 
         void sendImage(ImageBinaryFormat& image){

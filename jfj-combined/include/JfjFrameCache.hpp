@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <cstring>
+#include <deque>
+#include <thread>
 #include <vector>
 #include <functional>
 #include <shared_mutex>
@@ -81,7 +83,7 @@ public:
 
         // Queue for draining
         if(m_fill[idx]==m_MOD-1){
-            std::cout << "Complete frame at " << idx << "\t(queued for draining)" <<std::endl;
+            // std::cout << "Complete frame at " << idx << "\t(queued for draining)\tqueue size: " << drain_queue.size() << std::endl;
             drain_queue.push_back(idx);
         }
     }
@@ -130,10 +132,12 @@ protected:
     NOTE : It does not lock, that must be done externally!        **/
     void drain_loop(){
         while(true){
-            if(!drain_fifo.empty()){
-                uint32_t idx = drain_queue.pop_front();
-                std::cout << "\tDraining " << idx << std::endl;
+            if(!drain_queue.empty()){
+                uint32_t idx = drain_queue.front();
+                drain_queue.pop_front();
                 flush_line(idx);
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
         }
     }
@@ -155,7 +159,7 @@ protected:
     /** Watchdog timer and flush queue **/
     Watchdog *m_watchdog;
      std::thread m_drainer;
-    std::deque<uint32_t> drain_queue();
+    std::deque<uint32_t> drain_queue;
 
 };
 

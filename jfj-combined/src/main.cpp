@@ -20,7 +20,7 @@ int main (int argc, char *argv[]) {
 
 
     std::cout << "Creating ZMQ socket..." << std::endl;
-    ZmqImagePublisher<2> pub("*", 5200);
+    ZmqImagePublisher pub("*", 5200, 2);
     // ... and extracting sender function
     std::function<void(ImageBinaryFormat&)> zmq_publish =
         std::bind(&ZmqImagePublisher::sendImage, &pub, std::placeholders::_1);
