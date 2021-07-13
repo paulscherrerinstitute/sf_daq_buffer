@@ -14,17 +14,17 @@
     **/
 class Watchdog{
 public:
-    Watchdog(uint32_t timeout, std::function<void()> callback): m_timeout(timeout), m_callback(callback) {};
+    Watchdog(int64_t timeout, std::function<void()> callback): m_timeout(timeout), m_callback(callback) {};
     ~Watchdog() { Stop(); };
     void Start();
     void Stop();
     void Kick();
 
 protected:
-    uint32_t m_timeout;
+    int64_t m_timeout;
     std::atomic<bool> m_running = false;
     std::function<void()> m_callback;
-    std::chrono::time_point m_lastkick;
+    std::chrono::time_point<std::chrono::steady_clock> m_lastkick;
 
     std::thread m_thread;
     std::mutex m_mutex;
@@ -55,8 +55,11 @@ void Watchdog::Kick(){
 }
 
 void Watchdog::Loop(){
+    std::cout << "Starting watchdog" << std::endl;
     while(m_running){
-        if((std::chrono::now() - m_lastkick) < m_timeout){
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_lastkick);
+        if(elapsed.count() < m_timeout){
+            // std::cout << "Elapsed " << (int64_t)elapsed.count() << " of " << m_timeout << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } else {
             std::cout << "Expired timer" << std::endl;

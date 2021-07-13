@@ -169,7 +169,7 @@ char* RamBuffer::read_image(const uint64_t pulse_id) const
 void RamBuffer::write_image(const ImageMetadata& src_meta, const char *src_data)
 {
     const int slot_n = src_meta.id % n_slots_;
-    const int image_n_bytes = src_meta.height * src_meta.width * TypeMap[src_meta.dtype].size;
+    const int image_n_bytes = src_meta.height * src_meta.width * TypeMap.at(src_meta.dtype).size;
 
     char *dst_data = image_buffer_ + (image_n_bytes * slot_n);
 

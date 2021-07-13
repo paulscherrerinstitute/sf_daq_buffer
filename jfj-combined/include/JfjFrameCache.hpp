@@ -30,15 +30,19 @@
 	**/
 class FrameCache{
 public:
-    FrameCache(uint64_t _C, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
-            m_CAP(_C), m_MOD(N_MOD), m_valid(_C, 0), m_fill(_C, 0), m_lock(_C),
-            m_buffer(_C, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
-            f_send(callback), m_watchdog(500, flush_all) {
-
+    FrameCache(uint64_t N_CAP, uint64_t N_MOD, std::function<void(ImageBinaryFormat&)> callback):
+            m_CAP(N_CAP), m_MOD(N_MOD), m_valid(N_CAP, 0), m_fill(N_CAP, 0), m_lock(N_CAP),
+            m_buffer(N_CAP, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
+            f_send(callback) {
         // Initialize buffer metadata
         for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
-        // Start watchdog
-        m_watchdog.Start();
+
+
+        std::function<void()> wd_callback = std::bind(&FrameCache::flush_all, this);
+
+        m_watchdog = new Watchdog(500, wd_callback);
+        m_watchdog->Start();
+
         // Start drain worker
         m_drainer = std::thread(&FrameCache::drain_loop, this);
     };
@@ -57,11 +61,11 @@ public:
         const uint64_t idx = pulseID % m_CAP;
 
         // A new frame is starting
-        if(inc_frame.meta.pulse_id != m_buffer[idx].meta.pulse_id){
+        if(inc_frame.meta.pulse_id != m_buffer[idx].meta.id){
             // Unique lock to flush and start a new one
             std::unique_lock<std::shared_mutex> p_guard(m_lock[idx]);
             // Check if condition persists after getting the mutex
-            if(inc_frame.meta.pulse_id != m_buffer[idx].meta.pulse_id){
+            if(inc_frame.meta.pulse_id != m_buffer[idx].meta.id){
                 start_line(idx, inc_frame.meta);
             }
         }
@@ -73,6 +77,7 @@ public:
         char* ptr_dest = m_buffer[idx].data.data() + moduleIDX * m_blocksize;
         std::memcpy((void*)ptr_dest, (void*)&inc_frame.data, m_blocksize);
         m_fill[idx]++;
+        m_watchdog->Kick();
 
         // Queue for draining
         if(m_fill[idx]==m_MOD-1){
@@ -92,10 +97,10 @@ protected:
         if(m_valid[idx]){ f_send(m_buffer[idx]); }
 
         // 2. Init new frame
-        m_buffer[idx].meta.pulse_id = inc_frame.pulse_id;
-        m_buffer[idx].meta.frame_index = inc_frame.frame_index;
-        m_buffer[idx].meta.daq_rec = inc_frame.daq_rec;
-        m_buffer[idx].meta.is_good_image = true;
+        m_buffer[idx].meta.id = inc_frame.pulse_id;
+        m_buffer[idx].meta.user_1 = inc_frame.frame_index;
+        m_buffer[idx].meta.user_2 = inc_frame.daq_rec;
+        m_buffer[idx].meta.status = true;
         m_fill[idx] = 0;
         m_valid[idx] = 1;
     }
@@ -148,9 +153,10 @@ protected:
     std::vector<ImageBinaryFormat> m_buffer;
 
     /** Watchdog timer and flush queue **/
-    Watchdog m_watchdog;
-    std::thread m_drainer;
+    Watchdog *m_watchdog;
+     std::thread m_drainer;
     std::deque<uint32_t> drain_queue();
+
 };
 
 #endif // SF_DAQ_FRAME_CACHE_HPP
