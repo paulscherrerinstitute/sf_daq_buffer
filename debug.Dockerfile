@@ -1,4 +1,4 @@
-FROM paulscherrerinstitute/sf-daq_phdf5:1.0.1
+FROM paulscherrerinstitute/sf-daq_phdf5:1.0.2
 
 COPY . /sf_daq_buffer/
 
