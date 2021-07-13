@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../include/UdpRecvConfig.hpp"
 #include <netinet/in.h>
+#include <unistd.h>
 #include "mock/udp.hpp"
 
 #ifdef USE_EIGER
@@ -76,6 +77,11 @@ int main(int argc, char **argv) {
                         sizeof(sockaddr_in));
             }
         }
+
+        cout << "Sent image_id " << image_id << endl;
+        // 10Hz == 100ms between images
+        usleep(100 * 1000);
+
         image_id = ++image_id % MAX_IMAGE_ID;
     }
 }
