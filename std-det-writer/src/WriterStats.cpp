@@ -39,7 +39,9 @@ void WriterStats::end_image_write()
 
 void WriterStats::end_run()
 {
-    print_stats();
+    if (image_counter_ > 0){
+        print_stats();
+    }
     reset_counters();
 }
 

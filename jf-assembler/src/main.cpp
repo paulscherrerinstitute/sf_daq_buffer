@@ -95,13 +95,6 @@ int main (int argc, char *argv[])
         // receives the synced image id
         zmq_recv(receiver_sync, &image_id, sizeof(image_id), 0);
 
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            cout << " [" << std::chrono::system_clock::now();
-            cout << "] [ASSEMBLER::receiver_sync] image_id: ";
-            cout << image_id;
-            cout << endl;
-        #endif
         // metadata
         auto* src_meta = frame_buffer.get_slot_meta(image_id);
         auto* src_data = frame_buffer.get_slot_data(image_id);
