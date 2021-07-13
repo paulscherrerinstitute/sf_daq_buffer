@@ -14,12 +14,13 @@ int main (int argc, char *argv[]) {
     if (argc != 2) {
         std::cout << "\nUsage: jf_buffer_writer [detector_json_filename]\n";
         std::cout << "\tdetector_json_filename: detector config file path." << std::endl;
+        std::cout << "\tZMQ publisher port:     5200 (high data rate)" << std::endl;
         exit(-1);
     }
     const auto config = BufferUtils::read_json_config(std::string(argv[1]));
 
 
-    std::cout << "Creating ZMQ socket..." << std::endl;
+    std::cout << "Creating ZMQ sockets..." << std::endl;
     ZmqImagePublisher pub("*", 5200, 2);
     // ... and extracting sender function
     std::function<void(ImageBinaryFormat&)> zmq_publish =

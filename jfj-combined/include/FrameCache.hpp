@@ -12,6 +12,8 @@
 #include "../../core-buffer/include/formats.hpp"
 #include "Watchdog.hpp"
 
+#define MAX_FIFO_LENGTH 32
+
 
 /** Frame Cache
 
@@ -39,9 +41,8 @@ public:
         // Initialize buffer metadata
         for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
 
-
+        // Initialize the watchdog
         std::function<void()> wd_callback = std::bind(&FrameCache::flush_all, this);
-
         m_watchdog = new Watchdog(500, wd_callback);
         m_watchdog->Start();
 
@@ -83,8 +84,9 @@ public:
 
         // Queue for draining
         if(m_fill[idx]==m_MOD-1){
-            // std::cout << "Complete frame at " << idx << "\t(queued for draining)\tqueue size: " << drain_queue.size() << std::endl;
-            drain_queue.push_back(idx);
+            if(m_fill.size() > MAX_FIFO_LENGTH) {
+                m_drain_queue.push_back(idx);
+            }
         }
     }
 
@@ -128,13 +130,16 @@ protected:
     }
 
     /** Drain loop
-    Flushes a valid cache line and invalidates the associated buffer.
-    NOTE : It does not lock, that must be done externally!        **/
+
+    Flushes queued frames from the cache buffer and invalidates line.
+    It also locks the frame for the duration of flushing!        **/
     void drain_loop(){
         while(true){
-            if(!drain_queue.empty()){
-                uint32_t idx = drain_queue.front();
-                drain_queue.pop_front();
+            if(!m_drain_queue.empty()){
+                uint32_t idx = m_drain_queue.front();
+                m_drain_queue.pop_front();
+                // Lock and flush the frame
+                std::unique_lock<std::shared_mutex> p_guard(m_lock[idx]);
                 flush_line(idx);
             } else {
                 std::this_thread::sleep_for(std::chrono::milliseconds(2));
@@ -159,7 +164,7 @@ protected:
     /** Watchdog timer and flush queue **/
     Watchdog *m_watchdog;
      std::thread m_drainer;
-    std::deque<uint32_t> drain_queue;
+    std::deque<uint32_t> m_drain_queue;
 
 };
 

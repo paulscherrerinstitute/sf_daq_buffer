@@ -62,7 +62,6 @@ int main (int argc, char *argv[]){
     for (int idx = 0; idx < 100000; idx++) {
         // ZMQ guarantees full delivery of multipart massages!
         // Packets are sent as three part messages:  topic + meta + data
-        // Blocks until recv succesfull!
         subscriber.recv(&msg_topic, 0);
         subscriber.recv(&msg_meta, 0);
         subscriber.recv(&msg_data, 0);
