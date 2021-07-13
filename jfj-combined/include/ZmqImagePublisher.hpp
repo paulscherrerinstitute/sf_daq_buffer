@@ -55,7 +55,8 @@ class ZmqPublisher {
     Specialized publisher to send 'ImageBinaryFormat' data format as
     multipart message. It also takes care of thread safety.
 **/
-class ZmqImagePublisher: public ZmqPublisher {
+template <size_t ZMQ_PUB_IO_THREADS>
+class ZmqImagePublisher: public ZmqPublisher<ZMQ_PUB_IO_THREADS> {
     public:
         ZmqImagePublisher(std::string ip, uint16_t port) : ZmqPublisher(ip, port) {};
         const std::string topic = "IMAGEDATA";
