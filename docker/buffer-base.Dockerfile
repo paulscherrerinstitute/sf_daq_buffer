@@ -14,8 +14,4 @@ RUN wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/sr
     ./configure --enable-parallel && make install && \
     ln -v -s `pwd`/hdf5/lib/* /usr/lib64/ && \
     ln -v -s `pwd`/hdf5/include/* /usr/include/ && \
-    ln -v -s /usr/include/mpich-x86_64/* /usr/include/ && \
-    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
-    /opt/conda/bin/conda clean -tipsy
+    ln -v -s /usr/include/mpich-x86_64/* /usr/include/

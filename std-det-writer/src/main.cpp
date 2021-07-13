@@ -52,7 +52,7 @@ int main (int argc, char *argv[])
     JFH5Writer writer(config.detector_name);
     WriterStats stats(config.detector_name, IMAGE_N_BYTES);
 
-    char recv_buffer[12288];
+    char recv_buffer[8192];
     while (true) {
         zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
         
@@ -66,6 +66,14 @@ int main (int argc, char *argv[])
         const int run_id = document["run_id"].GetInt();
         const int i_image = document["i_image"].GetInt();
         const int n_images = document["n_images"].GetInt();
+        
+        // i_image == n_images -> end of run.
+        if (i_image == n_images) {
+            writer.close_run();
+
+            stats.end_run();
+            continue;
+        }
 
         // i_image == n_images -> end of run.
         if (i_image == n_images) {
@@ -87,7 +95,7 @@ int main (int argc, char *argv[])
                             image_meta->dtype);
         }
 
-        
+
         // Fair distribution of images among writers.
         if (i_image % n_writers == i_writer) {
             char* data = image_buffer.get_slot_data(image_id);

@@ -3,7 +3,11 @@ docker/
 docs/
 scripts/
 
-debug.Dockerfile
+.idea/
+.dockerignore
+
+build_buffer.sh
+README.md
 
 # Include files:
 !docker/example_detector.json
