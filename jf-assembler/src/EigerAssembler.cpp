@@ -70,21 +70,18 @@ void EigerAssembler::assemble_image(const char* src_meta,
             image_meta->encoding = 0;
             image_meta->source_id = 0;
             is_pulse_init = 1;
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [EigerAssembler::assemble_image] is_pulse_init ";
+                cout << " || Image id: " << image_meta->id;
+                cout << endl;
+            #endif
         }
 
         // missing packets: bad status = 1
         if (frame_meta->n_recv_packets != n_packets_per_frame_){
             image_meta->status = 1;
-             #ifdef DEBUG_OUTPUT
-                using namespace date;
-                cout << " [" << std::chrono::system_clock::now();
-                cout << "] [EigerAssembler::assemble_image] bad frame :";
-                cout << "frame_meta->frame_index != n_packets_per_frame_ ";
-                cout << "||  i_module: " << i_module;
-                cout << "|| frame_meta->n_recv_packets " << frame_meta->n_recv_packets;
-                cout << "|| n_packets_per_frame_" << n_packets_per_frame_;
-                cout << endl;
-            #endif
         }
         
         // frame id false: bad status = 2
@@ -118,20 +115,6 @@ void EigerAssembler::assemble_image(const char* src_meta,
             dest_offset += n_bytes_per_module_line_ + n_bytes_per_x_gap_;
         }
 
-        #ifdef DEBUG_OUTPUT
-            using namespace date;
-            // if (i_module == 0){
-            cout << " [" << std::chrono::system_clock::now();
-            cout << "] [MODULE " << i_module;
-            cout << "] (row " << i_module_row;
-            cout << " , column" << i_module_column;
-            cout << ") || reverse_factor" << reverse_factor;
-            cout << " || line_number" << line_number;
-            cout << " || N_RECV_PACKETS" << frame_meta->n_recv_packets;
-            cout << endl;
-            // }
-        #endif
-
         int counter = 0;
 
         for (uint32_t frame_line = 0;
@@ -142,29 +125,25 @@ void EigerAssembler::assemble_image(const char* src_meta,
                     (char*)(src_data + source_offset),
                     n_bytes_per_module_line_
             );
-            
-            #ifdef DEBUG_OUTPUT
-                using namespace date;
-                // verifies the addresses for 
-                // beginning and end of each frame
-                if (counter < 5 || counter > 508){
-                    cout << " [" << std::chrono::system_clock::now();
-                    cout << "] [MODULE " << i_module;
-                    cout << "] (row " << i_module_row;
-                    cout << ",column " << i_module_column;
-                    cout << ") source_offset" << source_offset;
-                    cout << " || dest_offset " << dest_offset;
-                    cout << " || frame_line " << frame_line;
-                    cout << " || COUNTER " << counter;
-                    cout << endl;
-                }
-            #endif
+
             counter += 1;
             source_offset += reverse * n_bytes_per_module_line_;
             dest_offset += reverse * n_bytes_per_image_line_;
             }
         line_number += n_lines_per_frame_;
         dest_module_line = line_number + n_lines_per_frame_ - 1;
-        last_image_status_ = image_meta->status;
+
+        // last module sets the last_image_status_
+        if (i_module == n_modules_ - 1){
+            last_image_status_ = image_meta->status;
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                cout << " [" << std::chrono::system_clock::now();
+                cout << "] [EigerAssembler::assemble_image] ";
+                cout << " || Image id: " << image_meta->id;
+                cout << " || last_image_status_ " << last_image_status_;
+                cout << endl;
+            #endif
+        }
     }
 }

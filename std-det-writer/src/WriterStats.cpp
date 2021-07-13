@@ -45,16 +45,19 @@ void WriterStats::end_run()
 
 void WriterStats::print_stats()
 {
-    const float avg_buffer_write_us = total_buffer_write_us_ / image_counter_;
-
-    const uint64_t timestamp = time_point_cast<nanoseconds>(
-            system_clock::now()).time_since_epoch().count();
-
-    const uint64_t avg_throughput =
+    float avg_buffer_write_us = 0;
+    uint64_t avg_throughput = 0;
+    if (image_counter_ > 0) {
+        avg_buffer_write_us = total_buffer_write_us_ / image_counter_;
+        avg_throughput =
             // bytes -> megabytes
             (image_n_bytes_ / 1024 / 1024) /
             // micro seconds -> seconds
             (avg_buffer_write_us * 1000 * 1000);
+    }
+
+    const uint64_t timestamp = time_point_cast<nanoseconds>(
+            system_clock::now()).time_since_epoch().count();    
 
     // Output in InfluxDB line protocol
     cout << "jf_buffer_writer";
