@@ -26,9 +26,10 @@
 
     Lightweight wrapper base class to initialize a ZMQ Publisher.
     Nothing data specific, but everything is only 'protected'.
-    It also has an internal mutex that can be used for threadsafe
-    access to the undelying connection;
+    It also has an internal mutex that can be used for thread-safe
+    access to the underlying connection;
 **/
+template <size_t ZMQ_PUB_IO_THREADS>
 class ZmqPublisher {
     protected:
         const uint16_t m_port;
@@ -39,7 +40,7 @@ class ZmqPublisher {
 
     public:
         ZmqPublisher(std::string ip, uint16_t port) :
-            m_port(port), m_address("tcp://*:" + std::to_string(port)), m_ctx(1), m_socket(m_ctx, ZMQ_PUB) {
+            m_port(port), m_address("tcp://*:" + std::to_string(port)), m_ctx(ZMQ_PUB_IO_THREADS), m_socket(m_ctx, ZMQ_PUB) {
             // Bind the socket
             m_socket.bind(m_address.c_str());
             std::cout << "Initialized ZMQ publisher at " << m_address << std::endl;

@@ -20,7 +20,7 @@ int main (int argc, char *argv[]) {
 
 
     std::cout << "Creating ZMQ socket..." << std::endl;
-    ZmqImagePublisher pub("*", 5200);
+    ZmqImagePublisher<2> pub("*", 5200);
     // ... and extracting sender function
     std::function<void(ImageBinaryFormat&)> zmq_publish =
         std::bind(&ZmqImagePublisher::sendImage, &pub, std::placeholders::_1);
@@ -33,18 +33,18 @@ int main (int argc, char *argv[]) {
         std::bind(&FrameCache::emplace, &cache, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
 
-    std::cout << "Creating workers..." << std::endl;
+    std::cout << "Creating frame workers..." << std::endl;
     std::vector<std::shared_ptr<JfjFrameWorker>> vWorkers;
     for(int mm=0; mm<config.n_modules; mm++){
         // Module name (not really used...)
         char m_name[128];
         snprintf(m_name, 128, "M%02d", mm);
-        std::string moduleName(m_name); 
+        std::string moduleName(m_name);
         vWorkers.emplace_back( std::make_shared<JfjFrameWorker>(config.start_udp_port+mm, moduleName, mm, push_cb) );
     }
 
 
-    std::cout << "Starting worker threads..." << std::endl;
+    std::cout << "Starting frame worker threads..." << std::endl;
     std::vector<std::thread> vThreads;
     for(int mm=0; mm<config.n_modules; mm++){
         vThreads.push_back( std::thread(&JfjFrameWorker::run, vWorkers[mm].get()) );

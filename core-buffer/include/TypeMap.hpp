@@ -1,6 +1,7 @@
 #ifndef SF_DAQ_BUFFER_TYPEMAP_HPP
 #define SF_DAQ_BUFFER_TYPEMAP_HPP
 
+#include <typeindex>
 #include <unordered_map>
 
 
@@ -27,7 +28,7 @@ struct Type{
 };
 
 
-const std::unordered_map<std::type_index, Type> TypeTable = {
+const std::unordered_map<std::type_index, TypeMap> TypeTable = {
     { typeid(void), {sizeof(void), TypeMap::VOID} },
     { typeid(char), {sizeof(char), TypeMap::CHAR} },
     { typeid(int8_t), {sizeof(int8_t), TypeMap::INT8} },
