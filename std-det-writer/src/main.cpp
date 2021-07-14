@@ -62,7 +62,7 @@ int main (int argc, char *argv[])
         }
         
         const string output_file = document["output_file"].GetString();
-        const uint64_t image_id = document["image_metadata"]["id"].GetUint64();
+        const uint64_t image_id = document["image_id"].GetUint64();
         const int run_id = document["run_id"].GetInt();
         const int i_image = document["i_image"].GetInt();
         const int n_images = document["n_images"].GetInt();
@@ -71,6 +71,13 @@ int main (int argc, char *argv[])
         if (i_image == n_images) {
             writer.close_run();
 
+            stats.end_run();
+            continue;
+        }
+
+        // i_image == n_images -> end of run.
+        if (i_image == n_images) {
+            writer.close_run();
             stats.end_run();
             continue;
         }

@@ -69,6 +69,8 @@ void EigerAssembler::assemble_image(const char* src_meta,
             image_meta->dtype = (bit_depth_ <= 8) ? 1 : bit_depth_ / 8;
             image_meta->encoding = 0;
             image_meta->source_id = 0;
+            image_meta->user_1 = 0;
+            image_meta->user_2 = 0;
             is_pulse_init = 1;
             #ifdef DEBUG_OUTPUT
                 using namespace date;
