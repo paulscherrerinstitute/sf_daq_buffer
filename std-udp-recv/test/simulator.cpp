@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
                         sockets[i_module],
                         &send_udp_buffer,
                         BYTES_PER_PACKET,
-                        -1,
+                        0,
                         (sockaddr *) &send_address[i_module],
                         sizeof(sockaddr_in));
             }
