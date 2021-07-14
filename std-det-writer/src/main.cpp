@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &n_writers);
 
     int i_writer;
-    MPI_Comm_size(MPI_COMM_WORLD, &i_writer);
+    MPI_Comm_rank(MPI_COMM_WORLD, &i_writer);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, LIVE_ZMQ_IO_THREADS);
