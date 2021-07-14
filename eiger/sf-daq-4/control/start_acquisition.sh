@@ -4,7 +4,7 @@ SYNC="/write_sync"
 ASYNC="/write_async"
 KILL="/kill"
 HEADER="Content-Type:application/json"
-N_IMAGES=5
+N_IMAGES=500
 SOURCES="eiger"
 # Define a timestamp function
 timestamp() {
@@ -17,10 +17,10 @@ generate_post_data()
 EOF
 }
 
-for((i=1;i<=10;i+=1)); do 
+for((i=1;i<=100;i+=1)); do 
     TIMESTAMP=$(date +%d-%m-%Y_%H-%M-%S)
     echo "[${TIMESTAMP}] Starting Request ${i}..."
-    OUTPUT_FILE="/home/hax_l/tests/output_"${i}"_"${TIMESTAMP}".h5"
+    OUTPUT_FILE="/home/hax_l/tests/"${TIMESTAMP}"_"${i}".h5"
     # echo "$(generate_post_data)"
     curl -X POST -H ${HEADER} --data "$(generate_post_data)" ${ENDPOINT}${SYNC}
     
