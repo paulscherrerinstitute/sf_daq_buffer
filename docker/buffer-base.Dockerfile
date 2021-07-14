@@ -2,7 +2,7 @@ FROM centos:centos7
 
 RUN yum -y install centos-release-scl epel-release && \
     yum -y update && \
-    yum -y install devtoolset-9 git cmake3 mpich-devel wget zeromq-devel
+    yum -y install devtoolset-9 git cmake3 mpich-devel wget zeromq-devel vim
 
 ENV PATH="/usr/lib64/mpich/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/lib64/mpich/lib:${LD_LIBRARY_PATH}"
