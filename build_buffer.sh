@@ -3,7 +3,7 @@
 VERSION=1.0.0
 
 docker build --no-cache=true -f buffer.Dockerfile -t paulscherrerinstitute/std-daq-buffer .
-docker tag paulscherrerinstitute/sf-daq-buffer paulscherrerinstitute/std-daq-buffer:$VERSION
+docker tag paulscherrerinstitute/std-daq-buffer paulscherrerinstitute/std-daq-buffer:$VERSION
 
 docker login
 docker push paulscherrerinstitute/std-daq-buffer:$VERSION
