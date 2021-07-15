@@ -54,11 +54,11 @@ int main (int argc, char *argv[])
 
     char recv_buffer[8192];
     while (true) {
-        zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
-        
+        auto nbytes = zmq_recv(receiver, &recv_buffer, sizeof(recv_buffer), 0);
         rapidjson::Document document;
-        if (document.Parse(recv_buffer).HasParseError()) {
-            continue;
+        if (document.Parse(recv_buffer, nbytes).HasParseError()) {
+            std::string error_str(recv_buffer, nbytes);
+            throw runtime_error(error_str);
         }
         
         const string output_file = document["output_file"].GetString();
@@ -66,7 +66,6 @@ int main (int argc, char *argv[])
         const int run_id = document["run_id"].GetInt();
         const int i_image = document["i_image"].GetInt();
         const int n_images = document["n_images"].GetInt();
-        
         // i_image == n_images -> end of run.
         if (i_image == n_images) {
             writer.close_run();
@@ -85,7 +84,7 @@ int main (int argc, char *argv[])
         // i_image == 0 -> we have a new run.
         if (i_image == 0) {
             auto image_meta = (ImageMetadata*)
-                    image_buffer.get_slot_meta(image_id);
+                image_buffer.get_slot_meta(image_id);
 
             writer.open_run(output_file,
                             run_id,
@@ -108,7 +107,7 @@ int main (int argc, char *argv[])
         // Only the first instance writes metadata.
         if (i_writer == 0) {
             auto image_meta = (ImageMetadata*)
-                    image_buffer.get_slot_meta(image_id);
+                image_buffer.get_slot_meta(image_id);
             writer.write_meta(run_id, i_image, image_meta);
         }
 
