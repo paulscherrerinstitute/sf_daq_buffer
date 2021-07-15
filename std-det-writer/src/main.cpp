@@ -70,14 +70,6 @@ int main (int argc, char *argv[])
         // i_image == n_images -> end of run.
         if (i_image == n_images) {
             writer.close_run();
-
-            stats.end_run();
-            continue;
-        }
-
-        // i_image == n_images -> end of run.
-        if (i_image == n_images) {
-            writer.close_run();
             stats.end_run();
             continue;
         }
