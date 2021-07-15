@@ -47,7 +47,7 @@ if (( ${ASSEMBLER} == 1 )); then
 fi
 
 if (( ${WRITER} == 1 )); then
-    echo "Killing assembler..."
+    echo "Killing writer..."
     ps aux | grep mpiexec | awk 'NR > 1 { print prev } { prev = $2 }' | xargs -I{} kill {}
 fi
 
