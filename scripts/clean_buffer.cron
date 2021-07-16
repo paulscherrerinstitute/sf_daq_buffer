@@ -1,3 +1,0 @@
-heck every hour if buffer is occupied for larger then 80% and remove all files older then 3 hours
-10 * * * * root /home/dbe/git/sf_daq_buffer/scripts/delete_old_files_in_buffer.sh 80 5
-
