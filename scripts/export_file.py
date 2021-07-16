@@ -88,7 +88,7 @@ if conversion:
             dtype=None,
             batch_size=35,
         )
-    os.remove(file_tmp)
+    #os.remove(file_tmp)
 
 else:
     with h5py.File(file_tmp, "r") as juf:

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#cores for the extraction from detector buffer
+coreAssociated="9,10,11,12,13,14,15,16,17"
+#max number of simultaneously running extraction from detector buffer processes
+NUMBER_BUFFER_EXTRACT=9
+#cores used for conversion
+coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
+#max number of simultaneously running convertion processes
+NUMBER_CONVERTION_PROCESSES=15
+
 if [ $# -lt 3 ]
 then
     echo "Usage :   $0 detector_name start_pulse_id end_pulse_id "
@@ -45,58 +54,8 @@ then
     fi
 fi
 
-
-case ${DETECTOR} in
-'JF01T03V01')
-  NM=3
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF01.json
-  ;;
-'JF02T09V02')
-  NM=9
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF02.json
-  ;;
-'JF04T01V01')
-  NM=1
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF04.json
-  ;;
-'JF03T01V02')
-  NM=1
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF03.json
-  ;;
-'JF06T32V02')
-  NM=32
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06.json
-  ;;
-'JF06T08V02')
-  NM=8
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF06_4M.daq8.json
-  ;;
-'JF07T32V01')
-  NM=32
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF07.json
-  ;;
-'JF09T01V01')
-  NM=1
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF09.json
-  ;;
-'JF10T01V01')
-  NM=1
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF10.json
-  ;;
-'JF13T01V01')
-  NM=1
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF13.json
-  ;;
-'JF11T04V01')
-  NM=4
-  DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/stream-JF11.json
-  ;;
-*)
-  NM=1
-esac
-
-#coreAssociated="7,8,9,10,11,12,13,14"
-coreAssociated="9,10,11,12,13,14,15,16,17"
+NM=`echo ${DETECTOR} | cut -c 6-7`
+DET_CONFIG_FILE=/gpfs/photonics/swissfel/buffer/config/${DETECTOR}.json
 
 touch /tmp/detector_retrieve.log
 
@@ -107,7 +66,7 @@ while [ ${PREVIOUS_STILL_RUN} == 0 ]
 do
     sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
     n=`ps -fe | grep "bin/sf_writer " | grep -v grep | grep sf_writer | wc -l`
-    if [ ${n} -lt 9 ]
+    if [ ${n} -lt ${NUMBER_BUFFER_EXTRACT} ]
     then
         PREVIOUS_STILL_RUN=1
     fi
@@ -131,8 +90,8 @@ else
         RUN_NUMBER=`basename ${RUN_FILE} | awk -F '.' '{print $1}'`
         D1=`dirname ${RUN_FILE}`
         D2=`dirname ${D1}`
-        OUTFILE_RAW=${D2}/.raw/${RUN_NUMBER}.${DETECTOR}.h5
-        mkdir -p ${D2}/.raw/
+        OUTFILE_RAW=${D2}/RAW_DATA/${RUN_NUMBER}.${DETECTOR}.h5
+        mkdir -p ${D2}/RAW_DATA/
     fi
 fi
 
@@ -140,9 +99,6 @@ taskset -c ${coreAssociated} /usr/local/bin/sf_writer ${OUTFILE_RAW} /gpfs/photo
 
 wait
 
-#coreAssociatedConversion="35,34,33,32,31,30,29,28,27"
-coreAssociatedConversion="35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18"
-#coreAssociatedConversion="26,25,24,23,22,21,20,19,18"
 #TODO: calculate this number from coreAssociatedConversion
 #export NUMBA_NUM_THREADS=18
 
@@ -165,8 +121,6 @@ then
     then
         echo "Pedestal run will make conversion"
 
-        export PATH=/home/dbe/miniconda3/bin:$PATH
-
         source /home/dbe/miniconda3/etc/profile.d/conda.sh
 
         conda deactivate
@@ -185,6 +139,7 @@ then
         elif [ ${DETECTOR} == "JF06T08V02" ]
         then
             time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T08V01/mask_2lines_module3.h5 
+#            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T08V01/mask_2lines_module3.asics_lines.h5
 #        elif [ ${DETECTOR} == "JF06T32V02" ]
 #        then
 #            time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/jungfrau_create_pedestals.py --filename ${OUTFILE_RAW} --directory ${dir_name} --verbosity DEBUG --add_pixel_mask /sf/alvra/config/jungfrau/pixel_mask/JF06T32V02/mask_noise_in_28.h5 
@@ -213,7 +168,7 @@ else
     PREVIOUS_STILL_RUN=0
     while [ ${PREVIOUS_STILL_RUN} == 0 ]
     do
-        sleep 15 # we need to sleep at least to make sure that we don't read from CURRENT file
+        sleep $[ ( $RANDOM % 10 )  + ${NUMBER_CONVERTION_PROCESSES} ]s # sleep some random time 
         n=`ps -fe | grep "scripts/export_file.py " | grep -v grep | grep export | wc -l`
         if [ ${n} -lt 15 ]
         then
@@ -224,18 +179,18 @@ else
     echo -n "Sleep Time : "
     echo $((date4-date3)) | awk '{print int($1/60)":"int($1%60)}'
 
-    export PATH=/home/dbe/miniconda3/bin:$PATH
-
     source /home/dbe/miniconda3/etc/profile.d/conda.sh
 
     conda deactivate
     conda activate sf-daq
 
     time taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/export_file.py ${OUTFILE_RAW} ${OUTFILE} ${RUN_FILE} ${DET_CONFIG_FILE}
-    if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
-    then
-        taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
-    fi
+
+#    if [ ${DETECTOR} == "JF06T32V02" ] || [ ${DETECTOR} == "JF06T08V02" ]
+#    then
+#        taskset -c ${coreAssociatedConversion} python /home/dbe/git/sf_daq_buffer/scripts/make_crystfel_list.py ${OUTFILE} ${RUN_FILE} ${DETECTOR}
+#    fi
+
     date5=$(date +%s)
     echo "Finished                : "`date`
     echo -n "Conversion Time : "
