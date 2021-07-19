@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
                            FRAME_N_BYTES, config.n_modules, RAM_BUFFER_N_SLOTS);
 
     ZmqPulseSyncReceiver receiver(ctx, config.detector_name, config.n_modules);
-    SyncStats stats(config.detector_name, SYNC_STATS_MODULO);
+    SyncStats stats(config.detector_name, STATS_TIME);
 
     while (true) {
         auto meta = receiver.get_next_pulse_id();

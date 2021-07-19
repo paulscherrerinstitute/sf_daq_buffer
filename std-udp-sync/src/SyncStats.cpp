@@ -7,9 +7,9 @@ using namespace chrono;
 
 SyncStats::SyncStats(
         const std::string &detector_name,
-        const size_t stats_modulo) :
+        const size_t stats_time) :
             detector_name_(detector_name),
-            stats_modulo_(stats_modulo)
+            stats_time_(stats_time)
 {
     reset_counters();
 }
@@ -26,7 +26,10 @@ void SyncStats::record_stats(const uint32_t n_lost_pulses)
     image_counter_++;
     n_sync_lost_images_ += n_lost_pulses;
 
-    if (image_counter_ == stats_modulo_) {
+    const auto time_passed = duration_cast<milliseconds>(
+             steady_clock::now()-stats_interval_start_).count();
+
+    if (time_passed >= stats_time_*1000) {
         print_stats();
         reset_counters();
     }
