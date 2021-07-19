@@ -102,6 +102,33 @@ ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
 
+### Integration testing
+Apart from unit-testing an integration pipeline can be started on your local 
+machine or dedicated server.
+
+#### Manual start
+To manually start the integration pipeline you will have to start the following
+containers:
+
+UDP generators:
+```bash
+docker run -d --rm --net=host --name=udp-sim paulscherrerinstitute/std-daq-buffer ./std_udp_sim example_detector.json 16
+```
+
+4 UDP receivers:
+```bash
+for i in {0..3}; do docker run --rm -d --net=host --ipc=host --shm-size=8G -v /tmp:/tmp --name=udp-recv-${i} paulscherrerinstitute/std-daq-buffer ./std_udp_recv example_detector.json ${i} 16; done
+```
+
+1 UDP synchronizer:
+```bash
+docker run -d --rm --net=host -v /tmp:/tmp --name=udp-sync paulscherrerinstitute/std-daq-buffer ./std_udp_sync example_detector.json 16
+```
+
+1 Image assembler:
+```bash
+docker run -d --rm --net=host --name=udp-sim paulscherrerinstitute/std-daq-buffer ./std_udp_sim example_detector.json 16
+```
 ### Warnings
 
 #### UDP recv tests failing
@@ -112,6 +139,7 @@ problems is the rmem limit. Please increase your rmem_max to something large:
 ```bash 
 echo 2147483646 > /proc/sys/net/core/rmem_max
 ```
+You need to do this on your host when running the integration pipeline.
 
 #### Zeromq
 
