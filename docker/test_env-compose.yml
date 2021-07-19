@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  udp-recv:
+    image: paulscherrerinstitute/std-daq-buffer:1.0.0
+    network: host
+    shm_size: '2gb'
+    container_name: ${DAQ_PROFILE}.udp-recv.${SERVICE_NAME}
+    command: exec
+
+  udp-sync:
+    image: paulscherrerinstitute/std-daq-buffer:1.0.0
+    network: host
+    shm_size: '2gb'
+    container_name: ${DAQ_PROFILE}.udp-sync.${SERVICE_NAME}
+
+  std-assembler:
+    image: paulscherrerinstitute/std-daq-buffer:1.0.0
+    network: host
+    shm_size: '2gb'
+    container_name: ${DAQ_PROFILE}.assembler.${SERVICE_NAME}
+
+  std-det-writer:
+    image: paulscherrerinstitute/std-daq-broker:1.0.0
+    network: host
+    shm_size: '2gb'
+    container_name: ${DAQ_PROFILE}.writer.${SERVICE_NAME}
+
+  std-det-writer_agent:
+    image: paulscherrerinstitute/std-daq-buffer:1.0.0
+    network: host
+    shm_size: '2gb'
+    container_name: ${DAQ_PROFILE}.writer_agent.${SERVICE_NAME}
