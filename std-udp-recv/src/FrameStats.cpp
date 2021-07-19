@@ -66,7 +66,7 @@ void FrameStats::print_stats()
             system_clock::now()).time_since_epoch().count();
 
     // Output in InfluxDB line protocol
-    cout << "std_udp_recv,";
+    cout << "std_udp_recv";
     cout << ",detector_name=" << detector_name_;
     cout << ",module_id=" << module_id_;
     cout << " ";
