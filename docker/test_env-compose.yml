@@ -1,32 +1,66 @@
-version: "3.9"
+version: "3.6"
 services:
-  udp-recv:
-    image: paulscherrerinstitute/std-daq-buffer:1.0.0
-    network: host
-    shm_size: '2gb'
-    container_name: ${DAQ_PROFILE}.udp-recv.${SERVICE_NAME}
-    command: exec
+  udp-sim:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    container_name: "udp-sim"
+    command: ./std_udp_sim example_detector.json 16
+
+  udp-recv-0:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    ipc: "host"
+    shm_size: 2G
+    volumes:
+      - /tmp:/tmp
+    container_name: "udp-recv-0"
+    command: ./std_udp_recv example_detector.json 0 16
+
+  udp-recv-1:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    ipc: "host"
+    shm_size: 2G
+    volumes:
+      - /tmp:/tmp
+    container_name: "udp-recv-1"
+    command: ./std_udp_recv example_detector.json 1 16
+
+  udp-recv-2:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    ipc: "host"
+    shm_size: 2G
+    volumes:
+      - /tmp:/tmp
+    container_name: "udp-recv-2"
+    command: ./std_udp_recv example_detector.json 2 16
+
+  udp-recv-3:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    ipc: "host"
+    shm_size: 2G
+    volumes:
+      - /tmp:/tmp
+    container_name: "udp-recv-3"
+    command: ./std_udp_recv example_detector.json 3 16
 
   udp-sync:
-    image: paulscherrerinstitute/std-daq-buffer:1.0.0
-    network: host
-    shm_size: '2gb'
-    container_name: ${DAQ_PROFILE}.udp-sync.${SERVICE_NAME}
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    restart: always
+    network_mode: "host"
+    volumes:
+      - /tmp:/tmp
+    container_name: "udp-sync"
+    command: ./std_udp_sync example_detector.json
 
-  std-assembler:
-    image: paulscherrerinstitute/std-daq-buffer:1.0.0
-    network: host
-    shm_size: '2gb'
-    container_name: ${DAQ_PROFILE}.assembler.${SERVICE_NAME}
-
-  std-det-writer:
-    image: paulscherrerinstitute/std-daq-broker:1.0.0
-    network: host
-    shm_size: '2gb'
-    container_name: ${DAQ_PROFILE}.writer.${SERVICE_NAME}
-
-  std-det-writer_agent:
-    image: paulscherrerinstitute/std-daq-buffer:1.0.0
-    network: host
-    shm_size: '2gb'
-    container_name: ${DAQ_PROFILE}.writer_agent.${SERVICE_NAME}
+  image-assembler:
+    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    network_mode: "host"
+    ipc: "host"
+    shm_size: 4G
+    volumes:
+      - /tmp:/tmp
+    container_name: "image-assembler"
+    command: ./eiger_assembler example_detector.json 16
