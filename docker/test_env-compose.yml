@@ -4,7 +4,7 @@ services:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
     network_mode: "host"
     container_name: "udp-sim"
-    command: ./std_udp_sim example_detector.json 16
+    command: ./std_udp_sim example_detector.json 16 95
 
   udp-recv-0:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
