@@ -63,6 +63,9 @@ int main(int argc, char **argv) {
 #ifdef USE_EIGER
                 send_udp_buffer.framenum = image_id;
                 send_udp_buffer.bunchid = image_id + 100;
+
+                send_udp_buffer.row = i_module / 2;
+                send_udp_buffer.column = i_module %2;
 #else
                 send_udp_buffer.framenum = image_id+100;
                 send_udp_buffer.bunchid = image_id;
