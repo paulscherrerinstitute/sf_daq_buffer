@@ -2,6 +2,6 @@
   "detector_name": "cSAXS.EG01V01",
   "detector_type": "eiger",
   "n_modules": 4,
-  "image_n_pixels": 524288,
+  "image_n_pixels": 264196,
   "start_udp_port": 50000
 }
