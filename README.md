@@ -113,7 +113,7 @@ docker run -d --name sf-msg-broker -p 15672:15672 -p 5672:5672 rabbitmq:3-manage
 
 Go into the **docker/** folder and run:
 ```bash
-docker-compose -f test_env-compose.yml up
+docker-compose -f integration-compose.yml up
 ```
 
 **Note**: you need to have docker-compose installed on your system. You can do this 
