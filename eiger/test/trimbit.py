@@ -8,10 +8,10 @@ plt.ion()
 dacs = np.array([   0, 2480, 2900, 1400, 4000, 2556,  898,  848,    0,  855, 1100,
        1100,  982,  895, 2000, 1550,  570,    0], dtype=np.int32)
 
-tb = np.zeros((256,1024), dtype = np.int32)
+tb = np.zeros((512,1024), dtype = np.int32)
 
 # Create the desired pattern 
-for row in range(0,256,64):
+for row in range(0,512,64):
     for col in range(0,1024,64):
         print(f'{row}, {col}')
         tb[row:row+32, col:col+32] = 63
