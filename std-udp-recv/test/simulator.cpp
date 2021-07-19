@@ -17,18 +17,21 @@ using namespace std;
 
 int main(int argc, char **argv) {
 
-    if (argc != 3) {
+    if (argc != 4) {
         cout << endl;
-        cout << "Usage: std_udp_sim [detector_json_filename] [bit_depth]";
+        cout << "Usage: std_udp_sim [detector_json_filename] [bit_depth] "
+                "[ms_delay]";
         cout << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
+        cout << "\tms_delay: delay in milliseconds between images." << endl;
         cout << endl;
         exit(-1);
     }
 
     const auto config = UdpRecvConfig::from_json_file(string(argv[1]));
     const int bit_depth = atoi(argv[2]);
+    const int ms_delay = atoi(argv[3]);
 
     if (DETECTOR_TYPE != config.detector_type) {
         throw runtime_error("UDP recv version for " + DETECTOR_TYPE +
@@ -83,7 +86,7 @@ int main(int argc, char **argv) {
 
         cout << "Sent image_id " << image_id << endl;
         // 10Hz == 100ms between images
-        usleep(100 * 1000);
+        usleep(ms_delay * 1000);
 
         image_id = ++image_id % MAX_IMAGE_ID;
     }
