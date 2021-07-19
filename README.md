@@ -106,6 +106,22 @@ ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 Apart from unit-testing an integration pipeline can be started on your local 
 machine or dedicated server.
 
+You need to have RabbitMQ running locally in order to use it:
+```bash
+docker run -d --name sf-msg-broker -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+```
+
+Go into the **docker/** folder and run:
+```bash
+docker-compose -f test_env-compose.yml up
+```
+
+**Note**: you need to have docker-compose installed on your system. You can do this 
+by running:
+```bash
+yum install docker-compose
+```
+
 #### Manual start
 To manually start the integration pipeline you will have to start the following
 containers:
