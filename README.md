@@ -122,12 +122,12 @@ for i in {0..3}; do docker run --rm -d --net=host --ipc=host --shm-size=8G -v /t
 
 1 UDP synchronizer:
 ```bash
-docker run -d --rm --net=host -v /tmp:/tmp --name=udp-sync paulscherrerinstitute/std-daq-buffer ./std_udp_sync example_detector.json 16
+docker run -d --rm -v /tmp:/tmp --name=udp-sync paulscherrerinstitute/std-daq-buffer ./std_udp_sync example_detector.json 16
 ```
 
 1 Image assembler:
 ```bash
-docker run -d --rm --net=host --name=udp-sim paulscherrerinstitute/std-daq-buffer ./std_udp_sim example_detector.json 16
+docker run -d --rm --ipc=host --shm-size=8G -v /tmp:/tmp --name=image-assembler paulscherrerinstitute/std-daq-buffer ./eiger_assembler example_detector.json 16
 ```
 ### Warnings
 
