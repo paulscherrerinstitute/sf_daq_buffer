@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
             sizeof(ImageMetadata), IMAGE_N_BYTES, 1,
             buffer_config::RAM_BUFFER_N_SLOTS);
 
-    AssemblerStats stats(config.detector_name, ASSEMBLER_STATS_MODULO);
+    AssemblerStats stats(config.detector_name, STATS_TIME);
 
 
     uint64_t image_id = 0;

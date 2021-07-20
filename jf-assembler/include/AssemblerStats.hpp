@@ -7,7 +7,7 @@
 
 class AssemblerStats {
     const std::string detector_name_;
-    const size_t stats_modulo_;
+    const size_t stats_time_;
 
     int image_counter_;
     int n_corrupted_images_;
@@ -19,7 +19,7 @@ class AssemblerStats {
 
 public:
     AssemblerStats(const std::string &detector_name,
-                   const size_t stats_modulo);
+                   const size_t stats_time);
 
     void record_stats(const ImageMetadata *meta, const uint32_t n_lost_pulses);
 };

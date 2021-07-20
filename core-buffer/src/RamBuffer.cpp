@@ -40,7 +40,7 @@ RamBuffer::RamBuffer(const string& buffer_name,
 
     shm_fd_ = shm_open(buffer_name_.c_str(), O_RDWR | O_CREAT, 0777);
     if (shm_fd_ < 0) {
-        throw runtime_error(strerror(errno));
+        throw runtime_error(string("shm_open failed: ") + strerror(errno));
     }
 
     if ((ftruncate(shm_fd_, buffer_bytes_)) == -1) {
