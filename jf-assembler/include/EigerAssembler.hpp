@@ -13,7 +13,7 @@ class EigerAssembler {
     int last_image_status_;
 
     const uint32_t n_bytes_per_frame_;
-    const uint32_t n_bytes_per_module_line_;
+    const uint32_t n_bytes_per_frame_line_;
     const uint32_t n_packets_per_frame_;
     const uint32_t n_bytes_per_x_gap_;
     const uint32_t n_bytes_per_y_gap_;
@@ -36,8 +36,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const EigerAssembler& p)
     {
         return os << "( n_bytes_per_frame_"
-                << p.n_bytes_per_frame_ << ", n_bytes_per_module_line_"
-                << p.n_bytes_per_module_line_ << ", n_packets_per_frame_"
+                << p.n_bytes_per_frame_ << ", n_bytes_per_frame_line_"
+                << p.n_bytes_per_frame_line_ << ", n_packets_per_frame_"
                 << p.n_packets_per_frame_ << ", n_bytes_per_x_gap_"
                 << p.n_bytes_per_x_gap_  << ", n_bytes_per_y_gap_"
                 << p.n_bytes_per_y_gap_  << ", n_bytes_per_eiger_x_gap_"

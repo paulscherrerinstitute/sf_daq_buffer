@@ -17,16 +17,15 @@ EigerAssembler::EigerAssembler(const int n_modules, const int bit_depth):
     n_eiger_modules_(n_modules/4),
     bit_depth_(bit_depth),
     n_bytes_per_frame_(MODULE_N_PIXELS * bit_depth / 8),
-    n_bytes_per_module_line_(N_BYTES_PER_MODULE_LINE(bit_depth)),
+    n_bytes_per_frame_line_(N_BYTES_PER_MODULE_LINE(bit_depth)),
     n_packets_per_frame_(n_bytes_per_frame_ / DATA_BYTES_PER_PACKET),
     n_bytes_per_x_gap_(GAP_X_MODULE_PIXELS * bit_depth / 8),
     n_bytes_per_y_gap_(GAP_Y_MODULE_PIXELS * bit_depth / 8),
     n_bytes_per_eiger_x_gap_(GAP_X_EIGERMOD_PIXELS * bit_depth / 8),
     n_bytes_per_eiger_y_gap_(GAP_Y_EIGERMOD_PIXELS * bit_depth / 8),
-    n_bytes_per_image_line_(n_bytes_per_module_line_ * 2 + n_bytes_per_x_gap_),
-    n_lines_per_frame_(DATA_BYTES_PER_PACKET / n_bytes_per_module_line_
-                       * n_packets_per_frame_),
-    image_bytes_((n_modules_ * MODULE_N_PIXELS * bit_depth_ / 8) +  ((n_eiger_modules_) * (MODULE_Y_SIZE * 2) * bit_depth_ / 8) + ((n_eiger_modules_) * (2 * n_bytes_per_image_line_)))
+    n_bytes_per_image_line_(n_bytes_per_frame_line_ * 2 + n_bytes_per_x_gap_),
+    n_lines_per_frame_(DATA_BYTES_PER_PACKET / n_bytes_per_frame_line_ * n_packets_per_frame_),
+    image_bytes_((n_modules_ * n_bytes_per_frame_) + (2 * (MODULE_Y_SIZE * 2) * bit_depth_ / 8) + ((n_eiger_modules_) * (2 * n_bytes_per_image_line_)))
 {
     
 }
@@ -69,6 +68,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
             image_meta->dtype = (bit_depth_ <= 8) ? 1 : bit_depth_ / 8;
             image_meta->encoding = 0;
             image_meta->source_id = 0;
+            // TODO: proper user ids
             image_meta->user_1 = 0;
             image_meta->user_2 = 0;
             is_pulse_init = 1;
@@ -104,7 +104,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
             reverse_factor = MODULE_Y_SIZE - 1;
             dest_offset += n_bytes_per_image_line_ *
                                 (MODULE_Y_SIZE + GAP_Y_MODULE_PIXELS);
-            source_offset = (MODULE_Y_SIZE-1) * n_bytes_per_module_line_;
+            source_offset = (MODULE_Y_SIZE-1) * n_bytes_per_frame_line_;
         }
 
         const auto i_module_row = frame_meta->pos_x;
@@ -114,7 +114,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
         uint32_t dest_module_line = line_number;
 
         if (i_module_column == 1) {
-            dest_offset += n_bytes_per_module_line_ + n_bytes_per_x_gap_;
+            dest_offset += n_bytes_per_frame_line_ + n_bytes_per_x_gap_;
         }
 
         int counter = 0;
@@ -125,7 +125,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
             memcpy (
                     (char*)(dst_data + dest_offset),
                     (char*)(src_data + source_offset),
-                    n_bytes_per_module_line_
+                    n_bytes_per_frame_line_
             );
 
             counter += 1;
