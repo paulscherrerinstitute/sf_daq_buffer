@@ -15,3 +15,10 @@ RUN wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/sr
     ln -v -s `pwd`/hdf5/lib/* /usr/lib64/ && \
     ln -v -s `pwd`/hdf5/include/* /usr/include/ && \
     ln -v -s /usr/include/mpich-x86_64/* /usr/include/
+
+COPY docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
+COPY redis_status.sh /usr/bin/redis_status.sh
+
+ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
+
+CMD["bash"]
