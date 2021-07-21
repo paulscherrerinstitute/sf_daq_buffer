@@ -67,6 +67,20 @@ inclusive range (both start and stop pulse_id are included) of pulses.
 
 ## Build
 
+### In docker
+Building and testing with docker does not require you to modify your host 
+and its the suggested way to build and test your applications.
+
+Running the **Dockerfile** in the project root copies the current repo folder 
+inside the docker container and builds all the targets.
+
+If you want to TAG and deploy a new container version, use the **build\_buffer.sh** 
+script, which also pushes the new container to the registry. Please do not forget 
+to push only 100% working images and to increase the VERSION 
+(at the beginning of the build_buffer.sh) number of the container.
+
+### On host
+
 To compile this repo you will need to install the following packages on RH7:
 - devtoolset-9
 - cmake3
@@ -102,18 +116,20 @@ ln -s "$(pwd)""/""sf_stream" /usr/bin/sf_stream
 ln -s "$(pwd)""/""sf_writer" /usr/bin/sf_writer
 ```
 
-### Integration testing
+## Testing
+Each project should have unit tests associated with it written using 
+GTest. The tests should always be run before pushing a new container to the 
+registry.
+
 Apart from unit-testing an integration pipeline can be started on your local 
 machine or dedicated server.
 
-You need to have RabbitMQ running locally in order to use it:
-```bash
-docker run -d --name sf-msg-broker -p 15672:15672 -p 5672:5672 rabbitmq:3-management
-```
+You can first start RabbitMQ and Redis in order to have the basic services 
+needed running locally
 
-Go into the **docker/** folder and run:
+In the root project folder run:
 ```bash
-docker-compose -f integration-compose.yml up
+docker-compose up -d broker redis 
 ```
 
 **Note**: you need to have docker-compose installed on your system. You can do this 
@@ -122,29 +138,11 @@ by running:
 yum install docker-compose
 ```
 
-#### Manual start
-To manually start the integration pipeline you will have to start the following
-containers:
-
-UDP generators:
+To start and test your new component as part of the integration pipeline run:
 ```bash
-docker run -d --rm --net=host --name=udp-sim paulscherrerinstitute/std-daq-buffer ./std_udp_sim example_detector.json 16
+docker-compose up -d 
 ```
 
-4 UDP receivers:
-```bash
-for i in {0..3}; do docker run --rm -d --net=host --ipc=host --shm-size=8G -v /tmp:/tmp --name=udp-recv-${i} paulscherrerinstitute/std-daq-buffer ./std_udp_recv example_detector.json ${i} 16; done
-```
-
-1 UDP synchronizer:
-```bash
-docker run -d --rm -v /tmp:/tmp --name=udp-sync paulscherrerinstitute/std-daq-buffer ./std_udp_sync example_detector.json
-```
-
-1 Image assembler:
-```bash
-docker run -d --rm --ipc=host --shm-size=8G -v /tmp:/tmp --name=image-assembler paulscherrerinstitute/std-daq-buffer ./eiger_assembler example_detector.json 16
-```
 ### Warnings
 
 #### UDP recv tests failing
