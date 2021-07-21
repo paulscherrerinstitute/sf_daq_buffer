@@ -21,4 +21,4 @@ COPY redis_status.sh /usr/bin/redis_status.sh
 
 ENTRYPOINT ["/usr/bin/docker-entrypoint.sh"]
 
-CMD["bash"]
+CMD ["bash"]
