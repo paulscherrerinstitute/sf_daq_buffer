@@ -1,5 +1,17 @@
 version: "3.6"
 services:
+  broker:
+    image: "rabbitmq:3-management"
+    network_mode: "bridge"
+    container_name: "std-broker"
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis:
+    image: "redis"
+    container_name: "redis"
+
   udp-sim:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
     network_mode: "host"
