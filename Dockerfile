@@ -1,4 +1,4 @@
-FROM paulscherrerinstitute/std-daq-buffer-base:1.0.3
+FROM paulscherrerinstitute/std-daq-buffer-base:1.0.4
 
 COPY . /std_daq_buffer/
 
