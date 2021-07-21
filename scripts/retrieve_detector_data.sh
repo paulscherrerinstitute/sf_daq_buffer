@@ -95,7 +95,7 @@ else
     fi
 fi
 
-taskset -c ${coreAssociated} /usr/local/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
+taskset -c ${coreAssociated} /home/dbe/bin/sf_writer ${OUTFILE_RAW} /gpfs/photonics/swissfel/buffer/${DETECTOR} ${NM} ${START_PULSE_ID} ${STOP_PULSE_ID} ${PULSE_ID_STEP}>> /tmp/detector_retrieve.log &
 
 wait
 
