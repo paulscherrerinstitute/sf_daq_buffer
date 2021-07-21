@@ -17,7 +17,7 @@ EigerAssembler::EigerAssembler(const int n_modules, const int bit_depth):
     n_eiger_modules_(n_modules/4),
     bit_depth_(bit_depth),
     n_bytes_per_frame_(MODULE_N_PIXELS * bit_depth / 8),
-    n_bytes_per_frame_line_(MODULE_X_SIZE * bit_depth) / 8),
+    n_bytes_per_frame_line_(MODULE_X_SIZE * bit_depth / 8),
     n_packets_per_frame_(n_bytes_per_frame_ / DATA_BYTES_PER_PACKET),
     n_bytes_per_x_gap_(GAP_X_MODULE_PIXELS * bit_depth / 8),
     n_bytes_per_y_gap_(GAP_Y_MODULE_PIXELS * bit_depth / 8),
