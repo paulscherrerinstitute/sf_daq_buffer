@@ -10,7 +10,10 @@ services:
 
   redis:
     image: "redis"
+    network_mode: "bridge"
     container_name: "redis"
+    ports:
+      - 6379:6379
 
   udp-sim:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
