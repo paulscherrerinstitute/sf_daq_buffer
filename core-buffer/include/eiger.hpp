@@ -12,14 +12,6 @@ const std::string DETECTOR_TYPE = "eiger";
 #define BYTES_PER_PACKET 4144
 #define DATA_BYTES_PER_PACKET 4096
 
-// EIGER 1M
-// Each packet line is made of 2 chip lines -> [CHIP1]<gap>[CHIP2]
-// gaps between chips
-// For a 1M:
-// 0 gap 1
-// gap  gap
-// 2 gap 3
-
 #define MODULE_X_SIZE 256
 #define MODULE_Y_SIZE 512
 #define MODULE_N_PIXELS 131072
@@ -28,11 +20,6 @@ const std::string DETECTOR_TYPE = "eiger";
 #define GAP_Y_MODULE_PIXELS 2
 #define GAP_X_EIGERMOD_PIXELS 8
 #define GAP_Y_EIGERMOD_PIXELS 36
-
-
-#define N_BYTES_PER_MODULE_LINE(bit_depth) ((MODULE_X_SIZE * bit_depth) / 8)
-#define N_BYTES_PER_MODULE_FRAME(bit_depth) ((MODULE_N_PIXELS * bit_depth) / 8)
-
 
 // #define N_BYTES_PER_IMAGE_LINE(bit_depth, n_submodules) ((n_submodules / 2 * MODULE_X_SIZE * bit_depth) / 8)
 

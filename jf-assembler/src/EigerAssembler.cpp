@@ -17,16 +17,15 @@ EigerAssembler::EigerAssembler(const int n_modules, const int bit_depth):
     n_eiger_modules_(n_modules/4),
     bit_depth_(bit_depth),
     n_bytes_per_frame_(MODULE_N_PIXELS * bit_depth / 8),
-    n_bytes_per_module_line_(N_BYTES_PER_MODULE_LINE(bit_depth)),
+    n_bytes_per_frame_line_(MODULE_X_SIZE * bit_depth / 8),
     n_packets_per_frame_(n_bytes_per_frame_ / DATA_BYTES_PER_PACKET),
     n_bytes_per_x_gap_(GAP_X_MODULE_PIXELS * bit_depth / 8),
     n_bytes_per_y_gap_(GAP_Y_MODULE_PIXELS * bit_depth / 8),
     n_bytes_per_eiger_x_gap_(GAP_X_EIGERMOD_PIXELS * bit_depth / 8),
     n_bytes_per_eiger_y_gap_(GAP_Y_EIGERMOD_PIXELS * bit_depth / 8),
-    n_bytes_per_image_line_(n_bytes_per_module_line_ * 2 + n_bytes_per_x_gap_),
-    n_lines_per_frame_(DATA_BYTES_PER_PACKET / n_bytes_per_module_line_
-                       * n_packets_per_frame_),
-    image_bytes_((n_modules_ * MODULE_N_PIXELS * bit_depth_ / 8) +  ((n_eiger_modules_) * (MODULE_Y_SIZE * 2) * bit_depth_ / 8) + ((n_eiger_modules_) * (2 * n_bytes_per_image_line_)))
+    n_bytes_per_image_line_(n_bytes_per_frame_line_ * 2 + n_bytes_per_x_gap_),
+    n_lines_per_frame_(DATA_BYTES_PER_PACKET / n_bytes_per_frame_line_ * n_packets_per_frame_),
+    image_bytes_((n_modules_ * n_bytes_per_frame_) + (2 * (MODULE_Y_SIZE * 2) * bit_depth_ / 8) + ((n_eiger_modules_) * (2 * n_bytes_per_image_line_)))
 {
     
 }
@@ -69,6 +68,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
             image_meta->dtype = (bit_depth_ <= 8) ? 1 : bit_depth_ / 8;
             image_meta->encoding = 0;
             image_meta->source_id = 0;
+            // TODO: proper user ids
             image_meta->user_1 = 0;
             image_meta->user_2 = 0;
             is_pulse_init = 1;
@@ -104,7 +104,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
             reverse_factor = MODULE_Y_SIZE - 1;
             dest_offset += n_bytes_per_image_line_ *
                                 (MODULE_Y_SIZE + GAP_Y_MODULE_PIXELS);
-            source_offset = (MODULE_Y_SIZE-1) * n_bytes_per_module_line_;
+            source_offset = (MODULE_Y_SIZE-1) * n_bytes_per_frame_line_;
         }
 
         const auto i_module_row = frame_meta->pos_x;
@@ -114,7 +114,7 @@ void EigerAssembler::assemble_image(const char* src_meta,
         uint32_t dest_module_line = line_number;
 
         if (i_module_column == 1) {
-            dest_offset += n_bytes_per_module_line_ + n_bytes_per_x_gap_;
+            dest_offset += n_bytes_per_frame_line_ + n_bytes_per_x_gap_;
         }
 
         int counter = 0;
@@ -125,15 +125,43 @@ void EigerAssembler::assemble_image(const char* src_meta,
             memcpy (
                     (char*)(dst_data + dest_offset),
                     (char*)(src_data + source_offset),
-                    n_bytes_per_module_line_
+                    n_bytes_per_frame_line_
             );
-
+            #ifdef DEBUG_OUTPUT
+                using namespace date;
+                // verifies the addresses for 
+                // beginning and end of each frame
+                if (counter < 5 || counter > 508){
+                    cout << " [" << std::chrono::system_clock::now();
+                    cout << "] [MODULE " << i_module;
+                    cout << "] (row " << i_module_row;
+                    cout << ",column " << i_module_column;
+                    cout << ") source_offset" << source_offset;
+                    cout << " || dest_offset " << dest_offset;
+                    cout << " || frame_line " << frame_line;
+                    cout << " || COUNTER " << counter;
+                    cout << endl;
+                }
+            #endif
             counter += 1;
-            source_offset += reverse * n_bytes_per_module_line_;
+            source_offset += reverse * n_bytes_per_frame_line_;
             dest_offset += reverse * n_bytes_per_image_line_;
             }
         line_number += n_lines_per_frame_;
         dest_module_line = line_number + n_lines_per_frame_ - 1;
+        #ifdef DEBUG_OUTPUT
+            using namespace date;
+            // if (i_module == 0){
+            cout << " [" << std::chrono::system_clock::now();
+            cout << "] [MODULE " << i_module;
+            cout << "] (row " << i_module_row;
+            cout << " , column" << i_module_column;
+            cout << ") || reverse_factor" << reverse_factor;
+            cout << " || line_number" << line_number;
+            cout << " || N_RECV_PACKETS" << frame_meta->n_recv_packets;
+            cout << endl;
+            // }
+        #endif
 
         // last module sets the last_image_status_
         if (i_module == n_modules_ - 1){
