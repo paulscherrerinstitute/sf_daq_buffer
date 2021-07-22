@@ -11,3 +11,5 @@ README.md
 
 # Include files:
 !docker/example_detector.json
+!docker/docker-entrypoint.sh
+!docker/redis_status.sh
