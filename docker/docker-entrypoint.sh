@@ -1,20 +1,21 @@
 #!/bin/sh
 set -e
 
-if [[ -z "${PIPELINE_NAME}" ]]; then
-  echo "Environment variable PIPELINE_NAME not defined."
-  exit 1;
-fi
-
-if [[ -z "${SERVICE_NAME}" ]]; then
-  echo "Environment variable SERVICE_NAME not defined."
-  exit 1;
-fi
-
 REDIS_SKIP="${REDIS_SKIP:-false}"
 
 # Download config from Redis to redis_config.json and start status reporting.
 if [ "${REDIS_SKIP}" = false ]; then
+
+  if [[ -z "${PIPELINE_NAME}" ]]; then
+    echo "Environment variable PIPELINE_NAME not defined."
+    exit 1;
+  fi
+
+  if [[ -z "${SERVICE_NAME}" ]]; then
+    echo "Environment variable SERVICE_NAME not defined."
+    exit 1;
+  fi
+
   REDIS_HOST="${REDIS_HOST:-127.0.0.1}"
   REDIS_CONFIG_KEY=config."${PIPELINE_NAME}"
   REDIS_STATUS_KEY=status."${PIPELINE_NAME}.${SERVICE_NAME}"
