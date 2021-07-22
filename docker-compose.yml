@@ -1,4 +1,5 @@
 version: "3.6"
+
 services:
   broker:
     image: "rabbitmq:3-management"
@@ -19,7 +20,10 @@ services:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
     network_mode: "host"
     container_name: "udp-sim"
-    command: ./std_udp_sim example_detector.json 16 95
+    command: ./std_udp_sim redis_config.json 16 95
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_sim
 
   udp-recv-0:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -29,7 +33,10 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-0"
-    command: ./std_udp_recv example_detector.json 0 16
+    command: ./std_udp_recv redis_config.json 0 16
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_recv_0
 
   udp-recv-1:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -39,7 +46,10 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-1"
-    command: ./std_udp_recv example_detector.json 1 16
+    command: ./std_udp_recv redis_config.json 1 16
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_recv_1
 
   udp-recv-2:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -49,7 +59,10 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-2"
-    command: ./std_udp_recv example_detector.json 2 16
+    command: ./std_udp_recv redis_config.json 2 16
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_recv_2
 
   udp-recv-3:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -59,7 +72,10 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-3"
-    command: ./std_udp_recv example_detector.json 3 16
+    command: ./std_udp_recv redis_config.json 3 16
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_recv_3
 
   udp-sync:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -68,7 +84,10 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "udp-sync"
-    command: ./std_udp_sync example_detector.json
+    command: ./std_udp_sync redis_config.json
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=readout.udp_sync
 
   image-assembler:
     image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
@@ -78,4 +97,7 @@ services:
     volumes:
       - /tmp:/tmp
     container_name: "image-assembler"
-    command: ./eiger_assembler example_detector.json 16
+    command: ./eiger_assembler redis_config.json 16
+    environment:
+      - PIPELINE_NAME=debug.test_pipeline
+      - SERVICE_NAME=online.image_assembly
