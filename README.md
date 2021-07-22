@@ -74,10 +74,11 @@ and its the suggested way to build and test your applications.
 Running the **Dockerfile** in the project root copies the current repo folder 
 inside the docker container and builds all the targets.
 
-If you want to TAG and deploy a new container version, use the **build\_buffer.sh** 
-script, which also pushes the new container to the registry. Please do not forget 
+Running the **build\_Dockerfile.sh** builds, tags, and pushes a new 
+container version to the registry. You should do this only if you are sure that 
+your image is production ready. Please, do not forget 
 to push only 100% working images and to increase the VERSION 
-(at the beginning of the build_buffer.sh) number of the container.
+(at the beginning of the build_Dockerfile.sh) number of the container.
 
 ### On host
 
