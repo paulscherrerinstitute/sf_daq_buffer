@@ -6,7 +6,7 @@ scripts/
 .idea/
 .dockerignore
 
-build_buffer.sh
+build_Dockerfile.sh
 README.md
 
 # Include files:
