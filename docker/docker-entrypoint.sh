@@ -33,4 +33,4 @@ if [ "${REDIS_SKIP}" = false ]; then
 fi
 
 EXECUTABLE="${@:1}"
-exec "$EXECUTABLE"
+exec $EXECUTABLE
