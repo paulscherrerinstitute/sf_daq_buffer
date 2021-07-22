@@ -17,68 +17,88 @@ services:
       - 6379:6379
 
   udp-sim:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     container_name: "udp-sim"
-    command: ./std_udp_sim redis_config.json 16 95
+    command: ./std_udp_sim redis_config.json ${BIT_DEPTH} 95
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_sim
 
   udp-recv-0:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     ipc: "host"
     shm_size: 2G
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-0"
-    command: ./std_udp_recv redis_config.json 0 16
+    command: ./std_udp_recv redis_config.json 0 ${BIT_DEPTH}
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_recv_0
 
   udp-recv-1:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     ipc: "host"
     shm_size: 2G
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-1"
-    command: ./std_udp_recv redis_config.json 1 16
+    command: ./std_udp_recv redis_config.json 1 ${BIT_DEPTH}
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_recv_1
 
   udp-recv-2:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     ipc: "host"
     shm_size: 2G
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-2"
-    command: ./std_udp_recv redis_config.json 2 16
+    command: ./std_udp_recv redis_config.json 2 ${BIT_DEPTH}
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_recv_2
 
   udp-recv-3:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     ipc: "host"
     shm_size: 2G
     volumes:
       - /tmp:/tmp
     container_name: "udp-recv-3"
-    command: ./std_udp_recv redis_config.json 3 16
+    command: ./std_udp_recv redis_config.json 3 ${BIT_DEPTH}
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_recv_3
 
   udp-sync:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     restart: always
     network_mode: "host"
     volumes:
@@ -86,18 +106,27 @@ services:
     container_name: "udp-sync"
     command: ./std_udp_sync redis_config.json
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
       - SERVICE_NAME=readout.udp_sync
 
   image-assembler:
-    image: "paulscherrerinstitute/std-daq-buffer:1.0.0"
+    image: "paulscherrerinstitute/std-daq-buffer:${CONTAINER_TAG}"
     network_mode: "host"
     ipc: "host"
     shm_size: 4G
     volumes:
       - /tmp:/tmp
     container_name: "image-assembler"
-    command: ./eiger_assembler redis_config.json 16
+    command: ./eiger_assembler redis_config.json ${BIT_DEPTH}
     environment:
-      - PIPELINE_NAME=debug.test_pipeline
-      - SERVICE_NAME=online.image_assembly
+      - REDIS_SKIP
+      - REDIS_HOST
+      - INFLUXDB_SKIP
+      - INFLUXDB_HOST
+      - PIPELINE_NAME
+      - SERVICE_NAME=online.image_assembler
+
