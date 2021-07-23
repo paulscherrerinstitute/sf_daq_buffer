@@ -1,4 +1,4 @@
-detsize 512 1024
+detsize 1024 512
 hostname beb031+beb032
 
 udp_dstmac 9c:dc:71:4d:2a:b5
@@ -8,10 +8,15 @@ udp_dstip 10.30.20.6
 0:udp_dstport 50200
 0:udp_dstport2 50201
 0:udp_srcip 10.30.20.201
+0:rx_tcpport 1960
 
 #bottom
 1:udp_dstport 50202
 1:udp_dstport2 50203
 1:udp_srcip 10.30.20.201
+1:rx_tcpport 1961
+
+rx_hostname sf-daq-4
 
 tengiga 1
+

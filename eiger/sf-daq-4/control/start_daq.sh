@@ -128,19 +128,19 @@ else
 fi
 
 # Start the eiger writer
-# echo "Starting the ${STD_DET_WRITER}..."
-# export PATH="/usr/lib64/mpich/bin:${PATH}";
-# export LD_LIBRARY_PATH="/usr/lib64/mpich/lib:${LD_LIBRARY_PATH}";
+echo "Starting the ${STD_DET_WRITER}..."
+export PATH="/usr/lib64/mpich-3.2/bin:${PATH}";
+export LD_LIBRARY_PATH="/usr/lib64/mpich-3.2/lib:${LD_LIBRARY_PATH}";
 
-# if [ -f "${BUILD_PATH}${STD_DET_WRITER}" ]; then
-#     if [ -f "${CONFIG_FILE}" ]; then
-#         mpiexec -n ${N_MPI_EXEC} ${BUILD_PATH}${STD_DET_WRITER} ${CONFIG_FILE} ${BIT_DEPTH} &
-#         sleep 0.5
-#     else
-#         echo "Something went wrong while starting the ${STD_DET_WRITER}..."
-#         exit
-#     fi
-# else
-#     echo "Error: ${STD_DET_WRITER} wasn't found..."
-#     exit
-# fi
+if [ -f "${BUILD_PATH}${STD_DET_WRITER}" ]; then
+    if [ -f "${CONFIG_FILE}" ]; then
+        mpiexec -n ${N_MPI_EXEC} ${BUILD_PATH}${STD_DET_WRITER} ${CONFIG_FILE} ${BIT_DEPTH} &
+        sleep 0.5
+    else
+        echo "Something went wrong while starting the ${STD_DET_WRITER}..."
+        exit
+    fi
+else
+    echo "Error: ${STD_DET_WRITER} wasn't found..."
+    exit
+fi
