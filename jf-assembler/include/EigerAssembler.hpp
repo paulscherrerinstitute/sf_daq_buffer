@@ -7,6 +7,7 @@
 
 class EigerAssembler {
     const int n_modules_;
+    const int n_rows_;
     const int bit_depth_;
     const int n_eiger_modules_;
 
