@@ -12,9 +12,13 @@
 using namespace std;
 using namespace buffer_config;
 
-EigerAssembler::EigerAssembler(const int n_modules, const int bit_depth):
+EigerAssembler::EigerAssembler(const int n_modules, const int bit_depth,
+            const int image_height, const int image_width):
     n_modules_(n_modules), 
-    n_rows_(n_modules/2),
+    image_height_(image_height),
+    image_width_(image_width),
+    n_rows_(image_width / MODULE_Y_SIZE),
+    n_columns_(image_height / MODULE_X_SIZE),
     n_eiger_modules_(n_modules/4),
     bit_depth_(bit_depth),
     n_bytes_per_frame_(MODULE_N_PIXELS * bit_depth / 8),
@@ -64,8 +68,8 @@ void EigerAssembler::assemble_image(const char* src_meta,
             // init good image status = 0 
             image_meta->status = 0;
             image_meta->id = frame_meta->id;
-            image_meta->height = n_rows_ * (MODULE_Y_SIZE + EXTEND_Y_PIXELS);
-            image_meta->width = n_rows_ * (MODULE_X_SIZE + EXTEND_X_PIXELS);
+            image_meta->height = image_height_;
+            image_meta->width = image_width_;
             image_meta->dtype = (bit_depth_ <= 8) ? 1 : bit_depth_ / 8;
             image_meta->encoding = 0;
             image_meta->source_id = 0;

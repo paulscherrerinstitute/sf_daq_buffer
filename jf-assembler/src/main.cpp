@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
     const int bit_depth = atoi(argv[2]);
     auto const stream_name = "assembler";
 
-    const size_t IMAGE_N_BYTES = config.image_n_pixels * bit_depth / 8;
+    const size_t IMAGE_N_BYTES = config.image_height * config.image_width * bit_depth / 8;
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, ASSEMBLER_ZMQ_IO_THREADS);
     auto sender = BufferUtils::bind_socket(
@@ -60,13 +60,16 @@ int main (int argc, char *argv[])
         cout << " Details of Assembler:";
         cout << " detector_name: " << config.detector_name;
         cout << " || n_modules: " << config.n_modules;
+        cout << " || img width: " << config.image_width;
+        cout << " || img height: " << config.image_height;
         cout << endl;
     #endif
 
     const size_t FRAME_N_BYTES = MODULE_N_PIXELS * bit_depth / 8;
     const size_t N_PACKETS_PER_FRAME = FRAME_N_BYTES / DATA_BYTES_PER_PACKET;
 
-    EigerAssembler assembler(config.n_modules, bit_depth);
+    EigerAssembler assembler(config.n_modules, bit_depth, 
+            config.image_width, config.image_height);
 
     #ifdef DEBUG_OUTPUT
         using namespace date;

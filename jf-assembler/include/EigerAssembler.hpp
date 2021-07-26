@@ -8,7 +8,10 @@
 class EigerAssembler {
     const int n_modules_;
     const int n_rows_;
+    const int n_columns_;
     const int bit_depth_;
+    const int image_height_;
+    const int image_width_;
     const int n_eiger_modules_;
 
     int last_image_status_;
@@ -27,7 +30,8 @@ class EigerAssembler {
     
 
 public:
-    EigerAssembler(const int n_modules, const int bit_depth);
+    EigerAssembler(const int n_modules, const int bit_depth,
+                    const int image_height, const int image_width);
     void assemble_image(const char* src_meta, const char* src_data,
                         char* dst_meta, char* dst_data);
     size_t get_image_n_bytes() const;
@@ -46,7 +50,11 @@ public:
                 << p.n_bytes_per_eiger_y_gap_  << ", n_bytes_per_image_line_"
                 << p.n_bytes_per_image_line_  << ", n_lines_per_frame_"
                 << p.n_lines_per_frame_ << ", image_bytes_"
-                << p.image_bytes_ << ", n_modules_"
+                << p.image_bytes_ << ", image_width_"
+                << p.image_width_ << ", n_columns"
+                << p.n_columns_ << ", image_height_"
+                << p.image_height_ << ", n_rows_"
+                << p.n_rows_ << ", n_modules_"
                 << p.n_modules_ << ", bit_depth_"
                 << p.bit_depth_ << ""
                 << ")";

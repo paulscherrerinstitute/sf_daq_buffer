@@ -162,7 +162,8 @@ BufferUtils::DetectorConfig BufferUtils::read_json_config(
             config_parameters["detector_name"].GetString(),
             config_parameters["detector_type"].GetString(),
             config_parameters["n_modules"].GetInt(),
-            config_parameters["image_n_pixels"].GetInt(),
+            config_parameters["image_height"].GetInt(),
+            config_parameters["image_width"].GetInt(),
             config_parameters["start_udp_port"].GetInt(),
     };
 }

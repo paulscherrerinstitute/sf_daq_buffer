@@ -3,11 +3,9 @@ jf-assembler is the component that receives the confirmation from the std-udp-sy
 
 ## Overview
 
-jf-assembler is a single threaded application that is used for assembling the images and send to anyone willing to listen. 
+jf-assembler is used for assembling the images and send to anyone willing to listen. It receives two arguments:
 
-jf-assembler receives two arguments:
-
-- number of modules: defines how many frames should be assembled together;
+- detector's configuration file: detector config file path. Which includes, for example, the total number of modules from the detector that is going to be assembled;
 - bit depth: defines properties of the data and the image that will be assembled. For example, number of bytes per line and bytes per image;
 
 Such properties are defined in combination with the detector's header file, which contains the dimensions of the modules and gap pixels (if any).

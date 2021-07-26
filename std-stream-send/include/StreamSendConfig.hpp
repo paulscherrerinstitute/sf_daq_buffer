@@ -18,13 +18,15 @@ struct StreamSendConfig {
         return {
                 config_parameters["detector_name"].GetString(),
                 config_parameters["n_modules"].GetInt(),
-                config_parameters["image_n_pixels"].GetInt(),
+                config_parameters["image_height"].GetInt(),
+                config_parameters["image_width"].GetInt(),
         };
     }
 
     const std::string detector_name;
     const int n_modules;
-    const int image_n_pixels;
+    const int image_height;
+    const int image_width;
 };
 
 
