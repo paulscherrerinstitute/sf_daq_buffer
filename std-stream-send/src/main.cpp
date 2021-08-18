@@ -60,7 +60,7 @@ int main (int argc, char *argv[])
                 sizeof(ImageMetadata),  
                 ZMQ_SNDMORE | ZMQ_NOBLOCK);
 
-                zmq_send(sender,
+            zmq_send(sender,
                 dst_data,
                 IMAGE_N_BYTES, ZMQ_NOBLOCK);
         }
