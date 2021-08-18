@@ -53,7 +53,6 @@ int main (int argc, char *argv[])
         
 
         if (meta.id % 10){
-            auto* dst_meta = image_buffer.get_slot_meta(meta.id);
             auto* dst_data = image_buffer.get_slot_data(meta.id);
             zmq_send(sender, 
                 &meta,
