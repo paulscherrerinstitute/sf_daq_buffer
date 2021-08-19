@@ -11,4 +11,7 @@ namespace stream_config
 
     // Number of pulses between each statistics print out.
     const size_t STREAM_STATS_MODULO = 1000;
+
+    // reduction factor
+    const int REDUCTION_FACTOR = 5;
 }

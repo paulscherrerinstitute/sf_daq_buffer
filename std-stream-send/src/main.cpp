@@ -1,12 +1,12 @@
 #include <iostream>
 #include <zmq.h>
-#include "stream_config.hpp"
 #include <chrono>
 #include <thread>
-#include <StreamSendConfig.hpp>
-#include "RamBuffer.hpp"
 #include <BufferUtils.hpp>
+#include <RamBuffer.hpp>
 
+#include "stream_config.hpp"
+#include "ZmqLiveSender.hpp"
 
 using namespace std;
 using namespace stream_config;
@@ -26,20 +26,19 @@ int main (int argc, char *argv[])
         exit(-1);
     }
 
-    const auto config = StreamSendConfig::from_json_file(string(argv[1]));
+    auto config = BufferUtils::read_json_config(string(argv[1]));
     const int bit_depth = atoi(argv[2]);
-    const string stream_address = string(argv[3]);
+    const auto stream_address = string(argv[3]);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
-
-    auto sender = BufferUtils::bind_socket(
-            ctx, config.detector_name, stream_address.c_str());
+    ZmqLiveSender sender(ctx, config.detector_name, stream_address);
 
     auto receiver_assembler = BufferUtils::connect_socket(
             ctx, config.detector_name, "assembler");
 
     const size_t IMAGE_N_BYTES = config.image_height * config.image_width * bit_depth / 8;
+
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES,
             1, RAM_BUFFER_N_SLOTS);
@@ -50,19 +49,20 @@ int main (int argc, char *argv[])
 
         // receives the assembled image id from the assembler
         zmq_recv(receiver_assembler, &meta, sizeof(meta), 0);
+        // gets the image data
+        char* dst_data = image_buffer.get_slot_data(meta.id);
+        // sends the json metadata with the data
+        sender.send(meta, dst_data, IMAGE_N_BYTES);
+
+            
+            // zmq_send(sender, 
+            //     &meta,
+            //     sizeof(ImageMetadata),  
+            //     ZMQ_SNDMORE | ZMQ_NOBLOCK);
+
+            // zmq_send(sender,
+            //     dst_data,
+            //     IMAGE_N_BYTES, ZMQ_NOBLOCK);
         
-
-        if (meta.id % 10){
-            auto* dst_meta = image_buffer.get_slot_meta(meta.id);
-            auto* dst_data = image_buffer.get_slot_data(meta.id);
-            zmq_send(sender, 
-                &meta,
-                sizeof(ImageMetadata),  
-                ZMQ_SNDMORE | ZMQ_NOBLOCK);
-
-            zmq_send(sender,
-                dst_data,
-                IMAGE_N_BYTES, ZMQ_NOBLOCK);
-        }
     }
 }
