@@ -54,15 +54,5 @@ int main (int argc, char *argv[])
         // sends the json metadata with the data
         sender.send(meta, dst_data, IMAGE_N_BYTES);
 
-            
-            // zmq_send(sender, 
-            //     &meta,
-            //     sizeof(ImageMetadata),  
-            //     ZMQ_SNDMORE | ZMQ_NOBLOCK);
-
-            // zmq_send(sender,
-            //     dst_data,
-            //     IMAGE_N_BYTES, ZMQ_NOBLOCK);
-        
     }
 }
