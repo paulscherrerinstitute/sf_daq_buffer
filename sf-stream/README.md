@@ -130,8 +130,6 @@ We use following fields in the JSON header:
 |daq_rec|uint32|daqrec from detector header|
 |pedestal_file|string|Path to pedestal file|
 |gain_file|string|Path to gain file|
-|number_frames_expected|int|Number of expected frames|
-|run_name|string|Name of the run|
 |detector_name|string|Name of the detector|
 |htype|string|Value: "array-1.0"|
 |type|string|Value: "uint16"|

@@ -74,14 +74,6 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data)
     gain_file.SetString(config_.GAIN_FILENAME.c_str(), header_alloc);
     header.AddMember("gain_file", gain_file, header_alloc);
 
-    header.AddMember("number_frames_expected", 10000, header_alloc);
-
-    rapidjson::Value run_name;
-    run_name.SetString(
-            to_string(uint64_t(meta.pulse_id/10000)*10000).c_str(),
-            header_alloc);
-    header.AddMember("run_name", run_name, header_alloc);
-
     rapidjson::Value detector_name;
     detector_name.SetString(config_.detector_name.c_str(), header_alloc);
     header.AddMember("detector_name", detector_name, header_alloc);
