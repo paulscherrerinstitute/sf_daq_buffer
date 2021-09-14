@@ -1,5 +1,6 @@
 #ifndef SF_DAQ_BUFFER_FORMATS_HPP
 #define SF_DAQ_BUFFER_FORMATS_HPP
+#include <vector>
 
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
