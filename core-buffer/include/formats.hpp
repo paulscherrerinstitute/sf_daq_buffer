@@ -20,10 +20,19 @@ struct ModuleFrame {
 #pragma pack(push)
 #pragma pack(1)
 struct ImageMetadata {
-    uint64_t pulse_id;
-    uint64_t frame_index;
-    uint32_t daq_rec;
-    uint32_t is_good_image;
+    uint64_t version; // protocol version
+
+    uint64_t id; // pulse_id for SF, frame_index for SLS
+    uint64_t height; // in pixels
+    uint64_t width; // in pixels
+
+    uint16_t dtype; // enum of data types (uint8, 16, 32, float etc.)
+    uint16_t encoding; // enum of encodings (raw, bshuf_lz4...)
+    uint16_t array_id; // if you want to interleave 2 buffers in the same data stream
+    uint16_t status; // Denotate some status of the images - corrupt for example.
+
+    uint64_t user_1; // extra field for custom needs
+    uint64_t user_2; // extra field for custom needs
 };
 #pragma pack(pop)
 
