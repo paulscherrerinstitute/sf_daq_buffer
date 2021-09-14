@@ -1,5 +1,6 @@
 file(GLOB SOURCES src/*.cpp)
 
+set(CMAKE_CXX_STANDARD 20)
 add_library(jf-zmqstreamer-lib STATIC ${SOURCES})
 target_include_directories(jf-zmqstreamer-lib PUBLIC include/)
 target_link_libraries(jf-zmqstreamer-lib external core-buffer-lib)

@@ -8,6 +8,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 using namespace buffer_config;
