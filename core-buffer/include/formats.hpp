@@ -64,7 +64,7 @@ class ImageBinaryFormat {
 	NewImageMetadata meta;
     std::vector<char> data;
     ImageBinaryFormat(size_t H, size_t W, size_t D): data(H*W*D, 0) { meta.height = H; meta.width = W; };
-    ~ImageBinaryFormat(){ std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
+    ~ImageBinaryFormat(){}
 };
 
 #pragma pack(push)
