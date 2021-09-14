@@ -9,27 +9,6 @@
 
 #include "../../core-buffer/include/formats.hpp"
 
-typedef enum {
-    DBF_STRING,
-    DBF_CHAR,
-    DBF_UCHAR,
-    DBF_SHORT,
-    DBF_USHORT,
-    DBF_LONG,
-    DBF_ULONG,
-    DBF_INT64,
-    DBF_UINT64,
-    DBF_FLOAT,
-    DBF_DOUBLE,
-    DBF_ENUM,
-    DBF_MENU,
-    DBF_DEVICE,
-    DBF_INLINK,
-    DBF_OUTLINK,
-    DBF_FWDLINK,
-    DBF_NOACCESS
-}dbfType;
-
 
 #define ASSERT_FALSE(expr, msg)                                                                                         \
     if(bool(expr)) {                                                                                                     \
@@ -86,7 +65,7 @@ class ZmqImagePublisher: public ZmqPublisher {
         ZmqImagePublisher(std::string ip, uint16_t port, uint32_t n_threads) : ZmqPublisher(ip, port, n_threads) {};
         const std::string topic = "IMAGEDATA";
 
-        std::string serializer(const ImageMetadata& meta){
+        std::string serializer(const NewImageMetadata& meta){
             rapidjson::Document header(rapidjson::kObjectType);
             auto& header_alloc = header.GetAllocator();
 
@@ -123,8 +102,8 @@ class ZmqImagePublisher: public ZmqPublisher {
             std::lock_guard<std::mutex> guard(g_zmq_socket);
             int len;
 
-            len = m_socket.send(topic.c_str(), topic.size(), ZMQ_SNDMORE);
-            ASSERT_TRUE( len >=0, "Failed to send topic data" )
+            // len = m_socket.send(topic.c_str(), topic.size(), ZMQ_SNDMORE);
+            // ASSERT_TRUE( len >=0, "Failed to send topic data" )
             len = m_socket.send(meta_str.c_str(), meta_str.length(), ZMQ_SNDMORE);
             ASSERT_TRUE( len >=0, "Failed to send meta data" )
             len = m_socket.send(image.data.data(), image.data.size(), 0);
