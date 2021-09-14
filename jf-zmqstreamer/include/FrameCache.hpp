@@ -37,7 +37,7 @@ class FrameCache{
 public:
     FrameCache(uint64_t N_CAP, uint64_t modX, uint64_t modY, std::function<void(ImageBinaryFormat&)> callback):
             m_capacity(N_CAP), m_modX(modX), m_modY(modY), m_mod(modX*modY), m_valid(N_CAP, 0), m_fill(N_CAP, 0), m_lock(N_CAP),
-            m_buffer(N_CAP, ImageBinaryFormat(512*N_MOD, 1024, sizeof(uint16_t))),
+            m_buffer(N_CAP, ImageBinaryFormat(512*m_modY, 1024*m_modX, sizeof(uint16_t))),
             f_send(callback) {
         // Initialize buffer metadata
         for(auto& it: m_buffer){ memset(&it.meta, 0, sizeof(it.meta)); }
