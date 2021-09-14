@@ -39,6 +39,14 @@ struct BufferBinaryFormat {
 };
 #pragma pack(pop)
 
+class ImageBinaryFormat {
+    public:
+    ImageMetadata meta;
+    std::vector<char> data;
+    ImageBinaryFormat(size_t H, size_t W, size_t D): data(H*W*D, 0) { meta.height = H; meta.width = W; };
+    ~ImageBinaryFormat(){ std::cout << "ImageBinaryFormat destructor called!" << std::endl; }
+};
+
 #pragma pack(push)
 #pragma pack(1)
 struct BufferBinaryBlock
