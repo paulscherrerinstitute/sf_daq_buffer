@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
+#include <stdexcept>
 
 #include "PacketUdpReceiver.hpp"
 #include "../../core-buffer/include/buffer_config.hpp"
