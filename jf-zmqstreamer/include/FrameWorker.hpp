@@ -27,7 +27,7 @@ class FrameWorker {
     // Buffer and helper structures
     bool in_progress = false;
     uint64_t m_current_index = 0;
-    PacketBuffer<jfjoch_packet_t, 64> m_buffer;
+    PacketBuffer<jungfrau_packet_t, 64> m_buffer;
 
     // Buffer processing
     inline uint64_t process_packets(BufferBinaryFormat& buffer);

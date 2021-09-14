@@ -31,7 +31,7 @@ inline uint64_t FrameWorker::process_packets(BufferBinaryFormat& buffer){
         }
 
         // Otherwise pop the queue (and set current frame index)
-        jfjoch_packet_t& c_packet = m_buffer.pop_front();
+        jungfrau_packet_t& c_packet = m_buffer.pop_front();
 
         // Sanity check: rather throw than segfault...
         if(c_packet.packetnum >= JF_N_PACKETS_PER_FRAME) {
