@@ -91,7 +91,6 @@ public:
         }
     }
 
-
 protected:
     /** Flush and start a new line
 

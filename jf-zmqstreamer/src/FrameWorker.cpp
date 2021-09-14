@@ -3,13 +3,13 @@
 #include "FrameWorker.hpp"
 
 
-JfjFrameWorker::JfjFrameWorker(const uint16_t port, std::string moduleName, const uint32_t moduleID, std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback):
+FrameWorker::FrameWorker(const uint16_t port, std::string moduleName, const uint32_t moduleID, std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback):
         m_moduleName(moduleName), m_moduleID(moduleID), m_moduleStats(moduleName, moduleID, 10.0), f_push_callback(callback) {
     m_udp_receiver.bind(port);
 }
 
 
-JfjFrameWorker::~JfjFrameWorker() {
+FrameWorker::~FrameWorker() {
     m_udp_receiver.disconnect();
 }
 
@@ -18,7 +18,7 @@ JfjFrameWorker::~JfjFrameWorker() {
     Drains the buffer either until it's empty or the current frame is finished.
     Has some optimizations and safety checks before segfaulting right away...
     TODO: Direct memcopy into FrameCache for more speed!                    **/
-inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
+inline uint64_t FrameWorker::process_packets(BufferBinaryFormat& buffer){
 
     while(!m_buffer.is_empty()){
         // Happens if the last packet from the previous frame gets lost.
@@ -68,7 +68,7 @@ inline uint64_t JfjFrameWorker::process_packets(BufferBinaryFormat& buffer){
     return 0;
 }
 
-uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
+uint64_t FrameWorker::get_frame(BufferBinaryFormat& buffer){
     // Reset the metadata and frame buffer for the next frame
     std::memset(&buffer, 0, sizeof(buffer));
     uint64_t pulse_id = 0;
@@ -85,7 +85,7 @@ uint64_t JfjFrameWorker::get_frame(BufferBinaryFormat& buffer){
 }
 
 
-void JfjFrameWorker::run(){
+void FrameWorker::run(){
     std::cout << "Running worker loop" << std::endl;
     // Might be better creating a structure for double buffering
     BufferBinaryFormat buffer;

@@ -35,20 +35,20 @@ int main (int argc, char *argv[]) {
 
 
     std::cout << "Creating frame workers..." << std::endl;
-    std::vector<std::shared_ptr<JfjFrameWorker>> vWorkers;
+    std::vector<std::shared_ptr<FrameWorker>> vWorkers;
     for(int mm=0; mm<config.n_modules; mm++){
         // Module name (not really used...)
         char m_name[128];
         snprintf(m_name, 128, "M%02d", mm);
         std::string moduleName(m_name);
-        vWorkers.emplace_back( std::make_shared<JfjFrameWorker>(config.start_udp_port+mm, moduleName, mm, push_cb) );
+        vWorkers.emplace_back( std::make_shared<FrameWorker>(config.start_udp_port+mm, moduleName, mm, push_cb) );
     }
 
 
     std::cout << "Starting frame worker threads..." << std::endl;
     std::vector<std::thread> vThreads;
     for(int mm=0; mm<config.n_modules; mm++){
-        vThreads.push_back( std::thread(&JfjFrameWorker::run, vWorkers[mm].get()) );
+        vThreads.push_back( std::thread(&FrameWorker::run, vWorkers[mm].get()) );
     }
 
     for(auto& it: vThreads){

@@ -10,13 +10,13 @@
 #include "PacketBuffer.hpp"
 #include "FrameStats.hpp"
 
-/** JungfrauJoch UDP receiver
+/** Jungfrau UDP receiver
 
     Capture UDP data stream from Jungfrau(Joch) FPGA card.
     NOTE: This design will not scale well for higher frame rates...
     TODO: Direct copy into FrameCache buffer (saves a memcopy)
 **/
-class JfjFrameWorker {
+class FrameWorker {
     const std::string m_moduleName;
     const uint64_t m_moduleID;
 
@@ -35,14 +35,13 @@ class JfjFrameWorker {
 
     std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> f_push_callback;
 public:
-    JfjFrameWorker(const uint16_t port, std::string moduleName, const uint32_t moduleID,
-                   std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback);
-    virtual ~JfjFrameWorker();
+    FrameWorker(const uint16_t port, std::string moduleName, const uint32_t moduleID, std::function<void(uint64_t, uint64_t, BufferBinaryFormat&)> callback);
+    virtual ~FrameWorker();
     void run();
     
     // Copy semantics : OFF
-    JfjFrameWorker(JfjFrameWorker const &) = delete;
-    JfjFrameWorker& operator=(JfjFrameWorker const &) = delete;
+    FrameWorker(FrameWorker const &) = delete;
+    FrameWorker& operator=(FrameWorker const &) = delete;
 };
 
 #endif //SF_DAQ_BUFFER_JFJ_FRAMEWORKER_HPP
