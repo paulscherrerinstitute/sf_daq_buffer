@@ -1,7 +1,7 @@
 #include <netinet/in.h>
 #include <jungfraujoch.hpp>
 #include "gtest/gtest.h"
-#include "PacketBuffer.hpp"
+#include "../include/PacketBuffer.hpp"
 
 #include <thread>
 #include <chrono>

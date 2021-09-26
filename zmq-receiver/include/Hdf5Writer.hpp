@@ -57,7 +57,7 @@ public:
     };
 	
     template <typename TY>
-    void writeArray(const std::vector<TY>& data_ref, const std::vector<TY>& shape_ref, std::string ipath){
+    void writeArray(const std::vector<TY>& data_ref, const std::vector<size_t>& shape_ref, std::string ipath){
         /* Allocating containers for the data */
 		int64_t n_dim = shape_ref.size();
         hsize_t      ds_dims[n_dim];

@@ -1,8 +1,8 @@
-add_executable(jfj-combined-tests main.cpp)
+add_executable(jf-zmqstreamer-tests main.cpp)
 
-target_link_libraries(jfj-combined-tests
+target_link_libraries(jf-zmqstreamer-tests
         core-buffer-lib
-        jfj-combined-lib
+        jf-zmqstreamer-lib
         gtest
         )
 

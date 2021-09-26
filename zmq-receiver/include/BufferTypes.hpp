@@ -132,7 +132,7 @@ public:
         writer.writeVector(hsh.get<std::vector<uint64_t>&>("user_2"),      "/data/" + detector_name + "/user_2");
 
         std::cout << "Writing data: " << hsh.get<std::vector<uint16_t>&>("data").size() << std::endl;
-        writer.writeArray(hsh.get<std::vector<uint16_t>&>("data"),      "/data/" + detector_name + "/data");
+        writer.writeArray(hsh.get<std::vector<uint16_t>&>("data"), {m_buffer_size, hsh.get<std::vector<uint64_t>&>("height")[0], hsh.get<std::vector<uint64_t>&>("height")[0], 1},      "/data/" + detector_name + "/data");
 
 
         run_id++;

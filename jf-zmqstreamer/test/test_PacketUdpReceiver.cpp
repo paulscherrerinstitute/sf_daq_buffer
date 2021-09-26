@@ -2,7 +2,7 @@
 #include <jungfrau.hpp>
 #include "gtest/gtest.h"
 #include "mock/udp.hpp"
-#include "PacketUdpReceiver.hpp"
+#include "../include/PacketUdpReceiver.hpp"
 
 #include <thread>
 #include <chrono>
