@@ -37,6 +37,8 @@ add_subdirectory("jf-assembler")
 add_subdirectory("jf-zmqstreamer")
 add_subdirectory("sf-stream")
 add_subdirectory("sf-writer")
+add_subdirectory("zmq-receiver")
+
 
 if(BUILD_JF_LIVE_WRITER)
         add_subdirectory("jf-live-writer")
