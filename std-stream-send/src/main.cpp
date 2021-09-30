@@ -1,11 +1,12 @@
 #include <iostream>
 #include <zmq.h>
-#include "stream_config.hpp"
 #include <chrono>
 #include <thread>
-#include <StreamSendConfig.hpp>
-#include "RamBuffer.hpp"
+#include <BufferUtils.hpp>
+#include <RamBuffer.hpp>
 
+#include "stream_config.hpp"
+#include "ZmqLiveSender.hpp"
 
 using namespace std;
 using namespace stream_config;
@@ -25,48 +26,33 @@ int main (int argc, char *argv[])
         exit(-1);
     }
 
-    const auto config = StreamSendConfig::from_json_file(string(argv[1]));
+    auto config = BufferUtils::read_json_config(string(argv[1]));
     const int bit_depth = atoi(argv[2]);
-    const string stream_address = string(argv[3]);
+    const auto stream_address = string(argv[3]);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
+    ZmqLiveSender sender(ctx, config.detector_name, stream_address);
 
-    auto sender = zmq_socket(ctx, ZMQ_PUSH);
-    const int sndhwm = PROCESSING_ZMQ_SNDHWM;
-    if (zmq_setsockopt(
-            sender, ZMQ_SNDHWM, &sndhwm, sizeof(sndhwm)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
+    auto receiver_assembler = BufferUtils::connect_socket(
+            ctx, config.detector_name, "assembler");
 
-    const int linger = 0;
-    if (zmq_setsockopt(
-            sender, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
+    const size_t IMAGE_N_BYTES = config.image_height * config.image_width * bit_depth / 8;
 
-    if (zmq_bind(sender, stream_address.c_str()) != 0) {
-        throw runtime_error(zmq_strerror(errno));
-    }
-
-    const size_t IMAGE_N_BYTES = config.width * config.height * bit_depth / 8;
     RamBuffer image_buffer(config.detector_name + "_assembler",
             sizeof(ImageMetadata), IMAGE_N_BYTES,
-            config.n_modules, RAM_BUFFER_N_SLOTS);
+            1, RAM_BUFFER_N_SLOTS);
+
+    ImageMetadata meta;
 
     while (true) {
 
-        image_id = 123;
+        // receives the assembled image id from the assembler
+        zmq_recv(receiver_assembler, &meta, sizeof(meta), 0);
+        // gets the image data
+        char* dst_data = image_buffer.get_slot_data(meta.id);
+        // sends the json metadata with the data
+        sender.send(meta, dst_data, IMAGE_N_BYTES);
 
-        zmq_send(sender,
-                 ram_buffer.get_slot_meta(image_id),
-                 sizeof(ImageMetadata), ZMQ_SNDMORE);
-
-        zmq_send(sender,
-                 ram_buffer.get_slot_data(image_id),
-                 buffer_config::MODULE_N_BYTES * 4, 0);
-
-        pulse_id++;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
