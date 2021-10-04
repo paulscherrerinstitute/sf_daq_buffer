@@ -1,9 +1,14 @@
 #include <zmq.hpp>
 #include <iostream>
 #include <sstream>
+#include <chrono>
 
 #include "../../core-buffer/include/buffer_config.hpp"
 #include "../include/BufferTypes.hpp"
+
+
+
+
 
 int main (int argc, char *argv[]){
     if (argc != 4) {
@@ -29,7 +34,8 @@ int main (int argc, char *argv[]){
     //  Subscribe to TOPIC (expected schema)
     zmq::socket_t subscriber (context, ZMQ_SUB);
     subscriber.connect(sub_addr.c_str());
-    subscriber.setsockopt(ZMQ_SUBSCRIBE, topic.c_str(), topic.size());
+    //subscriber.setsockopt(ZMQ_SUBSCRIBE, topic.c_str(), topic.size());
+    subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
     // Publisher to ipc
     std::cout << "Crating publisher...\n" << std::endl;
@@ -65,13 +71,18 @@ int main (int argc, char *argv[]){
     for (int idx = 0; idx < 100000; idx++) {
         // ZMQ guarantees full delivery of multipart massages!
         // Packets are sent as three part messages:  topic + meta + data
-        subscriber.recv(&msg_topic, 0);
+        //subscriber.recv(&msg_topic, 0);
         subscriber.recv(&msg_meta, 0);
         subscriber.recv(&msg_data, 0);
 
         // Schema (topic) specific saving)
         if(topic=="IMAGEDATA"){
+            auto t1 = std::chrono::high_resolution_clock::now();
             cache.append((void*)msg_meta.data(), msg_meta.size(), (void*)msg_data.data(), msg_data.size());
+            auto t2 = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+            
+            std::cout << "Append took: " << ms_double.count() << " ms" << std::endl;
             //buffer.write_image((ImageMetadata*)msg_meta.data(), (char*)msg_data.data);
             if(idx%100==0){
                 std::cout << "Received " << idx << " (at size " << msg_data.size() << " )" << std::endl;

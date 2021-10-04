@@ -1,6 +1,7 @@
 #ifndef SF_DAQ_BUFFER_TYPES_HPP
 #define SF_DAQ_BUFFER_TYPES_HPP
 
+#include <chrono>
 #include <cstring>
 #include "rapidjson/document.h"
 
@@ -48,6 +49,7 @@ public:
         hsh.set("status", std::vector<uint16_t>(bs) );
         hsh.set("user_1", std::vector<uint64_t>(bs) );
         hsh.set("user_2", std::vector<uint64_t>(bs) );
+        hsh.set("shape", std::vector<std::vector<uint64_t>>(bs) );
     };
 
     bool is_full(){
@@ -55,15 +57,20 @@ public:
     };
 
     void append(void* meta, size_t meta_size, void* data, size_t data_size){
-
+        std::chrono::time_point<std::chrono::high_resolution_clock> t1, t2;
+        std::chrono::duration<double, std::milli> ms_double;
+        
+        t1 = std::chrono::high_resolution_clock::now();
+        
         std::string jason_string((char*)meta, meta_size);
-        std::cout << jason_string << std::endl;
-
         rapidjson::Document jason_parsed;
-
         jason_parsed.Parse(jason_string.c_str());
+        if(jason_parsed["id"].GetInt() % 20 ==0){ std::cout << jason_string << std::endl; }
+        
+        t2 = std::chrono::high_resolution_clock::now();
+        ms_double = t2 - t1;        
+        std::cout << "    JSON parsing took: " << ms_double.count() << " ms" << std::endl;
 
-	//std::cout << "NI" << std::endl;
 
         // Enforce flushing when full
         if(is_full()){ write_to_disk(); }
@@ -77,6 +84,9 @@ public:
         //}
 
         // Update the hash
+        t1 = std::chrono::high_resolution_clock::now();
+
+            
         hsh.get<std::vector<uint64_t>&>("version")[write_idx] = jason_parsed["version"].GetInt();
         hsh.get<std::vector<uint64_t>&>("id")[write_idx] = jason_parsed["id"].GetInt();
         hsh.get<std::vector<uint64_t>&>("height")[write_idx] = jason_parsed["height"].GetInt();
@@ -87,12 +97,29 @@ public:
         hsh.get<std::vector<uint16_t>&>("status")[write_idx] = jason_parsed["status"].GetInt();
         hsh.get<std::vector<uint64_t>&>("user_1")[write_idx] = jason_parsed["user_1"].GetInt();
         hsh.get<std::vector<uint64_t>&>("user_2")[write_idx] = jason_parsed["user_2"].GetInt();
+        
 
-		std::cout << "hashed" << std::endl;
+        
+        std::vector<uint64_t> shape;
+        const auto& s = jason_parsed["shape"];
+        for(auto& it : s.GetArray()){   shape.push_back(it.GetInt());   }
+        hsh.get<std::vector<std::vector<uint64_t>>&>("shape")[write_idx] = shape;
 
-        // Hard coded type for now
-        auto data_buf = hsh.get<std::vector<uint16_t>&>("data");
-        std::memcpy(&data_buf[write_idx*m_block_size], data, std::min(data_size, m_block_size));
+        t2 = std::chrono::high_resolution_clock::now();
+        ms_double = t2 - t1;        
+        std::cout << "    Hash update took: " << ms_double.count() << " ms" << std::endl;
+
+        // Hard coded type for now        
+        // NOTE: There's a massive performance bottleneck here if this is pre fetched!
+        //std::vector<uint64_t>& data_buf = hsh.get<std::vector<uint16_t>&>("data");
+
+        t1 = std::chrono::high_resolution_clock::now();
+
+        std::memcpy(&hsh.get<std::vector<uint16_t>&>("data")[write_idx*m_block_size], data, std::min(data_size, m_block_size));
+
+        t2 = std::chrono::high_resolution_clock::now();
+        ms_double = t2 - t1;        
+        std::cout << "    Data copy took: " << ms_double.count() << " ms (size: " << std::min(data_size, m_block_size) << " )" << std::endl;
 
         // Pop index
         write_idx++;
@@ -132,9 +159,11 @@ public:
         writer.writeVector(hsh.get<std::vector<uint64_t>&>("user_2"),      "/data/" + detector_name + "/user_2");
 
         std::cout << "Writing data: " << hsh.get<std::vector<uint16_t>&>("data").size() << std::endl;
-        writer.writeArray(hsh.get<std::vector<uint16_t>&>("data"), {m_buffer_size, hsh.get<std::vector<uint64_t>&>("height")[0], hsh.get<std::vector<uint64_t>&>("height")[0], 1},      "/data/" + detector_name + "/data");
-
-
+        std::vector<uint64_t> array_shape = {m_buffer_size};
+        auto slice_shape =hsh.get<std::vector<std::vector<uint64_t>>&>("shape")[0];
+        array_shape.insert(array_shape.end(), slice_shape.begin(), slice_shape.end());
+        writer.writeArray(hsh.get<std::vector<uint16_t>&>("data"), array_shape,      "/data/" + detector_name + "/data");
+        
         run_id++;
     };
 
