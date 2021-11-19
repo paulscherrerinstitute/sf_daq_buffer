@@ -56,6 +56,11 @@ namespace BufferUtils
             const std::string& detector_name,
             const std::string& stream_name);
 
+    void* connect_socket_gf(
+            void* ctx,
+            const std::string& detector_name,
+            const std::string& stream_name);
+
     DetectorConfig read_json_config(const std::string& filename);
 }
 

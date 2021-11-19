@@ -52,6 +52,11 @@ public:
     void write_meta(const int64_t run_id,
                     const uint32_t index,
                     const ImageMetadata* meta);
+
+    void write_meta_gf(const int64_t run_id,
+                    const uint32_t index,
+                    const uint16_t id,
+                    const uint64_t status);
 };
 
 #endif //JF_LIVE_WRITER_HPP

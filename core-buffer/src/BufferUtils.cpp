@@ -124,6 +124,41 @@ void* BufferUtils::connect_socket(
     return socket;
 }
 
+void* BufferUtils::connect_socket_gf(
+        void* ctx, const string& detector_name, const string& stream_name)
+{
+    // string ipc_address = buffer_config::IPC_URL_BASE +
+    //                      detector_name + "-" +
+    //                      stream_name;
+    
+    string ipc_address = stream_name;
+
+    void* socket = zmq_socket(ctx, ZMQ_SUB);
+    if (socket == nullptr) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    int rcvhwm = BUFFER_ZMQ_RCVHWM;
+    if (zmq_setsockopt(socket, ZMQ_RCVHWM, &rcvhwm, sizeof(rcvhwm)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    int linger = 0;
+    if (zmq_setsockopt(socket, ZMQ_LINGER, &linger, sizeof(linger)) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    if (zmq_connect(socket, ipc_address.c_str()) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    if (zmq_setsockopt(socket, ZMQ_SUBSCRIBE, "", 0) != 0) {
+        throw runtime_error(zmq_strerror(errno));
+    }
+
+    return socket;
+}
+
 void* BufferUtils::bind_socket(
         void* ctx, const string& detector_name, const string& stream_name)
 {

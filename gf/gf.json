@@ -1,0 +1,8 @@
+{
+    "detector_name": "GF1",
+    "detector_type": "gf",
+    "n_modules": 16,
+    "image_height": 1200,
+    "image_width": 2016,
+    "start_udp_port": 50200
+}

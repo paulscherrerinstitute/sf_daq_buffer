@@ -236,6 +236,47 @@ void JFH5Writer::write_data(
     H5Sclose(ram_ds);
 }
 
+void JFH5Writer::write_meta_gf(
+    const int64_t run_id, const uint32_t index, const uint16_t id, const uint64_t status)
+{
+    if (run_id != current_run_id_) {
+        throw runtime_error("Invalid run_id.");
+    }
+
+    const hsize_t ram_dims[3] = {1, 1, 1};
+    auto ram_ds = H5Screate_simple(3, ram_dims, nullptr);
+    if (ram_ds < 0) {
+        throw runtime_error("Cannot create metadata ram dataspace.");
+    }
+
+    auto file_ds = H5Dget_space(image_id_dataset_);
+    if (file_ds < 0) {
+        throw runtime_error("Cannot get metadata dataset file dataspace.");
+    }
+
+    const hsize_t file_ds_start[] = {index, 0, 0};
+    const hsize_t file_ds_stride[] = {1, 1, 1};
+    const hsize_t file_ds_count[] = {1, 1, 1};
+    const hsize_t file_ds_block[] = {1, 1, 1};
+    if (H5Sselect_hyperslab(file_ds, H5S_SELECT_SET,
+            file_ds_start, file_ds_stride, file_ds_count, file_ds_block) < 0) {
+        throw runtime_error("Cannot select metadata dataset file hyperslab.");
+    }
+
+    if (H5Dwrite(image_id_dataset_, H5T_NATIVE_UINT64,
+                 ram_ds, file_ds, H5P_DEFAULT, &id) < 0) {
+        throw runtime_error("Cannot write data to pulse_id dataset.");
+    }
+
+    if (H5Dwrite(status_dataset_, H5T_NATIVE_UINT64,
+                 ram_ds, file_ds, H5P_DEFAULT, &status) < 0) {
+        throw runtime_error("Cannot write data to is_good_image dataset.");
+    }
+
+    H5Sclose(file_ds);
+    H5Sclose(ram_ds);
+}
+
 void JFH5Writer::write_meta(
         const int64_t run_id, const uint32_t index, const ImageMetadata* meta)
 {
