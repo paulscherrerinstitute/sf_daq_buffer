@@ -21,7 +21,6 @@ CONFIG_FILE='/home/hax_l/sf_daq_buffer/eiger/sf-daq-4/config/eiger.json'
 HELP_FLAG=0
 
 # CONFIGURATION
-BIT_DEPTH=16
 N_MPI_EXEC=3
 STREAM_NAME='streamvis'
 while getopts h:c:b:m: flag
@@ -29,7 +28,6 @@ do
     case "${flag}" in
         h ) HELP_FLAG=${OPTARG};;
         c ) CONFIG_FILE=${OPTARG};;
-        b ) BIT_DEPTH=${OPTARG};;
         m ) N_MPIT_EXEC=${OPTARG};;
         s ) STREAMVIS=${OPTARG};;
     esac
@@ -37,10 +35,9 @@ done
 
 # prints help and exits
 if (( ${HELP_FLAG} == 1 )); then
-    echo "Usage : $0 -h <help_flag> -c <config_file> -b <bit_depth> -s <stream_name>"
+    echo "Usage : $0 -h <help_flag> -c <config_file> -s <stream_name>"
     echo "           help_flag : show this help and exits."
     echo "           config_file : detector configuration file."
-    echo "           bit_depth : detector bit depth."
     echo "           stream name : live stream name."
     exit
 fi
@@ -74,16 +71,11 @@ echo "Starting ${N_UDP_RECVS} udp receivers..."
 COUNTER=0
 if [ -f "${BUILD_PATH}${UDP_RECV}" ]; then
     if [ -f "${CONFIG_FILE}" ]; then
-        if [ ${BIT_DEPTH} -ne 0 ]; then
-            while [  $COUNTER -lt ${N_UDP_RECVS} ]; do
-                ${BUILD_PATH}${UDP_RECV} ${CONFIG_FILE} ${COUNTER} ${BIT_DEPTH} &
-                let COUNTER=COUNTER+1 
-                sleep 0.5
-            done
-        else
-            echo "Error: ${BIT_DEPTH} can't be zero..."
-            exit
-        fi
+        while [  $COUNTER -lt ${N_UDP_RECVS} ]; do
+            ${BUILD_PATH}${UDP_RECV} ${CONFIG_FILE} ${COUNTER}&
+            let COUNTER=COUNTER+1 
+            sleep 0.5
+        done
     else
         echo "Something went wrong while starting the ${UDP_RECV}..."
         exit
@@ -115,13 +107,8 @@ fi
 echo "Starting the ${EIGER_ASSEMBLER}..."
 if [ -f "${BUILD_PATH}${EIGER_ASSEMBLER}" ]; then
     if [ -f "${CONFIG_FILE}" ]; then
-        if [ ${BIT_DEPTH} -ne 0 ]; then
-            ${BUILD_PATH}${EIGER_ASSEMBLER} ${CONFIG_FILE} ${BIT_DEPTH} &
-            sleep 0.5
-        else
-            echo "Error: ${BIT_DEPTH} can't be zero..."
-            exit
-        fi
+        ${BUILD_PATH}${EIGER_ASSEMBLER} ${CONFIG_FILE} &
+        sleep 0.5
     else
         echo "Something went wrong while starting the ${EIGER_ASSEMBLER}..."
         exit
@@ -135,12 +122,7 @@ fi
 echo "Starting the ${STD_STREAM_SEND}..."
 if [ -f "${BUILD_PATH}${STD_STREAM_SEND}" ]; then
     if [ -f "${CONFIG_FILE}" ]; then
-        if [ ${BIT_DEPTH} -ne 0 ]; then
-            ${BUILD_PATH}${STD_STREAM_SEND} ${CONFIG_FILE} ${BIT_DEPTH} ${STREAM_NAME} &
-        else
-            echo "Error: ${BIT_DEPTH} can't be zero..."
-            exit
-        fi
+        ${BUILD_PATH}${STD_STREAM_SEND} ${CONFIG_FILE} ${STREAM_NAME} &
     else
         echo "Something went wrong while starting the ${STD_STREAM_SEND}..."
         exit
@@ -157,7 +139,7 @@ export LD_LIBRARY_PATH="/usr/lib64/mpich-3.2/lib:${LD_LIBRARY_PATH}";
 
 if [ -f "${BUILD_PATH}${STD_DET_WRITER}" ]; then
     if [ -f "${CONFIG_FILE}" ]; then
-        mpiexec -n ${N_MPI_EXEC} ${BUILD_PATH}${STD_DET_WRITER} ${CONFIG_FILE} ${BIT_DEPTH} &
+        mpiexec -n ${N_MPI_EXEC} ${BUILD_PATH}${STD_DET_WRITER} ${CONFIG_FILE} &
         sleep 0.5
     else
         echo "Something went wrong while starting the ${STD_DET_WRITER}..."

@@ -17,12 +17,14 @@ struct UdpSyncConfig {
 
         return {
                 config_parameters["detector_name"].GetString(),
-                config_parameters["n_modules"].GetInt()
+                config_parameters["n_modules"].GetInt(),
+                config_parameters["bit_depth"].GetInt()
         };
     }
 
     const std::string detector_name;
     const int n_modules;
+    const int bit_depth;
 };
 
 

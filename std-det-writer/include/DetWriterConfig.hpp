@@ -19,12 +19,14 @@ struct DetWriterConfig {
                 config_parameters["detector_name"].GetString(),
                 config_parameters["image_height"].GetInt(),
                 config_parameters["image_width"].GetInt(),
+                config_parameters["bit_depth"].GetInt(),
         };
     }
 
     const std::string detector_name;
     const int image_height;
     const int image_width;
+    const int bit_depth;
 };
 
 
