@@ -12,6 +12,7 @@ namespace BufferUtils
         const std::string detector_name;
         const std::string detector_type;
         const int n_modules;
+        const int bit_depth;
         const int image_height;
         const int image_width;
         const int start_udp_port;
@@ -23,6 +24,7 @@ namespace BufferUtils
                         << det_config.detector_type << ' '
                         << det_config.n_modules << ' '
                         << det_config.start_udp_port << ' '
+                        << det_config.bit_depth << ' '
                         << det_config.image_height << ' '
                         << det_config.image_width << ' ';
         }

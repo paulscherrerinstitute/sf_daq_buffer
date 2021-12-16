@@ -20,19 +20,16 @@ using namespace live_writer_config;
 
 int main (int argc, char *argv[])
 {
-    if (argc != 3) {
+    if (argc != 2) {
         cout << endl;
-        cout << "Usage: std_det_writer [detector_json_filename]"
-                " [bit_depth]" << endl;
+        cout << "Usage: std_det_writer [detector_json_filename]" << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
-        cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
 
         exit(-1);
     }
 
     auto const config = DetWriterConfig::from_json_file(string(argv[1]));
-    const int bit_depth = atoi(argv[2]);
 
     MPI_Init(nullptr, nullptr);
 
@@ -47,7 +44,7 @@ int main (int argc, char *argv[])
     auto receiver = BufferUtils::connect_socket_gf(
             ctx, config.detector_name, "tcp://localhost:9911");
 
-    const size_t IMAGE_N_BYTES = config.image_width * config.image_height * bit_depth / 8;
+    const size_t IMAGE_N_BYTES = config.image_width * config.image_height * config.bit_depth / 8;
 
 
     JFH5Writer writer(config.detector_name);
@@ -96,7 +93,6 @@ int main (int argc, char *argv[])
             // i_image == n_images -> end of run.
             if (i_image == n_images && open_run == true) {
                 writer.close_run();
-                cout << "[ Writer" <<   i_writer << " AFTER CLOSE RUN.... " << endl;
                 stats.end_run();
                 open_run = false;
                 continue;
@@ -118,7 +114,6 @@ int main (int argc, char *argv[])
             if (img_nbytes != -1 && header_in == true && open_run == true){
                 // Fair distribution of images among writers.
                 if (i_image % n_writers == i_writer) {
-                    cout << "[ Writer" << i_writer << ":: Frame" << i_image << "]"<< endl;
                     stats.start_image_write();
                     writer.write_data(run_id, i_image, recv_buffer_data);
                     stats.end_image_write();
@@ -128,7 +123,6 @@ int main (int argc, char *argv[])
 
             // Only the first instance writes metadata.
             if (i_writer == 0 && header_in == true && open_run == true) {
-                cout << "[ Writer" << i_writer << "::META from image" << i_image << "]"<< endl;
                 writer.write_meta_gf(run_id, 
                     i_image, 
                     (uint16_t)run_id, 
