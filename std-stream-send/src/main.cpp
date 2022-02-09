@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
     }
 
     auto config = BufferUtils::read_json_config(string(argv[1]));
-    const auto stream_address = string(argv[3]);
+    const auto stream_address = string(argv[2]);
 
     auto ctx = zmq_ctx_new();
     zmq_ctx_set(ctx, ZMQ_IO_THREADS, STREAM_ZMQ_IO_THREADS);
