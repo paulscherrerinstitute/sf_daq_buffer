@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GREP="std|streamvis"
+GREP="std|streamvis|rabbit"
 RESTART="OFF"
 STATUS_VERBOSE="OFF"
 while getopts g:s: flag
