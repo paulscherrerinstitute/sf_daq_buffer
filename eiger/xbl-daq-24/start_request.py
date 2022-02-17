@@ -5,12 +5,21 @@ import json
 
 # writer agent endpoint
 URL = "http://127.0.0.1:5000"
-# type of write request
-SYNC = "/write_sync"
 # details of request
-n_images = 3
-n_acquisitions = 1000
+n_images = 10
+n_acquisitions = 5
 headers = {'Content-type': 'application/json'}
+
+print("Configuring the detector...")
+data_config = {"det_name":"eiger","config":{"frames":100,"dr":16, "triggers":1, "exptime":0.000005, "timing":"auto", "tengiga":1}}
+r = requests.post(url="http://127.0.0.1:5000/detector", headers=headers, json=data_config)
+time.sleep(0.5)
+
+
+print("Starting the detector...")
+start_data = {'cmd':"START"}
+r = requests.post(url = "http://127.0.0.1:5000/detector/eiger", headers=headers, json=start_data)
+time.sleep(0.5)
 
 print("Performing sync aquisitions...")
 for i in range(0,n_acquisitions):
@@ -20,22 +29,7 @@ for i in range(0,n_acquisitions):
     print("REQUEST: ", i)
     print("DATA: ", data)
 
-    r = requests.post(url = "http://127.0.0.1:5000/write_sync", json=data, headers=headers)
+    r = requests.post(url = "http://127.0.0.1:5000/write_async", json=data, headers=headers)
     print("RESPONSE FROM REQUEST: ", r.text)
-    data = None
     time.sleep(0.2)
 
-# time.sleep(3)
-# print("Performing async aquisitions...")
-# for i in range(0,n_acquisitions):
-#     output_file ='/home/hax_l/tests/eiger_async_%s_%s.h5' % (datetime.now().strftime("%H%M%S"), i)
-#     data = {'sources':'eiger', 'n_images':n_images, 'output_file':output_file}
-#     print("REQUEST: ", i)
-#     print("DATA: ", data)
-
-#     r = requests.post(url = "http://127.0.0.1:5000/write_async", json=data, headers=headers)
-#     data = None
-#     time.sleep(1)
-
-
-# #//TODO  print("Testing kill aquisitions...")
