@@ -1,8 +1,0 @@
-{
-    "detector_name": "cSAXS.EG01V01",
-    "detector_type": "eiger",
-    "n_modules": 4,
-    "image_height": 514,
-    "image_width": 1030,
-    "start_udp_port": 50000
-}

@@ -1,0 +1,12 @@
+{ 
+    "size": "medium",
+    "price": 15.67,
+    "toppings": ["mushrooms", "pepperoni", "basil"],
+    "extra_cheese": false,
+    "delivery": true,
+    "client": {
+        "name": "Jane Doe",
+        "phone": null,
+        "email": "janedoe@email.com"
+    }
+}

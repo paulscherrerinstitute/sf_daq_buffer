@@ -1,5 +1,6 @@
 import socket
 import numpy as np
+import sys
 
 frame_header_dt = np.dtype(
     [
@@ -19,19 +20,20 @@ frame_header_dt = np.dtype(
     ]
 )
 
+#ip = "10.30.40.211"
+ip = sys.argv[1]
 
-ip = "10.30.20.6"
-ports = list(range(50200, 50204, 1))
+ports = list(range(50000, 50004, 1))
 sockets = [socket.socket(socket.AF_INET, socket.SOCK_DGRAM) for i in range(len(ports))]
 
 for s, p in zip(sockets, ports):
-    print("IP:Port: ", ip, p)
-    s.bind((ip, p))
+    print(ip,p)
+    s.bind((ip,p))
 
 while True:
     for s in sockets:
         data, address = s.recvfrom(4096)
         h = np.frombuffer(data, count=1, dtype=frame_header_dt)[0]
         print(
-            f'pkt:{h["Packet Number"]}, frame: {h["Frame Number"]}, row: {h["Row"]}, column: {h["Column"]}'
+                f'[{h["Timestamp"]}] frame: {h["Frame Number"]}, pkt:{h["Packet Number"]}, explength:{h["SubFrame Number/ExpLength"]}, module id: {h["Module Id"]} ,row: {h["Row"]}, column: {h["Column"]}'
         )
