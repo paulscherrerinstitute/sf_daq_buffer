@@ -17,6 +17,7 @@
 #include "date.h"
 
 using namespace std;
+using namespace date;
 using namespace buffer_config;
 using namespace live_writer_config;
 
@@ -72,6 +73,24 @@ int main (int argc, char *argv[])
         if (i_image == n_images) {
             writer.close_run();
             stats.end_run();
+
+            #ifdef DEBUG_OUTPUT 
+                cout << "[" << std::chrono::system_clock::now() << "]";
+                cout << "[std_daq_det_writer] Setting real group/user id..." << endl;
+            #endif
+            if (setresgid(0,0,0)){
+                stringstream error_message;
+                cout << " Problem setting real group id..." << endl;
+                error_message << "[" << std::chrono::system_clock::now() << "]";
+                error_message << "[std_daq_det_writer] Cannot set real group id..." << endl;
+                throw runtime_error(error_message.str());
+            }
+            if (setresuid(0,0,0)){
+                stringstream error_message;
+                error_message << "[" << std::chrono::system_clock::now() << "]";
+                error_message << "[std_daq_det_writer] Cannot set real user id..." << endl;
+                throw runtime_error(error_message.str());
+            }
             continue;
         }
 
@@ -80,22 +99,19 @@ int main (int argc, char *argv[])
             // TODO Improve changing GID and UID of the writer processes 
             // to be part of the deployment via the ansible deployment.
             #ifdef DEBUG_OUTPUT
-                 using namespace date;
                  cout << "[" << std::chrono::system_clock::now() << "]";
                  cout << "[std_daq_det_writer] Setting process uid to " << user_id << endl;
             #endif
             
-            if (setgid(user_id)) {
+            if (setegid(user_id)) {
                 stringstream error_message;
-                using namespace date;
                 error_message << "[" << std::chrono::system_clock::now() << "]";
                 error_message << "[std_daq_det_writer] Cannot set group_id to " << user_id << endl;
                 throw runtime_error(error_message.str());
             }
 
-            if (setuid(user_id)) {
+            if (seteuid(user_id)) {
                 stringstream error_message;
-                using namespace date;
                 error_message << "[" << std::chrono::system_clock::now() << "]";
                 error_message << "[std_daq_det_writer] Cannot set user_id to " << user_id << endl;
                 throw runtime_error(error_message.str());
@@ -128,6 +144,7 @@ int main (int argc, char *argv[])
                 image_buffer.get_slot_meta(image_id);
             writer.write_meta(run_id, i_image, image_meta);
         }
-
     }
+    cout << " FINISHING It.... " << endl;
+    return 0; 
 }
