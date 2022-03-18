@@ -44,7 +44,7 @@ def main(argv):
             time.sleep(1.5)
             for i in range(0,n_acquisitions):
                 output_file ='/home/dbe/git/sf_daq_buffer/eiger/xbl-daq-28/output_folder%s_%s_req%s_dr%s.h5' % (j, datetime.now().strftime("%H%M%S"), i, dr)
-                data = {'sources':'BEC.EG01V01', 'n_images':n_images, 'output_file':output_file}
+                data = {'sources':'BEC.EG01V01', 'n_images':n_images, 'output_file':output_file, 'user_id': 503}
                 r = requests.post(url = urljoin(URL,SYNC), json=data, headers=headers)
                 print("RESPONSE FROM REQUEST: ", r.text)
 
