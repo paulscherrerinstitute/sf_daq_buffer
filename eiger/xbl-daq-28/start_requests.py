@@ -23,10 +23,11 @@ def prepare_det(dr):
     print("Configuring the detector...")
     data_config = {"det_name":"eiger","config":{"frames":5000, "triggers":1, "exptime":0.0005, "period": 0.001,  "timing":"auto", "tengiga":1, "dr":dr}}
     r = requests.post(url=urljoin(URL,DET), headers=headers, json=data_config)
-    time.sleep(1)
+    time.sleep(0.5)
     print("Starting the detector...")
     start_data = {'cmd':"START"}
     r = requests.post(url = urljoin(URL,DET), headers=headers, json=start_data)
+    time.sleep(0.5)
 
 
 
@@ -41,7 +42,6 @@ def main(argv):
         prepare_det(dr)
         for j in [SYNC, ASYNC]:
             print(f'Performing { j } aquisitions (bit depth { dr })...')
-            time.sleep(1.5)
             for i in range(0,n_acquisitions):
                 output_file ='/home/dbe/git/sf_daq_buffer/eiger/xbl-daq-28/output_folder%s_%s_req%s_dr%s.h5' % (j, datetime.now().strftime("%H%M%S"), i, dr)
                 data = {'sources':'BEC.EG01V01', 'n_images':n_images, 'output_file':output_file, 'user_id': 503}
