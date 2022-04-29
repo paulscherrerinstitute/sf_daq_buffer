@@ -98,6 +98,11 @@ void* BufferUtils::connect_socket(
                          detector_name + "-" +
                          stream_name;
     
+#ifdef DEBUG_OUTPUT
+    cout << "[BufferUtils::connect_socket]";
+    cout << " IPC address: " << ipc_address << endl;
+#endif
+
     void* socket = zmq_socket(ctx, ZMQ_SUB);
     if (socket == nullptr) {
         throw runtime_error(zmq_strerror(errno));
@@ -165,6 +170,12 @@ void* BufferUtils::bind_socket(
     string ipc_address = IPC_URL_BASE +
                          detector_name + "-" +
                          stream_name;
+
+#ifdef DEBUG_OUTPUT
+    cout << "[BufferUtils::bind_socket]";
+    cout << " IPC address: " << ipc_address << endl;
+#endif
+
 
     void* socket = zmq_socket(ctx, ZMQ_PUB);
 

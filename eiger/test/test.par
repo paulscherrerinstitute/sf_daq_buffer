@@ -1,0 +1,6 @@
+frames 10
+exptime 0.01
+period 0.1
+dr 16
+
+timing auto #in case this is trigger it waits forever

@@ -1,0 +1,23 @@
+# arm centos
+FROM arm64v8/centos:7
+# setting env variables
+ENV container docker
+ENV CPLUS_INCLUDE_PATH /hdf5-1.12.0/hdf5/include/
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+SHELL ["/bin/bash", "-c"]
+RUN yum -y update; yum clean all; yum -y groupinstall "Development Tools"; 
+RUN yum -y install centos-release-scl-rh
+RUN yum -y install dnf wget epel-release which
+RUN yum -y install cmake3 zeromq-devel hdf5-devel mpich-3.2
+RUN yum -y install devtoolset-9 openmpi-devel
+RUN scl enable devtoolset-9 bash && source /etc/profile.d/modules.sh && module load mpi && \
+    wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.gz && \
+    tar -xzf hdf5-1.12.0.tar.gz && cd hdf5-1.12.0 &&  ./configure --enable-parallel; make install
+RUN scl enable devtoolset-9 bash && source /etc/profile.d/modules.sh && module load mpi && \
+    rm -rf /sf_daq_buffer && git clone https://github.com/paulscherrerinstitute/sf_daq_buffer.git && \
+    cd sf_daq_buffer && git checkout eiger && mkdir build
+
+RUN echo "source /opt/rh/devtoolset-9/enable && source /etc/profile.d/modules.sh && module load mpi && cd /sf_daq_buffer/build/ && cmake3 .. -DUSE_EIGER=ON -DBUILD_JF_LIVE_WRITER=ON -DCMAKE_CXX_STANDARD_LIBRARIES=\"-L/hdf5-1.12.0/hdf5/lib/ -lhdf5\" && make" >> /tmp/setup
+RUN /bin/bash -C "/tmp/setup"
+RUN rm -f /tmp/setup
+ENTRYPOINT [ "/bin/bash" ]

@@ -4,5 +4,6 @@
     "n_modules": 4,
     "image_height": 514,
     "image_width": 1030,
+    "bit_depth": 16,
     "start_udp_port": 50200
 }

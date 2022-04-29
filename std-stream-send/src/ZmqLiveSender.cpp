@@ -50,11 +50,21 @@ void ZmqLiveSender::send(const ImageMetadata& meta, const char *data,
 
     // TODO: Here we need to send to streamvis and live analysis metadata(probably need to operate still on them) and data(not every frame)
     header.AddMember("frame", meta.id, header_alloc);
-    header.AddMember("is_good_frame", meta.status, header_alloc);
+    header.AddMember("pulse_id", meta.id, header_alloc);
+    // image status convention 0 == good, 1 == frames missing, 2 == different ids
+    header.AddMember("is_good_frame", (meta.status == 0) ? 1 : 0, header_alloc);
+    header.AddMember("flip_data", true, header_alloc);
 
-    rapidjson::Value detector_name;
-    detector_name.SetString(det_name_.c_str(), header_alloc);
-    header.AddMember("detector_name", detector_name, header_alloc);
+    
+    #ifdef USE_EIGER
+        header.AddMember("detector_name", "Eiger", header_alloc);
+    #else
+        rapidjson::Value detector_name;
+        detector_name.SetString(det_name_.c_str(), header_alloc);
+        header.AddMember("detector_name", detector_name, header_alloc);
+    #endif
+
+    
 
     header.AddMember("htype", "array-1.0", header_alloc);
     

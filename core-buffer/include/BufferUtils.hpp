@@ -23,10 +23,10 @@ namespace BufferUtils
                 return os << det_config.detector_name << ' '
                         << det_config.detector_type << ' '
                         << det_config.n_modules << ' '
-                        << det_config.start_udp_port << ' '
                         << det_config.bit_depth << ' '
                         << det_config.image_height << ' '
-                        << det_config.image_width << ' ';
+                        << det_config.image_width << ' '
+                        << det_config.start_udp_port << ' ';
         }
     };
 

@@ -18,21 +18,18 @@ using namespace BufferUtils;
 
 int main (int argc, char *argv[]) {
 
-    if (argc != 4) {
+    if (argc != 3) {
         cout << endl;
-        cout << "Usage: std_udp_recv [detector_json_filename] [module_id] "
-                "[bit_depth]";
+        cout << "Usage: std_udp_recv [detector_json_filename] [module_id] ";
         cout << endl;
         cout << "\tdetector_json_filename: detector config file path." << endl;
         cout << "\tmodule_id: id of the module for this process." << endl;
-        cout << "\tbit_depth: bit depth of the incoming udp packets." << endl;
         cout << endl;
         exit(-1);
     }
 
     const auto config = UdpRecvConfig::from_json_file(string(argv[1]));
     const int module_id = atoi(argv[2]);
-    const int bit_depth = atoi(argv[3]);
 
     if (DETECTOR_TYPE != config.detector_type) {
         throw runtime_error("UDP recv version for " + DETECTOR_TYPE +
@@ -40,7 +37,7 @@ int main (int argc, char *argv[]) {
     }
 
     const auto udp_port = config.start_udp_port + module_id;
-    const size_t FRAME_N_BYTES = MODULE_N_PIXELS * bit_depth / 8;
+    const size_t FRAME_N_BYTES = MODULE_N_PIXELS * config.bit_depth / 8;
     const size_t N_PACKETS_PER_FRAME = FRAME_N_BYTES / DATA_BYTES_PER_PACKET;
 
     FrameUdpReceiver receiver(udp_port, N_PACKETS_PER_FRAME);
@@ -54,7 +51,7 @@ int main (int argc, char *argv[]) {
 
     ModuleFrame meta;
     meta.module_id = module_id;
-    meta.bit_depth = bit_depth;
+    meta.bit_depth = config.bit_depth;
 
     char* data = new char[FRAME_N_BYTES];
 
