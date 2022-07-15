@@ -20,7 +20,7 @@ def prepare_det(dr):
     stop_data = {'cmd': "STOP"}
     r = requests.post(url=urljoin(URL,DET), headers=headers, json=stop_data)
     print("Configuring the detector...")
-    data_config = {"det_name":"eiger","config":{"frames":5000, "triggers":1, "exptime":0.0005, "period": 0.001,  "timing":"auto", "tengiga":1, "dr":dr}}
+    data_config = {"det_name":"eiger","config":{"frames":5000, "triggers":1, "exptime":0.0005, "period": 0.001,  "timing":"auto_timing", "tengiga":1, "dr":dr}}
     r = requests.post(url=urljoin(URL,DET), headers=headers, json=data_config)
     print("Starting the detector...")
     start_data = {'cmd':"START"}
