@@ -163,10 +163,6 @@ ImageMetadataBlock* ImageAssembler::get_metadata_buffer(const uint64_t bunch_id)
                     image_is_good_frame[i_pulse] = 0;
                 }
 
-                if (frame_meta.daq_rec != image_daq_rec[i_pulse]) {
-                    image_is_good_frame[i_pulse] = 0;
-                }
-
                 if (frame_meta.n_recv_packets != JF_N_PACKETS_PER_FRAME) {
                     image_is_good_frame[i_pulse] = 0;
                 }
