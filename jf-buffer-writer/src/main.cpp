@@ -53,6 +53,10 @@ int main (int argc, char *argv[]) {
         // TODO: Memory copy here. Optimize this one out.
         ram_buff.read_frame(
                 pulse_id, module_id, file_buff->meta, file_buff->data);
+        
+        if (pulse_id != file_buff->meta.pulse_id) {
+            continue;
+        }
 
         writer.write(pulse_id, file_buff);
 
