@@ -34,9 +34,12 @@ add_subdirectory("core-buffer")
 add_subdirectory("jf-udp-recv")
 add_subdirectory("jf-buffer-writer")
 add_subdirectory("jf-assembler")
-add_subdirectory("jfj-udp-recv")
 add_subdirectory("sf-stream")
 add_subdirectory("sf-writer")
+add_subdirectory("jf-zmqstreamer")
+add_subdirectory("zmq-receiver")
+add_subdirectory("sim-jungfrau")
+
 
 if(BUILD_JF_LIVE_WRITER)
         add_subdirectory("jf-live-writer")

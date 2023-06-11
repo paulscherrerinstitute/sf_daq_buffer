@@ -1,5 +1,6 @@
 #ifndef SF_DAQ_BUFFER_FORMATS_HPP
 #define SF_DAQ_BUFFER_FORMATS_HPP
+#include <vector>
 
 #include "buffer_config.hpp"
 #include "jungfrau.hpp"
@@ -26,6 +27,25 @@ struct ImageMetadata {
 };
 #pragma pack(pop)
 
+#pragma pack(push)
+#pragma pack(1)
+struct NewImageMetadata {
+    uint64_t version; // protocol version
+
+    uint64_t id; // pulse_id for SF, frame_index for SLS
+    uint64_t height; // in pixels
+    uint64_t width; // in pixels
+
+    uint16_t dtype; // enum of data types (uint8, 16, 32, float etc.)
+    uint16_t encoding; // enum of encodings (raw, bshuf_lz4...)
+    uint16_t array_id; // if you want to interleave 2 buffers in the same data stream
+    uint16_t status; // Denotate some status of the images - corrupt for example.
+
+    uint64_t user_1; // extra field for custom needs
+    uint64_t user_2; // extra field for custom needs
+};
+#pragma pack(pop)
+
 struct ModuleFrameBuffer {
     ModuleFrame module[JUNGFRAU_N_MODULES];
 };
@@ -38,6 +58,14 @@ struct BufferBinaryFormat {
     char data[buffer_config::MODULE_N_BYTES];
 };
 #pragma pack(pop)
+
+class ImageBinaryFormat {
+    public:
+	NewImageMetadata meta;
+    std::vector<char> data;
+    ImageBinaryFormat(size_t H, size_t W, size_t D): data(H*W*D, 0) { meta.height = H; meta.width = W; };
+    ~ImageBinaryFormat(){}
+};
 
 #pragma pack(push)
 #pragma pack(1)
