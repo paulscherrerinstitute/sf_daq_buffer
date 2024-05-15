@@ -69,41 +69,42 @@ class BinaryBufferReader:
 
             output_prefix = f"[pulse_id {pulse_id} module {i_module}] "
 
-            if frame_buffer.FORMAT_MARKER == b"\xBE":
-                is_good_frame = (frame_buffer.n_recv_packets == 128)
-
-                if is_good_frame:
-                    current = {
-                        "pulse_id":    frame_buffer.pulse_id,
-                        "frame_index": frame_buffer.frame_index,
-                        "daq_rec":     frame_buffer.daq_rec
-                    }
-
-                    if not metadata_init:
-                        metadata.update(current)
-                        metadata_init = True
-
-                    if metadata["is_good_frame"]:
-                        for key, val in current.items():
-                            md_val = metadata[key]
-                            if val != md_val:
-                                _logger.debug(f"{output_prefix} Mismatch {key}: {val} != {md_val}")
-                                metadata["is_good_frame"] = False
-
-                else:
-                    n_lost_packets = 128 - frame_buffer.n_recv_packets
-                    _logger.debug(f"{output_prefix} n_lost_packets {n_lost_packets}")
-                    metadata["is_good_frame"] = False
-
-                start_byte_image = MODULE_N_BYTES * i_module
-                stop_byte_image = start_byte_image + MODULE_N_BYTES
-
-                frame_data = numpy.array(frame_buffer.data, dtype="bytes")
-                data[start_byte_image:stop_byte_image] = frame_data
-
-            else:
+            if frame_buffer.FORMAT_MARKER != b"\xBE":
                 _logger.debug(f"{output_prefix} no data in buffer")
                 metadata["is_good_frame"] = False
+                continue
+
+            is_good_frame = (frame_buffer.n_recv_packets == 128)
+
+            if is_good_frame:
+                current = {
+                    "pulse_id":    frame_buffer.pulse_id,
+                    "frame_index": frame_buffer.frame_index,
+                    "daq_rec":     frame_buffer.daq_rec
+                }
+
+                if not metadata_init:
+                    metadata.update(current)
+                    metadata_init = True
+
+                if metadata["is_good_frame"]:
+                    for key, val in current.items():
+                        md_val = metadata[key]
+                        if val != md_val:
+                            _logger.debug(f"{output_prefix} Mismatch {key}: {val} != {md_val}")
+                            metadata["is_good_frame"] = False
+
+            else:
+                n_lost_packets = 128 - frame_buffer.n_recv_packets
+                _logger.debug(f"{output_prefix} n_lost_packets {n_lost_packets}")
+                metadata["is_good_frame"] = False
+
+            start_byte_image = MODULE_N_BYTES * i_module
+            stop_byte_image = start_byte_image + MODULE_N_BYTES
+
+            frame_data = numpy.array(frame_buffer.data, dtype="bytes")
+            data[start_byte_image:stop_byte_image] = frame_data
+
 
         if not metadata_init:
             metadata["is_good_frame"] = False
