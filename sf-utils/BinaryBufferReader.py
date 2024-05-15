@@ -83,17 +83,17 @@ class BinaryBufferReader:
                     if metadata["is_good_frame"]:
                         md_pulse_id = metadata["pulse_id"]
                         if md_pulse_id != frame_buffer.pulse_id:
-                            _logger.debug(f"{output_prefix} Mismatch pulse_id {md_pulse_id}")
+                            _logger.debug(f"{output_prefix} Mismatch pulse_id {md_pulse_id} != {frame_buffer.pulse_id}")
                             metadata["is_good_frame"] = False
 
                         md_frame_index = metadata["frame_index"]
                         if md_frame_index != frame_buffer.frame_index:
-                            _logger.debug(f"{output_prefix} Mismatch frame_index {md_frame_index}")
+                            _logger.debug(f"{output_prefix} Mismatch frame_index {md_frame_index} != {frame_buffer.frame_index}")
                             metadata["is_good_frame"] = False
 
                         md_daq_rec = metadata["daq_rec"]
                         if md_daq_rec != frame_buffer.daq_rec:
-                            _logger.debug(f"{output_prefix} Mismatch daq_rec {md_daq_rec}")
+                            _logger.debug(f"{output_prefix} Mismatch daq_rec {md_daq_rec} != {frame_buffer.daq_rec}")
                             metadata["is_good_frame"] = False
 
                 else:
