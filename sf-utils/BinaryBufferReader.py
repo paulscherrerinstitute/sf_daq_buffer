@@ -73,28 +73,22 @@ class BinaryBufferReader:
                 is_good_frame = (frame_buffer.n_recv_packets == 128)
 
                 if is_good_frame:
-                    if not metadata_init:
-                        metadata["pulse_id"]    = frame_buffer.pulse_id
-                        metadata["frame_index"] = frame_buffer.frame_index
-                        metadata["daq_rec"]     = frame_buffer.daq_rec
+                    current = {
+                        "pulse_id":    frame_buffer.pulse_id,
+                        "frame_index": frame_buffer.frame_index,
+                        "daq_rec":     frame_buffer.daq_rec
+                    }
 
+                    if not metadata_init:
+                        metadata.update(current)
                         metadata_init = True
 
                     if metadata["is_good_frame"]:
-                        md_pulse_id = metadata["pulse_id"]
-                        if md_pulse_id != frame_buffer.pulse_id:
-                            _logger.debug(f"{output_prefix} Mismatch pulse_id {md_pulse_id} != {frame_buffer.pulse_id}")
-                            metadata["is_good_frame"] = False
-
-                        md_frame_index = metadata["frame_index"]
-                        if md_frame_index != frame_buffer.frame_index:
-                            _logger.debug(f"{output_prefix} Mismatch frame_index {md_frame_index} != {frame_buffer.frame_index}")
-                            metadata["is_good_frame"] = False
-
-                        md_daq_rec = metadata["daq_rec"]
-                        if md_daq_rec != frame_buffer.daq_rec:
-                            _logger.debug(f"{output_prefix} Mismatch daq_rec {md_daq_rec} != {frame_buffer.daq_rec}")
-                            metadata["is_good_frame"] = False
+                        for key, val in current.items():
+                            md_val = metadata[key]
+                            if val != md_val:
+                                _logger.debug(f"{output_prefix} Mismatch {key}: {val} != {md_val}")
+                                metadata["is_good_frame"] = False
 
                 else:
                     n_lost_packets = 128 - frame_buffer.n_recv_packets
