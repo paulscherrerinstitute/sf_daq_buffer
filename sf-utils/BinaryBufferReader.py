@@ -131,9 +131,9 @@ def get_filename(root_folder, device_name, pulse_id):
 def main():
     parser = ArgumentParser(description="Read DAQ Binary Buffer")
 
-    parser.add_argument("root_folder", type=str, help="Absolute path to root folder of device.")
-    parser.add_argument("n_modules",   type=int, help="Number of modules to read from this device.")
-    parser.add_argument("pulse_id",    type=int, help="Pulse_id to retrieve.")
+    parser.add_argument("root_folder", type=str, help="absolute path to root folder of device")
+    parser.add_argument("n_modules",   type=int, help="number of modules to read from this device")
+    parser.add_argument("pulse_id",    type=int, help="pulse ID to retrieve")
     parser.add_argument("--log_level", default="WARNING", choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], help="log level")
 
     clargs = parser.parse_args()
