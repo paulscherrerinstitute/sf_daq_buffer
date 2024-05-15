@@ -74,7 +74,7 @@ class BinaryBufferReader:
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(input_data)
 
             if frame_buffer.FORMAT_MARKER != b"\xBE":
-                _logger.debug(f"{output_prefix} no data in buffer")
+                _logger.warning(f"{output_prefix} no data in buffer")
                 metadata["is_good_frame"] = False
                 continue
 
@@ -88,7 +88,7 @@ class BinaryBufferReader:
 
             if not is_good_frame:
                 n_lost_packets = 128 - frame_buffer.n_recv_packets
-                _logger.debug(f"{output_prefix} n_lost_packets {n_lost_packets}")
+                _logger.warning(f"{output_prefix} n_lost_packets: {n_lost_packets}")
                 metadata["is_good_frame"] = False
                 continue
 
@@ -106,7 +106,7 @@ class BinaryBufferReader:
                 for key, val in current.items():
                     md_val = metadata[key]
                     if val != md_val:
-                        _logger.debug(f"{output_prefix} Mismatch {key}: {val} != {md_val}")
+                        _logger.warning(f"{output_prefix} Mismatch {key}: {val} != {md_val}")
                         metadata["is_good_frame"] = False
 
         if not metadata_init:
