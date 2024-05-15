@@ -81,21 +81,25 @@ class BinaryBufferReader:
                         metadata_init = True
 
                     if metadata["is_good_frame"]:
-                        if metadata["pulse_id"] != frame_buffer.pulse_id:
-                            _logger.debug(output_prefix + "Mismatch pulse_id " + metadata["pulse_id"])
-
+                        md_pulse_id = metadata["pulse_id"]
+                        if md_pulse_id != frame_buffer.pulse_id:
+                            _logger.debug(f"{output_prefix} Mismatch pulse_id {md_pulse_id}")
                             metadata["is_good_frame"] = False
 
-                        if metadata["frame_index"] != frame_buffer.frame_index:
+                        md_frame_index = metadata["frame_index"]
+                        if md_frame_index != frame_buffer.frame_index:
+                            _logger.debug(f"{output_prefix} Mismatch frame_index {md_frame_index}")
                             metadata["is_good_frame"] = False
 
-                        if metadata["daq_rec"] != frame_buffer.daq_rec:
-                            _logger.debug(output_prefix + "Mismatch daq_rec " + metadata["daq_rec"])
-
+                        md_daq_rec = metadata["daq_rec"]
+                        if md_daq_rec != frame_buffer.daq_rec:
+                            _logger.debug(f"{output_prefix} Mismatch daq_rec {md_daq_rec}")
                             metadata["is_good_frame"] = False
+
                 else:
+                    n_lost_packets = 128 - frame_buffer.n_recv_packets
+                    _logger.debug(f"{output_prefix} n_lost_packets {n_lost_packets}")
                     metadata["is_good_frame"] = False
-                    _logger.debug(output_prefix + "n_lost_packets " + 128 - frame_buffer.n_recv_packets)
 
                 start_byte_image = MODULE_N_BYTES * i_module
                 stop_byte_image = start_byte_image + MODULE_N_BYTES
@@ -104,8 +108,8 @@ class BinaryBufferReader:
                 data[start_byte_image:stop_byte_image] = frame_data
 
             else:
+                _logger.debug(f"{output_prefix} no data in buffer")
                 metadata["is_good_frame"] = False
-                _logger.debug(output_prefix + "no data in buffer")
 
         if not metadata_init:
             metadata["is_good_frame"] = False
