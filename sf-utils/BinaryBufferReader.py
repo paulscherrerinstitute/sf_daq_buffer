@@ -134,8 +134,11 @@ def main():
     parser.add_argument("root_folder", type=str, help="Absolute path to root folder of device.")
     parser.add_argument("n_modules",   type=int, help="Number of modules to read from this device.")
     parser.add_argument("pulse_id",    type=int, help="Pulse_id to retrieve.")
+    parser.add_argument("--log_level", default="WARNING", choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], help="log level")
 
     clargs = parser.parse_args()
+
+    _logger.setLevel(clargs.log_level)
 
     reader = BinaryBufferReader(clargs.root_folder, clargs.n_modules)
 
