@@ -19,6 +19,7 @@ MODULE_Y_SIZE = 512
 BYTES_PER_PIXEL = 2
 MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE
 MODULE_N_BYTES = MODULE_N_PIXELS * BYTES_PER_PIXEL
+BUFFER_FORMAT_MARKER = b"\xBE"
 
 
 class BufferBinaryFormat(Structure):
@@ -73,8 +74,8 @@ class BinaryBufferReader:
                 input_data = input_file.read(n_bytes_to_read)
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(input_data)
 
-            if frame_buffer.FORMAT_MARKER != b"\xBE":
-                _logger.warning(f"{output_prefix} no data in buffer")
+            if frame_buffer.FORMAT_MARKER != BUFFER_FORMAT_MARKER:
+                _logger.warning(f"{output_prefix} no data in buffer: {frame_buffer.FORMAT_MARKER} != {BUFFER_FORMAT_MARKER}")
                 metadata["is_good_frame"] = False
                 continue
 
@@ -97,6 +98,9 @@ class BinaryBufferReader:
                 "frame_index": frame_buffer.frame_index,
                 "daq_rec":     frame_buffer.daq_rec
             }
+
+            printable_current = ", ".join(f"{k}: {v}" for k, v in current.items())
+            _logger.debug(f"{output_prefix} {printable_current}")
 
             if not metadata_init:
                 metadata.update(current)
