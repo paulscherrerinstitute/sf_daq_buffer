@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 from argparse import ArgumentParser
 from ctypes import c_byte, c_char, c_uint64, sizeof, Structure
@@ -5,6 +7,7 @@ from ctypes import c_byte, c_char, c_uint64, sizeof, Structure
 import numpy
 
 
+logging.basicConfig()
 _logger = logging.getLogger(__name__)
 
 
@@ -60,7 +63,7 @@ class BinaryBufferReader:
         metadata_init = False
 
         for i_module in range(self.n_modules):
-            output_prefix = f"[pulse_id {pulse_id} module {i_module}] "
+            output_prefix = f"[pulse_id {pulse_id} module {i_module}]"
 
             device_name = f"M{i_module:02}"
             filename = get_filename(self.root_folder, device_name, pulse_id)
