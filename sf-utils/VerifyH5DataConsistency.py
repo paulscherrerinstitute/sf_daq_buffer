@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from argparse import ArgumentParser
 from .BinaryBufferReader import BinaryBufferReader
 
@@ -60,3 +62,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
