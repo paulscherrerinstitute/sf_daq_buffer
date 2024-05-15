@@ -5,6 +5,9 @@ from ctypes import c_byte, c_char, c_uint64, sizeof, Structure
 import numpy
 
 
+_logger = logging.getLogger(__name__)
+
+
 FOLDER_MOD = 100000
 FILE_MOD = 1000
 FILE_EXTENSION = ".bin"
@@ -13,10 +16,6 @@ MODULE_Y_SIZE = 512
 BYTES_PER_PIXEL = 2
 MODULE_N_PIXELS = MODULE_X_SIZE * MODULE_Y_SIZE
 MODULE_N_BYTES = MODULE_N_PIXELS * BYTES_PER_PIXEL
-
-
-_logger = logging.getLogger(__name__)
-
 
 
 class BufferBinaryFormat(Structure):
@@ -32,6 +31,9 @@ class BufferBinaryFormat(Structure):
     ]
 
 
+BUFFER_BINARY_SIZE = sizeof(BufferBinaryFormat)
+
+
 
 class BinaryBufferReader:
 
@@ -42,8 +44,8 @@ class BinaryBufferReader:
 
     def read_pulse_id(self, pulse_id):
         index_in_file = get_file_frame_index(pulse_id)
-        n_bytes_offset = int(index_in_file * sizeof(BufferBinaryFormat))
-        n_bytes_to_read = sizeof(BufferBinaryFormat)
+        n_bytes_offset = int(index_in_file * BUFFER_BINARY_SIZE)
+        n_bytes_to_read = BUFFER_BINARY_SIZE
 
         metadata = {
             "pulse_id": 0,
