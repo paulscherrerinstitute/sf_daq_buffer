@@ -58,7 +58,14 @@ def main():
     detector = clargs.detector
 
     root_folder = get_root_folder(detector)
-    pulse_id = clargs.pulse_id or get_pulse_id(root_folder)
+
+    if clargs.pulse_id is None:
+        pulse_id = get_pulse_id(root_folder)
+    elif clargs.pulse_id < 0:
+        pulse_id = get_pulse_id(root_folder) + clargs.pulse_id
+    else:
+        pulse_id = clargs.pulse_id
+
     n_modules = clargs.n_modules or get_n_modules(root_folder)
 
     _logger.setLevel(clargs.log_level)
