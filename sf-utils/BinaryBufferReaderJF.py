@@ -23,7 +23,7 @@ def get_root_folder(detector):
     if nfound == 0:
         raise SystemExit(f"no root folder matching {detector}")
     if nfound > 1:
-        raise SystemExit(f"cannot unambiguously matched {detector} to root folder: {dns}")
+        raise SystemExit(f"cannot unambiguously match {detector} to root folder: {dns}")
 
 def get_pulse_id(root_folder):
     latest = f"{root_folder}/M00/LATEST"
@@ -35,8 +35,8 @@ def get_pulse_id(root_folder):
 
 def get_n_modules(root_folder):
     detname = get_detname(root_folder)
-    nmod = int(detname[5:7])
-    return nmod
+    nmod = detname[5:7]
+    return int(nmod)
 
 def get_detname(root_folder):
     return root_folder.split("/")[-1]
