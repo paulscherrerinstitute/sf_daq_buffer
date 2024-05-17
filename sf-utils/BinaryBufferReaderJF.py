@@ -49,8 +49,8 @@ def main():
     parser = ArgumentParser(description="Read DAQ Binary Buffer for JFs")
 
     parser.add_argument("detector", help="detector name (JF01...)")
-    parser.add_argument("--n_modules", type=int, help="number of modules to read from this device")
-    parser.add_argument("--pulse_id", type=int, help="pulse ID to retrieve")
+    parser.add_argument("--n_modules", type=int, help="number of modules to read from this device (if not given, all modules are read)")
+    parser.add_argument("--pulse_id", type=int, help="pulse ID to retrieve (if not given, the last pulse ID is retrieved -- negative values count backwards from the last)")
     parser.add_argument("--log_level", default="WARNING", choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], help="log level")
 
     clargs = parser.parse_args()
