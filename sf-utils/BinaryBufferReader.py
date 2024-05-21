@@ -34,6 +34,7 @@ class BufferBinaryFormat(Structure):
         ("data",           c_byte * MODULE_N_BYTES)
     ]
 
+BUFFER_BINARY_NON_DATA = [n for n, _t in BufferBinaryFormat._fields_ if n != "data"]
 
 BUFFER_BINARY_SIZE = sizeof(BufferBinaryFormat)
 
@@ -74,6 +75,10 @@ class BinaryBufferReader:
                 input_data = input_file.read(n_bytes_to_read)
                 frame_buffer = BufferBinaryFormat.from_buffer_copy(input_data)
 
+            non_data = {n: getattr(frame_buffer, n) for n in BUFFER_BINARY_NON_DATA}
+            printable_non_data = ", ".join(f"{k}: {v}" for k, v in non_data.items())
+            _logger.debug(f"{output_prefix} {printable_non_data}")
+
             if frame_buffer.FORMAT_MARKER != BUFFER_FORMAT_MARKER:
                 _logger.warning(f"{output_prefix} no data in buffer: {frame_buffer.FORMAT_MARKER} != {BUFFER_FORMAT_MARKER}")
                 metadata["is_good_frame"] = False
@@ -98,9 +103,6 @@ class BinaryBufferReader:
                 "frame_index": frame_buffer.frame_index,
                 "daq_rec":     frame_buffer.daq_rec
             }
-
-            printable_current = ", ".join(f"{k}: {v}" for k, v in current.items())
-            _logger.debug(f"{output_prefix} {printable_current}")
 
             if not metadata_init:
                 metadata.update(current)
